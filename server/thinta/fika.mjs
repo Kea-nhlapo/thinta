@@ -153,7 +153,10 @@ export async function dispatchEvent({ graphJobId, kind, machineId, dispatch: sen
     rec.trace_('Schedule Checker', check.pass ? 'done' : 'fail', check.pass ? 'The new schedule passes every check' : `${review.reason}. Flagged for the teacher`);
     lateNotes(rec, next.jobs, school);
   }
-  next.summary = await summarise(deps, rec, next, school, { apiKey, translate, fetchImpl });
+  // A clock tick where nothing finished changes no facts, so the last summary stands (and costs no Gemini call).
+  const unchanged = kind === 'tick' && next.events.length === (current.events || []).length && current.summary?.en;
+  if (unchanged) rec.trace_('Notifier', 'done', 'Nothing new to tell the teacher');
+  else next.summary = await summarise(deps, rec, next, school, { apiKey, translate, fetchImpl });
   putDispatch(next);
   return { dispatch: next, corrections: rec.corrections, trace: rec.trace, reviews };
 }

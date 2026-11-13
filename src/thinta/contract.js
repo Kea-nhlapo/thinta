@@ -245,5 +245,5 @@ export const EXAMPLE_DISPATCH = {
     { rule: 'deadlines', pass: true, detail: 'Every item is ready before Fri 07:30' },
   ],
   events: [],
-  summary: { en: 'Phone packs are with 5 learners. The tactile prints will be ready on Thu at 14:34, before the lesson.', zu: '', ready: 2, late: 0 },
+  summary: { en: 'Phone packs and plain-language solutions are with 2 learners now. Tactile prints ready: 0 of 1; all 1 by Thu 14:34, before the Fri 08:00 lesson.', zu: '', ready: 2, late: 0 },
 };
