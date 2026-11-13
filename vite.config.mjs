@@ -3,6 +3,7 @@ import { signReconstructionMiddleware } from './server/sign-reconstruct.mjs';
 import { learnBridgeMiddleware } from './server/learnbridge-middleware.mjs';
 import { createLessonJobs } from './server/lesson-jobs.mjs';
 import { ngtSignsMiddleware } from './server/ngt-signs.mjs';
+import { thintaMiddleware } from './server/thinta.mjs';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'GEMINI_');
@@ -21,5 +22,8 @@ export default defineConfig(({ mode }) => {
   // Any sign from Nia's NGT dictionary, for /nia-sign.
   const ngtSigns = ngtSignsMiddleware(new URL('./public', import.meta.url).pathname);
   const ngtApi = { name: 'ngt-signs', configureServer(server) { server.middlewares.use(ngtSigns); }, configurePreviewServer(server) { server.middlewares.use(ngtSigns); } };
-  return { plugins: [signApi, learnBridgeApi, lessonApi, ngtApi], server: { hmr: false } };
+  // Thinta's agent team (/api/thinta/*), streamed.
+  const thinta = thintaMiddleware(() => ({ GEMINI_API_KEY: env.GEMINI_API_KEY || process.env.GEMINI_API_KEY, HF_TOKEN: loadEnv(mode, process.cwd(), 'HF_').HF_TOKEN || process.env.HF_TOKEN }));
+  const thintaApi = { name: 'thinta-api', configureServer(server) { server.middlewares.use(thinta); }, configurePreviewServer(server) { server.middlewares.use(thinta); } };
+  return { plugins: [signApi, learnBridgeApi, lessonApi, ngtApi, thintaApi], server: { hmr: false } };
 });

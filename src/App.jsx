@@ -8,6 +8,7 @@ const SignIntroduction = React.lazy(() => import('./SignConversation.jsx'));
 const SignCalibration = React.lazy(() => import('./SignCalibration.jsx'));
 const ProfilePage = React.lazy(() => import('./learnbridge/ProfilePage.jsx'));
 const ResultsPage = React.lazy(() => import('./learnbridge/ResultsPage.jsx'));
+const ThintaApp = React.lazy(() => import('./thinta/ThintaApp.jsx'));
 
 // The signed-in learner's large text and contrast settings, before anything is drawn.
 applyProfile();
@@ -38,6 +39,7 @@ function App() {
   if (window.location.pathname === '/sign-introduction') return <React.Suspense fallback={<p>Loading sign introduction…</p>}><SignIntroduction /></React.Suspense>;
   if (window.location.pathname === '/profile') return <React.Suspense fallback={<p>Loading settings…</p>}><ProfilePage /></React.Suspense>;
   if (window.location.pathname === '/results') return <React.Suspense fallback={<p>Loading results…</p>}><ResultsPage /></React.Suspense>;
+  if (window.location.pathname === '/thinta') return <React.Suspense fallback={<p>Loading Thinta…</p>}><ThintaApp /></React.Suspense>;
   if (window.location.pathname === '/sign-calibration') return <React.Suspense fallback={<p>Loading calibration…</p>}><SignCalibration /></React.Suspense>;
   const [language, setLanguage] = useState('English');
   const [signInOpen, setSignInOpen] = useState(false);
