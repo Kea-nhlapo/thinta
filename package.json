@@ -10,7 +10,8 @@
     "screenshot": "node screenshot.mjs",
     "screenshot:demo": "node qa-screenshots.mjs",
     "verify": "node verify.mjs",
-    "test:integration": "node --test src/lesson-integration/*.test.js"
+    "test:integration": "node --test src/lesson-integration/*.test.js",
+    "start": "node scripts/start.mjs"
   },
   "dependencies": {
     "@breezystack/lamejs": "^1.2.7",
@@ -20,11 +21,13 @@
     "@ricky0123/vad-web": "^0.0.29",
     "onnxruntime-web": "1.20.1",
     "pako": "^2.1.0",
+    "pg": "^8.23.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "three": "^0.156.1"
-  },
-  "devDependencies": {
+    "three": "^0.156.1",
     "vite": "^7.1.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
