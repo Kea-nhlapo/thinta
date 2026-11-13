@@ -65,8 +65,8 @@ function App() {
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-inner">
           <div className="hero-copy">
-            <h1 id="hero-title">Quality education<br/>for a brighter<br/>South Africa.</h1>
-            <p>Create, share and deliver engaging<br className="desktop-break"/> lesson plans for every classroom.</p>
+            <h1 id="hero-title">Quality education <br/>for a brighter <br/>South Africa.</h1>
+            <p>Create, share and deliver engaging <br className="desktop-break"/> lesson plans for every classroom.</p>
             <div className="hero-buttons"><button className="button button-primary" onClick={start}>Get started</button><button className="button button-outline" onClick={signIn}>I already have an account</button></div>
           </div>
           <img className="hero-illustration" src={`${assets}hero-educator.png`} alt="Educator holding a lesson plan and tablet" />
@@ -78,16 +78,16 @@ function App() {
       <section className="how-section" aria-labelledby="how-title">
         <div className="section-heading"><span className="spark-left" aria-hidden="true">⌁</span><h2 id="how-title">From a PDF to a lesson learners love.</h2><span className="spark-right" aria-hidden="true">⌁</span><p>Turn your existing materials into engaging, accessible lessons in just a few steps.</p></div>
         <div className="steps">
-          <article className="step-card"><span className="step-number">1</span><img src={`${assets}step-upload.png`} alt="PDF being uploaded"/><h3>Upload material</h3><p>Add a PDF, document, video<br/>or image from your device.</p></article>
+          <article className="step-card"><span className="step-number">1</span><img src={`${assets}step-upload.png`} alt="PDF being uploaded"/><h3>Upload material</h3><p>Add a PDF, document, video <br/>or image from your device.</p></article>
           <span className="step-arrow" aria-hidden="true">⇢</span>
-          <article className="step-card"><span className="step-number">2</span><img src={`${assets}step-review.png`} alt="Generated lesson preview"/><h3>Review the lesson</h3><p>We turn your content into<br/>a structured, interactive lesson.</p></article>
+          <article className="step-card"><span className="step-number">2</span><img src={`${assets}step-review.png`} alt="Generated lesson preview"/><h3>Review the lesson</h3><p>We turn your content into <br/>a structured, interactive lesson.</p></article>
           <span className="step-arrow" aria-hidden="true">⇢</span>
-          <article className="step-card"><span className="step-number">3</span><img src={`${assets}step-assign.png`} alt="Three learners"/><h3>Assign to your class</h3><p>Share with your learners<br/>and track their progress.</p></article>
+          <article className="step-card"><span className="step-number">3</span><img src={`${assets}step-assign.png`} alt="Three learners"/><h3>Assign to your class</h3><p>Share with your learners <br/>and track their progress.</p></article>
         </div>
       </section>
 
       <section className="dashboard-section" aria-labelledby="dashboard-title">
-        <div className="dashboard-copy"><h2 id="dashboard-title">Everything you need<br/>to keep lessons moving.</h2><p>Organise your materials, create engaging lessons, assign to classes, and see real progress, all in one simple workspace.</p>
+        <div className="dashboard-copy"><h2 id="dashboard-title">Everything you need <br/>to keep lessons moving.</h2><p>Organise your materials, create engaging lessons, assign to classes, and see real progress, all in one simple workspace.</p>
           <Feature icon="book" title="All your materials in one place">Upload PDFs, videos, images and more.</Feature>
           <Feature icon="lesson" title="Interactive, accessible lessons">Turn content into activities, quizzes and summaries.</Feature>
           <Feature icon="chart" title="Track learner progress">See completion, understanding and class insights.</Feature>
@@ -97,7 +97,7 @@ function App() {
 
       <section className="accessibility-section" aria-labelledby="access-title">
         <img className="access-preview" src={`${assets}accessibility-preview.png`} alt="Lesson question with text, audio and sign-language explanation options" />
-        <div className="access-copy"><h2 id="access-title">One lesson.<br/>More ways to<br/>understand.</h2><p>Read it, hear it, or watch the explanation in sign language.</p>
+        <div className="access-copy"><h2 id="access-title">One lesson. <br/>More ways to <br/>understand.</h2><p>Read it, hear it, or watch the explanation in sign language.</p>
           <Feature icon="document" title="Read">Clear, simple explanations.</Feature>
           <Feature icon="volume" title="Listen">Hear the question and explanation.</Feature>
           <Feature icon="hand" title="Watch">See the explanation in sign language.</Feature>
@@ -105,11 +105,11 @@ function App() {
       </section>
 
       <section className="progress-section" aria-labelledby="progress-title">
-        <div className="progress-copy"><h2 id="progress-title">Every step feels<br/>like progress.</h2><p>Short, focused lessons help you<br/>build your skills with confidence.</p></div>
+        <div className="progress-copy"><h2 id="progress-title">Every step feels <br/>like progress.</h2><p>Short, focused lessons help you <br/>build your skills with confidence.</p></div>
         <img src={`${assets}progress-preview.png`} alt="Water Cycle lesson path alongside correct and incorrect feedback"/>
       </section>
 
-      <section className="benefits-section" aria-labelledby="benefits-title"><h2 id="benefits-title">Built for the whole learning journey.</h2><div className="benefit-grid"><Benefit icon="book" title="Plan with confidence">Turn your existing materials<br/>into clear, structured lessons.</Benefit><Benefit icon="play" title="Learn at your own pace">Short, focused lessons that<br/>fit your time and goals.</Benefit><Benefit icon="bulb" title="Understand every answer">Clear explanations help<br/>you learn and remember.</Benefit></div></section>
+      <section className="benefits-section" aria-labelledby="benefits-title"><h2 id="benefits-title">Built for the whole learning journey.</h2><div className="benefit-grid"><Benefit icon="book" title="Plan with confidence">Turn your existing materials <br/>into clear, structured lessons.</Benefit><Benefit icon="play" title="Learn at your own pace">Short, focused lessons that <br/>fit your time and goals.</Benefit><Benefit icon="bulb" title="Understand every answer">Clear explanations help <br/>you learn and remember.</Benefit></div></section>
 
       <section className="faq-section" aria-labelledby="faq-title"><h2 id="faq-title">Frequently asked questions</h2><div className="faq-list">{faqs.map(([question, answer], index) => <div className="faq-row" key={question}><button aria-expanded={openFaq === index} onClick={() => setOpenFaq(openFaq === index ? null : index)}><span>{question}</span><span className={`chevron ${openFaq === index ? 'open' : ''}`} aria-hidden="true">⌄</span></button>{openFaq === index && <p>{answer}</p>}</div>)}</div></section>
 
