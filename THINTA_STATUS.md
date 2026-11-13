@@ -87,7 +87,11 @@ _not started_
 - Blocked on: nothing. Interface changes requested: none (`explain` takes no `speak`; audio is the separate `speakDescription`).
 
 ## E. Phone UI & Trace
-_not started_
+- Done: `/thinta` phone UI (`src/thinta/ThintaApp.jsx`, `thinta.css`, `ui/`, `replay/`). Snap screen (Take a photo with `capture="environment"`, Choose a picture, canvas downscale to 1600 px JPEG 0.85 with retry under the 3.5 MB limit, preview, optional equation, collapsible questions defaulting to `DEFAULT_QUESTIONS`). Live trace: incremental NDJSON reader, pipeline chips (icon + word for waiting/working/done/retry/failed/not run), `aria-live` log, corrections as `<del>` → `<ins>` with agent and reason, reviews with pass/fail and "3/5 → 5/5" or score/total and attempt. Non-200 JSON (e.g. the 501 without a key) and mid-stream drops show the error plus "Replay a recorded run". Result tabs: Blind (C's `TouchGraph` via guarded `import.meta.glob`, key points, EN + isiZulu description with Read aloud: POST `/api/speak` per ≤400-char chunk, `speechSynthesis` fallback, device voice only in replay; tactile preview as `<img>` data URL, SVG + PDF (B's `svgToPdf`, guarded) downloads only after approval). Deaf (large steps with "Picture:" visual, key terms as spaced letters, SASL reviewer note; `src/fingerspelling.js` is an ASL classifier, not a display, so not reused). Teacher (check summary, reviews, corrections, rule checks, calls/ms, Approve → `/api/thinta/approve`, "Approved by … at …", full trace). Replay: sticky "REPLAY · a saved run, not live" banner, plays `replay/recorded-*.json` if present else the contract example (labelled as example), original timing sped ×4 and capped, zero network calls (approval stays local). Focus moves to results when done. Tests: `node --test src/thinta/ui/*.test.js` (10 pass).
+- Verified in the built-in browser at 375 px: live flow against a stub stream (lines split across chunks), correction/review rendering, all three tabs, approve + downloads, 501 and dropped-stream errors, replay from the error box with no network calls, Read aloud start/stop, no text under 16 px, no console errors. `npm run build` passes.
+- Doing: nothing; available for polish.
+- Blocked on: nothing.
+- Interface notes: replay loader accepts a GraphJob, an array of events, or `{events:[{t, event}]}` in `src/thinta/replay/recorded-parabola.json` (F/orchestrator to drop it in). TouchGraph is used as `<TouchGraph job={job}/>` (default export). PDF: `svgToPdf(svg)` may return Blob, bytes or a URL string.
 
 ## F. QA & Demo
 _not started_
