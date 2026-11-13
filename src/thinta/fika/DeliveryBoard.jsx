@@ -147,9 +147,9 @@ export default function DeliveryBoard({ job, replay = false }) {
 
   return <div className="fk-board">
     <h3>Delivery</h3>
-    <p className="th-notice fk-honest"><span aria-hidden="true">ⓘ </span>Machine capacities are demo values. Fika does not control real printers yet; it makes the schedule and the print files.</p>
-    {replay && <p className="th-notice th-replay-note"><span aria-hidden="true">⟲ </span>Replay: {source?.label || 'loading the recorded delivery run…'}.</p>}
-    {d?.clock && <p className="fk-clock"><span aria-hidden="true">🕐 </span>Demo clock: <b>{formatEta(d.clock)}</b></p>}
+    {/* One short line of honesty instead of stacked notices, so the board is the first thing on screen. */}
+    <p className="fk-context"><span aria-hidden="true">ⓘ </span>Demo school and machines. Fika makes the schedule and the print files; it does not drive real printers yet.
+      {replay && <> <b><span aria-hidden="true">⟲ </span>Replay:</b> {source?.label || 'loading…'}.</>}</p>
     <p className="th-sr" role="status" aria-live="polite">{announcement}</p>
 
     {state.status !== 'done' && <section aria-labelledby="fk-progress">
@@ -161,7 +161,7 @@ export default function DeliveryBoard({ job, replay = false }) {
     </section>}
 
     {ready && late.length > 0 && <HonestFailure dispatch={d} late={late} school={school} />}
-    {ready && <Summary summary={d.summary} />}
+    {ready && <Summary summary={d.summary} clock={d.clock && formatEta(d.clock)} />}
 
     {ready && <section aria-labelledby="fk-learners">
       <h4 id="fk-learners">Each learner's items</h4>
@@ -179,30 +179,35 @@ export default function DeliveryBoard({ job, replay = false }) {
     {ready && <Checker checks={d.checks || []} reviews={state.reviews} />}
     {ready && <Machines school={school} dispatch={d} />}
 
-    <section aria-labelledby="fk-trace">
+    {/* Example data has no agent trace; only show the agents when there is something they did. */}
+    {(state.log.length > 0 || state.status !== 'done') && <section aria-labelledby="fk-trace">
       <h4 id="fk-trace">What Fika's agents did</h4>
       <FikaChips log={state.log} status={state.status} />
-      <TraceLog log={readableLog(state.log, formatEta, Object.fromEntries(school.machines.map(m => [m.id, m.name])))} live />
-    </section>
+      {state.log.length > 0 && <details className="th-details"><summary>Every step ({state.log.filter(i => i.kind === 'trace').length})</summary>
+        <TraceLog log={readableLog(state.log, formatEta, Object.fromEntries(school.machines.map(m => [m.id, m.name])))} />
+      </details>}
+    </section>}
   </div>;
 }
 
 function Item({ item, machine, correction }) {
   const [icon, word] = statusLabel(item.status);
   const phone = !item.machineId && item.pages === 0;
+  // Name, then one row of status + time; printed items add where and by when. Phone items need nothing more.
   return <li className={`fk-item fk-item-${item.status}`}>
     <p className="fk-item-name"><b>{itemLabel(item.item)}</b></p>
-    <span className={`fk-status fk-status-${item.status}`}><span aria-hidden="true">{icon} </span>{word}</span>
-    <p className="fk-machine">{machine ? <>On the {machine.name}</> : phone ? 'Sent to the phone, no machine needed' : item.machineId ? `On ${item.machineId}` : item.status === 'late' ? 'No machine available' : 'No machine yet'}</p>
-    {correction
-      ? <p className="fk-eta th-correction">
-          <b>{item.status === 'delivered' ? 'Delivered' : 'ETA'}</b>{' '}
-          <span className="th-sr">was</span> <del>{formatEta(correction.before)}</del>{' '}
-          <span aria-hidden="true">→</span> <span className="th-sr">now</span> <ins>{correction.after ? formatEta(correction.after) : 'no time yet'}</ins>
-          {correction.reason && <span className="th-reason">Why: {correction.reason}</span>}
-        </p>
-      : item.eta && <p className="fk-eta"><b>{item.status === 'delivered' ? 'Delivered' : 'ETA'}</b> {formatEta(item.eta)}</p>}
-    {item.status !== 'delivered' && item.deadline && <p className="fk-deadline">Needed by {formatEta(item.deadline)}</p>}
+    <div className="fk-item-row">
+      <span className={`fk-status fk-status-${item.status}`}><span aria-hidden="true">{icon} </span>{word}</span>
+      {correction
+        ? <span className="fk-eta th-correction">
+            <span className="th-sr">{item.status === 'delivered' ? 'Delivered' : 'Ready'} was</span> <del>{formatEta(correction.before)}</del>{' '}
+            <span aria-hidden="true">→</span> <span className="th-sr">now</span> <ins>{correction.after ? formatEta(correction.after) : 'no time yet'}</ins>
+          </span>
+        : item.eta && <span className="fk-eta">{item.status === 'delivered' || item.status === 'ready' ? '' : 'ready '}{formatEta(item.eta)}</span>}
+    </div>
+    {!phone && <p className="fk-machine">{machine ? <>On the {machine.name}</> : item.machineId ? `On ${item.machineId}` : item.status === 'late' ? 'No machine available' : 'No machine yet'}{item.status !== 'delivered' && item.deadline ? ` · needed by ${formatEta(item.deadline)}` : ''}</p>}
+    {/* The cause only ("The braille embosser went offline"): the times are already struck through above. */}
+    {correction?.reason && <p className="th-reason">Why: {correction.reason.split(':')[0]}</p>}
     {item.status === 'late' && item.lateReason && <p className="fk-late-reason"><span aria-hidden="true">⚠ </span>Late: {item.lateReason}</p>}
   </li>;
 }
@@ -220,13 +225,16 @@ function HonestFailure({ dispatch, late, school }) {
   </section>;
 }
 
-function Summary({ summary }) {
+function Summary({ summary, clock }) {
   const [lang, setLang] = useState('en');
   if (!summary) return null;
   const hasZu = Boolean(summary.zu);
   const shown = lang === 'zu' && hasZu ? 'zu' : 'en';
   return <section className="fk-summary" aria-labelledby="fk-summary-title">
-    <h4 id="fk-summary-title">For the teacher</h4>
+    <div className="fk-summary-head">
+      <h4 id="fk-summary-title">For the teacher</h4>
+      {clock && <span className="fk-clock"><span aria-hidden="true">🕐 </span>Demo clock <b>{clock}</b></span>}
+    </div>
     <ul className="fk-counts">
       <li><span aria-hidden="true">✓ </span><b>{summary.ready ?? 0}</b> ready</li>
       <li><span aria-hidden="true">⚠ </span><b>{summary.late ?? 0}</b> late</li>
@@ -244,28 +252,33 @@ const ruleName = rule => RULE_NAMES[rule] || String(rule || 'Check').replace(/-/
 
 function Checker({ checks, reviews }) {
   const failed = checks.filter(c => !c.pass);
-  return <section className="fk-checker" aria-labelledby="fk-checker-title">
-    <h4 id="fk-checker-title">Schedule Checker</h4>
-    <p><b>{checks.length - failed.length} of {checks.length}</b> checks passed{failed.length ? `, ${failed.length} failed` : ''}.</p>
-    <ul className="th-plain">{checks.map((c, i) => <li key={i}>
-      <p className={`th-review ${c.pass ? 'th-pass' : 'th-fail'}`}><b><span aria-hidden="true">{c.pass ? '✓ ' : '✕ '}</span>{c.pass ? 'Passed' : 'Failed'}: {ruleName(c.rule)}</b><span className="th-reason">{c.detail}</span></p>
-    </li>)}</ul>
-    {failed.length > 0 && <><h5>Problems</h5><ul>{failed.map((c, i) => <li key={i}>{c.detail}</li>)}</ul></>}
-    {reviews.length > 0 && <><h5>Checker reviews</h5><ul className="th-plain">{reviews.map((r, i) => <li key={i}><Review item={r} /></li>)}</ul></>}
+  return <section className={`fk-checker ${failed.length ? 'fk-checker-fail' : 'fk-checker-pass'}`} aria-labelledby="fk-checker-title">
+    <h4 id="fk-checker-title"><span aria-hidden="true">{failed.length ? '✕ ' : '✓ '}</span>Schedule Checker: {checks.length - failed.length} of {checks.length} checks pass</h4>
+    <p className="fk-muted">Capacity, deadlines, no machine double-booked, no job on an offline machine, every learner covered.</p>
+    {failed.length > 0 && <ul>{failed.map((c, i) => <li key={i}><b>{ruleName(c.rule)}:</b> {c.detail}</li>)}</ul>}
+    <details className="th-details"><summary>Every check{reviews.length ? ' and review' : ''}</summary>
+      <ul className="th-plain">{checks.map((c, i) => <li key={i}>
+        <p className={`th-review ${c.pass ? 'th-pass' : 'th-fail'}`}><b><span aria-hidden="true">{c.pass ? '✓ ' : '✕ '}</span>{c.pass ? 'Passed' : 'Failed'}: {ruleName(c.rule)}</b><span className="th-reason">{c.detail}</span></p>
+      </li>)}</ul>
+      {reviews.length > 0 && <ul className="th-plain fk-reviews">{reviews.map((r, i) => <li key={i}><Review item={r} /></li>)}</ul>}
+    </details>
   </section>;
 }
 
 function Machines({ school, dispatch }) {
+  // Status stays in view (it is what the demo changes); capacities are one tap away.
   return <section aria-labelledby="fk-machines">
-    <h4 id="fk-machines">Machines <small>(demo values)</small></h4>
+    <h4 id="fk-machines">Machines</h4>
     <ul className="fk-machines">{school.machines.map(m => {
       const online = machineOnline(dispatch, m.id, school);
       return <li key={m.id}>
-        <b>{m.name}</b>{' '}
+        <b>{m.name}</b>
         <span className={`fk-status ${online ? 'fk-online' : 'fk-offline'}`}><span aria-hidden="true">{online ? '● ' : '○ '}</span>{online ? 'Online' : 'Offline'}</span>
-        <span className="fk-muted">{m.pagesPerHour} pages per hour (demo value){m.queue?.length ? `, ${m.queue.reduce((n, q) => n + q.pages, 0)} pages of other classes' work already waiting` : ''}</span>
       </li>;
     })}</ul>
+    <details className="th-details"><summary>Capacities (demo values)</summary>
+      <ul className="fk-capacities">{school.machines.map(m => <li key={m.id}><b>{m.name}:</b> {m.pagesPerHour} pages an hour{m.queue?.length ? `, ${m.queue.reduce((n, q) => n + q.pages, 0)} pages of other classes' work waiting` : ''}</li>)}</ul>
+    </details>
   </section>;
 }
 
@@ -297,16 +310,13 @@ function DemoControls({ school, dispatch, replay, busy, onEvent, actions, onPlay
 
 function FikaChips({ log, status }) {
   const states = fikaAgentStates(log, status);
-  return <ol className="th-pipeline" aria-label="Fika's agents">
-    {FIKA_AGENTS.map((agent, i) => {
+  return <ol className="th-pipeline th-pipeline-grid" aria-label="Fika's agents, in order">
+    {FIKA_AGENTS.map(agent => {
       const [icon, label] = STATE_LABELS[states[agent]];
-      return <li key={agent} className="th-stage">
-        <span className={`th-chip th-chip-${states[agent]}`}>
-          <span className="th-chip-icon" aria-hidden="true">{icon}</span>
-          <span className="th-chip-name">{agent}</span>
-          <span className="th-chip-state">{label}</span>
-        </span>
-        {i < FIKA_AGENTS.length - 1 && <span className="th-arrow" aria-hidden="true">→</span>}
+      return <li key={agent} className={`th-chip th-chip-${states[agent]}`}>
+        <span className="th-chip-icon" aria-hidden="true">{icon}</span>
+        <span className="th-chip-name">{agent}</span>
+        <span className="th-chip-state">{label}</span>
       </li>;
     })}
   </ol>;

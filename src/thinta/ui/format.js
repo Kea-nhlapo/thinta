@@ -26,7 +26,7 @@ export function formatValue(value) {
   if (typeof value === 'string') return prettyMaths(value);
   if (isPoint(value)) return formatPoint(value);
   if (Array.isArray(value)) return value.map(formatValue).join(', ');
-  if (typeof value === 'object') return Object.entries(value).map(([k, v]) => `${k} ${formatValue(v)}`).join('; ');
+  if (typeof value === 'object') return Object.entries(value).map(([k, v]) => `${fieldLabel(k)} ${formatValue(v)}`).join('; ');
   return String(value);
 }
 

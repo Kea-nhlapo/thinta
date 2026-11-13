@@ -51,7 +51,8 @@ export function agentStates(job, status = 'running') {
   for (const agent of PIPELINE_AGENTS) {
     const filled = (AGENT_FIELDS[agent] || []).some(field => hasOutput(job?.[field]));
     if (states[agent] === 'waiting' && filled) states[agent] = 'done';
-    if (agent === 'Reviewer' && states[agent] === 'waiting' && job?.reviews?.length) states[agent] = 'done';
+    // Only the Reviewer's own trace lights its chip: the Prover's early reader check is not the review stage.
+    if (agent === 'Reviewer' && states[agent] === 'waiting' && job?.reviews?.length && !job?.trace?.length) states[agent] = 'done';
     if (status === 'done' && (states[agent] === 'waiting' || states[agent] === 'working')) states[agent] = states[agent] === 'working' ? 'done' : 'skipped';
     if (status === 'error' && states[agent] === 'working') states[agent] = 'failed';
   }

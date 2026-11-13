@@ -2,10 +2,10 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import Brand from '../Brand.jsx';
 import { DEFAULT_QUESTIONS, emptyJob } from './contract.js';
-import { initialRun, applyEvent, timelineFromRecording, replayDelays } from './ui/job.js';
+import { initialRun, applyEvent, timelineFromRecording, replayDelays, agentStates } from './ui/job.js';
 import { readNdjson } from './ui/stream.js';
 import { downscaleImage } from './ui/image.js';
-import { PipelineChips, TraceLog } from './ui/Trace.jsx';
+import { PipelineChips, TraceLog, LatestStep, Highlights } from './ui/Trace.jsx';
 import Results from './ui/Results.jsx';
 import { loadReplay } from './replay/index.js';
 import './thinta.css';
@@ -116,10 +116,11 @@ export default function ThintaApp() {
 
   return <div className="thinta">
     {isReplay && started && <p className="th-badge" role="status"><span aria-hidden="true">⟲ </span><b>Replay</b> · a saved run, not live</p>}
-    <header className="th-header">
+    {/* Once a run starts the header shrinks to one line, so the phone shows the team's work, not the title. */}
+    <header className={`th-header${started ? ' th-header-compact' : ''}`}>
       <Brand href="/" />
       <h1>Thinta <span>touch the maths</span></h1>
-      <p>Photograph a graph. A team of agents builds a checked version for blind and Deaf learners.</p>
+      {!started && <p>Photograph a graph. A team of agents builds a checked version for blind and Deaf learners.</p>}
     </header>
 
     <main>
@@ -165,10 +166,14 @@ export default function ThintaApp() {
       {started && <section className="th-card" aria-labelledby="th-trace">
         <h2 id="th-trace" ref={traceHeading} tabIndex={-1}>2. Watch the team work</h2>
         {isReplay && <p className="th-notice th-replay-note"><span aria-hidden="true">⟲ </span>Replay: {replayInfo?.label || (source === 'replay' ? 'loading the recorded run…' : 'the server sent saved example data, not a live run')}.</p>}
-        <p className="th-status" role="status">{statusText(run.status)}</p>
-        <PipelineChips job={run.job} status={run.status} />
-        <h3>What each agent did</h3>
-        <TraceLog log={run.log} live />
+        <p className="th-status" role={run.status === 'running' ? undefined : 'status'}>{statusText(run.status)}</p>
+        {run.status === 'done' ? <TeamFinished job={run.job} /> : <PipelineChips job={run.job} status={run.status} />}
+        {run.status === 'running' && <LatestStep log={run.log} />}
+        <Highlights job={run.job} />
+        {run.log.length > 0 && <details className="th-details th-all-steps">
+          <summary>Every step the team took ({run.log.filter(item => item.kind === 'trace').length})</summary>
+          <TraceLog log={run.log} />
+        </details>}
         {run.status === 'error' && <div className="th-error-box" role="alert">
           <p><b>Thinta stopped:</b> {run.error}</p>
           <button type="button" className="th-button" onClick={() => { setReplayMode(true); startReplay(); }}>Replay a recorded run</button>
@@ -183,6 +188,14 @@ export default function ThintaApp() {
       </section>}
     </main>
   </div>;
+}
+
+// After the run, the chips fold into one line; the headlines below carry the story.
+function TeamFinished({ job }) {
+  const states = Object.values(agentStates(job, 'done'));
+  const done = states.filter(s => s === 'done').length;
+  const facts = [Number.isFinite(job.ms) && `${Math.round(job.ms / 1000)} s`, Number.isFinite(job.calls) && `${job.calls} agent calls`].filter(Boolean).join(', ');
+  return <p className="th-finished"><span aria-hidden="true">✓ </span>{done === states.length ? `All ${done} agents finished` : `${done} of ${states.length} agents finished`}{facts ? ` in ${facts}` : ''}.</p>;
 }
 
 // Browser network failures say "Failed to fetch" or "network error"; say what happened instead.

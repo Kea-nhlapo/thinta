@@ -114,7 +114,78 @@
 .th-summary { padding-left: 20px; }
 .th-approve { display: grid; gap: 10px; }
 .th-approve p { margin: 0; }
+.th-approve label { display: grid; gap: 6px; font-weight: 800; }
+.th-approve input { font: inherit; font-weight: 400; padding: 12px; border: 1.5px solid #b8cbe0; border-radius: 10px; width: 100%; color: var(--ink); background: #fff; }
 .th-approved { background: var(--ok-bg); border: 2px solid var(--ok); border-radius: 12px; padding: 12px; font-weight: 900; color: var(--ok); }
+
+/* Pipeline as a compact grid: two agents a row, each on one line. */
+.th-pipeline-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.th-pipeline-grid .th-chip { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; padding: 5px 10px; min-width: 0; }
+.th-pipeline-grid .th-chip-icon { grid-row: span 2; font-size: 20px; }
+.th-pipeline-grid .th-chip-name { line-height: 1.2; overflow-wrap: anywhere; }
+.th-pipeline-grid .th-chip-state { font-size: 16px; line-height: 1.2; }
+.th-pipeline-grid .th-chip:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.th-replay-note { padding: 6px 10px; font-size: 16px; }
+
+/* Compact header once a run starts: logo and name on one short line. */
+.th-header-compact { display: flex; align-items: center; gap: 12px; padding: 10px 0 6px; }
+.th-header-compact .brand { font-size: 18px; }
+.th-header-compact .brand svg { width: 28px; height: 28px; }
+.th-header-compact h1 { font-size: 24px; margin: 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.th-header-compact h1 span { display: none; }
+
+/* "Now": the latest step while the team works. */
+.th-latest { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0 4px; padding: 10px 12px; border-radius: 12px; background: var(--pale); border: 2px solid var(--blue); }
+.th-latest p { margin: 0; }
+.th-latest-tag { flex: none; font-weight: 900; font-size: 16px; color: #fff; background: var(--blue-dark); border-radius: 999px; padding: 1px 10px; margin-top: 2px; }
+.th-all-steps { margin-top: 14px; }
+.th-all-steps .th-log { margin-top: 8px; }
+
+/* What the team caught: the self-corrections first, each with its before and after. Tone shows by tag word and border style. */
+.th-highlights h3 { margin-top: 18px; }
+.th-hl-count { margin: 0 0 10px; font-weight: 800; color: var(--muted); }
+.th-highlights ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.th-hl { border-radius: 14px; padding: 12px 14px; background: #fff; border: 2px solid var(--line); display: grid; gap: 4px; }
+.th-hl p { margin: 0; }
+.th-hl-tag { justify-self: start; font-size: 16px; font-weight: 900; border-radius: 999px; padding: 1px 10px; border: 2px solid currentColor; }
+.th-hl-title { font-size: 20px; font-weight: 900; line-height: 1.25; }
+.th-hl-change { font-size: 20px; font-weight: 800; }
+.th-hl-change del { color: var(--bad); text-decoration-thickness: 2px; }
+.th-hl-change ins { color: var(--ok); text-decoration: none; font-weight: 900; border-bottom: 3px solid var(--ok); }
+.th-hl-what { color: var(--muted); }
+.th-hl-detail { color: var(--muted); }
+.th-hl-fixed { border-color: #f2c879; background: var(--warn-bg); border-left-width: 8px; }
+.th-hl-fixed .th-hl-tag { color: var(--warn); }
+.th-hl-open { border-color: var(--bad); background: var(--bad-bg); border-width: 3px; border-style: dashed; }
+.th-hl-open .th-hl-tag { color: var(--bad); }
+.th-hl-pass { border-color: #b7e4c7; }
+.th-hl-pass .th-hl-tag { color: var(--ok); }
+.th-moves summary { cursor: pointer; min-height: 32px; }
+.th-moves .th-plain { margin-top: 8px; }
+
+/* Teacher tab: where each check ended. */
+.th-verdict { font-size: 20px; font-weight: 900; margin: 0 0 10px; }
+.th-outcomes { list-style: none; padding: 0; margin: 0 0 10px; display: grid; gap: 8px; }
+.th-outcome { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; border: 2px solid var(--line); background: #fff; }
+.th-outcome-tag { justify-self: start; font-size: 16px; font-weight: 900; }
+.th-outcome-passed .th-outcome-tag { color: var(--ok); }
+.th-outcome-fixed { border-left: 8px solid #f2c879; }
+.th-outcome-fixed .th-outcome-tag { color: var(--warn); }
+.th-outcome-open { border: 3px dashed var(--bad); background: var(--bad-bg); }
+.th-outcome-open .th-outcome-tag { color: var(--bad); }
+.th-outcome-text { color: var(--muted); }
+
+/* Deaf steps: a drawn picture for each step. */
+.th-pic { margin: 8px 0 6px; }
+.th-pic svg { width: 100%; height: auto; display: block; background: #fff; border: 1.5px solid var(--line); border-radius: 12px; }
+.th-pic-axis { stroke: #8293b3; stroke-width: 1.5; }
+.th-pic-axis-name { font: 700 16px Nunito, sans-serif; fill: var(--muted); }
+.th-pic-curve { fill: none; stroke: var(--ink); stroke-width: 3.5; stroke-linejoin: round; }
+.th-pic-curve-quiet { stroke: #9aa8c2; stroke-width: 3; }
+.th-pic-region { fill: none; stroke: var(--warn); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 2 7; }
+.th-pic-point { fill: var(--blue-dark); stroke: #fff; stroke-width: 2.5; }
+.th-pic-label { font: 900 16px Nunito, sans-serif; fill: var(--blue-dark); paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
+.th-pic-region-label { fill: var(--warn); }
 
 @media (min-width: 700px) {
   .th-photo-buttons { grid-template-columns: 1fr 1fr; }
@@ -123,3 +194,4 @@
 @media (prefers-reduced-motion: reduce) {
   .th-chip-working { animation: none; }
 }
+.th-finished { margin: 0 0 6px; padding: 8px 12px; border-radius: 12px; background: var(--ok-bg); border: 2px solid var(--ok); color: var(--ok); font-weight: 900; }

@@ -1,6 +1,8 @@
 // Result tabs for the checked pack: Blind, Deaf and Teacher. Nothing is downloadable before approval.
 import React, { useEffect, useRef, useState } from 'react';
-import { TraceLog, Correction, Review } from './Trace.jsx';
+import { TraceLog, Review } from './Trace.jsx';
+import { checkOutcomes, outcomeSummary } from './highlights.js';
+import StepPicture from './StepPicture.jsx';
 import { formatPoint, formatValue, prettyMaths } from './format.js';
 import { readAloud } from './speech.js';
 
@@ -154,7 +156,8 @@ function DeafTab({ job }) {
     {solution?.steps?.length ? <ol className="th-steps">
       {solution.steps.map((step, i) => <li key={i}>
         <p className="th-step-text">{prettyMaths(step.text)}</p>
-        {step.visual && <p className="th-step-visual"><span aria-hidden="true">👁 </span><b>Picture:</b> {prettyMaths(step.visual)}</p>}
+        <StepPicture step={step} proof={job.proof} />
+        {step.visual && <p className="th-step-visual"><span aria-hidden="true">👁 </span><b>Look:</b> {prettyMaths(step.visual)}</p>}
       </li>)}
     </ol> : <NotReady>No Deaf solution in this pack.</NotReady>}
     {solution?.keyTerms?.length > 0 && <>
@@ -172,33 +175,64 @@ function DeafTab({ job }) {
   </>;
 }
 
+const RULE_NAMES = {
+  'label-gap': 'Labels at least 3.2 mm from the curve', 'stroke-hierarchy': 'Curve thicker than the axes', 'label-overlap': 'No labels overlap',
+  'label-in-page': 'Every label fits on the page', 'label-axis-gap': 'Labels clear of the axes', 'label-near-own-point': 'Each label beside its own point',
+};
+const ruleName = rule => RULE_NAMES[rule] || String(rule).replace(/-/g, ' ');
+const OUTCOME = { passed: ['✓', 'Passed'], fixed: ['↻', 'Fixed by the team'], open: ['⚠', 'Needs you'] };
+
+// How a check ended, in words: "Passed after 1 rewrite (0/5 → 5/5)".
+function outcomeText(o) {
+  if (o.check === 'reader-vs-prover') return o.status === 'passed' ? 'The photo and the algebra agree' : 'The algebra overruled the photo';
+  const scores = o.firstScore && o.finalScore && o.firstScore !== o.finalScore ? ` (${o.firstScore} → ${o.finalScore})` : o.finalScore ? ` (${o.finalScore})` : '';
+  const fixes = o.tries - 1;
+  if (o.status === 'passed') return `Passed first time${scores}`;
+  if (o.status === 'fixed') return `Passed after ${fixes} ${o.check === 'fresh-eyes' ? 'fix' : 'rewrite'}${fixes === 1 ? '' : 's'}${scores}`;
+  const problem = o.final.meaning?.problems?.[0];
+  return `${problem ? `This sentence disagrees with the proof: “${prettyMaths(problem.sentence).replace(/\.$/, '')}”` : prettyMaths(o.final.reason || 'Still failing')}. Escalated after ${fixes} ${o.check === 'fresh-eyes' ? 'fix' : 'rewrite'}${fixes === 1 ? '' : 's'}.`;
+}
+
 function TeacherTab({ job, log, replay, onApprove, approving, approveError }) {
   const [name, setName] = useState('Teacher');
   const reviews = job.reviews || [], corrections = job.corrections || [];
-  const passed = reviews.filter(r => r.pass).length;
+  const outcomes = checkOutcomes(job);
+  const totals = outcomeSummary(outcomes);
+  const rules = job.tactile?.ruleChecks || [];
   const approval = job.approval || {};
   return <>
-    <h3>Checks</h3>
-    <ul className="th-summary">
-      <li><b>{passed} of {reviews.length}</b> checks passed{reviews.length > passed ? ` (${reviews.length - passed} failed, then corrected or escalated)` : ''}</li>
-      <li><b>{corrections.length}</b> correction{corrections.length === 1 ? '' : 's'} made by the team</li>
-      {Number.isFinite(job.calls) && <li><b>{job.calls}</b> agent calls{Number.isFinite(job.ms) ? ` in ${(job.ms / 1000).toFixed(1)} s` : ''}</li>}
+    <h3>Where every check ended</h3>
+    <p className="th-verdict">{[totals.passed && `${totals.passed} passed`, totals.fixed && `${totals.fixed} fixed by the team`, totals.open && `${totals.open} need${totals.open === 1 ? 's' : ''} you`].filter(Boolean).join(' · ')}</p>
+    <ul className="th-outcomes">
+      {outcomes.map(o => <li key={o.check} className={`th-outcome th-outcome-${o.status}`}>
+        <span className="th-outcome-tag"><span aria-hidden="true">{OUTCOME[o.status][0]} </span>{OUTCOME[o.status][1]}</span>
+        <b>{o.name}</b>
+        <span className="th-outcome-text">{outcomeText(o)}</span>
+      </li>)}
+      {rules.length > 0 && <li className={`th-outcome th-outcome-${rules.every(r => r.pass) ? 'passed' : 'open'}`}>
+        <span className="th-outcome-tag"><span aria-hidden="true">{rules.every(r => r.pass) ? '✓ ' : '⚠ '}</span>{rules.every(r => r.pass) ? 'Passed' : 'Needs you'}</span>
+        <b>Tactile print rules</b>
+        <span className="th-outcome-text">{rules.filter(r => r.pass).length} of {rules.length} rules pass</span>
+      </li>}
     </ul>
-    {reviews.length > 0 && <><h4>Reviews</h4><ul className="th-plain">{reviews.map((r, i) => <li key={i}><Review item={r} /></li>)}</ul></>}
-    {corrections.length > 0 && <><h4>Corrections</h4><ul className="th-plain">{corrections.map((c, i) => <li key={i}><Correction item={c} /></li>)}</ul></>}
-    {job.tactile?.ruleChecks?.length > 0 && <><h4>Tactile rules</h4><ul className="th-plain">{job.tactile.ruleChecks.map((c, i) => <li key={i}><p className={`th-review ${c.pass ? 'th-pass' : 'th-fail'}`}><b><span aria-hidden="true">{c.pass ? '✓ ' : '✕ '}</span>{c.pass ? 'Passed' : 'Failed'}: {c.rule}</b><span className="th-reason">{c.detail}</span></p></li>)}</ul></>}
+    {Number.isFinite(job.calls) && <p className="th-muted">{corrections.length} correction{corrections.length === 1 ? '' : 's'} by the team, {job.calls} agent calls{Number.isFinite(job.ms) ? ` in ${(job.ms / 1000).toFixed(0)} s` : ''}.</p>}
+
     <h3>Approve the pack</h3>
     {approval.approved
-      ? <p className="th-approved" role="status"><span aria-hidden="true">✓ </span>Approved by {approval.by || 'Teacher'} at {new Date(approval.at || Date.now()).toLocaleString('en-ZA')}{replay ? ' (replay: saved on this phone only)' : ''}.</p>
+      ? <p className="th-approved" role="status"><span aria-hidden="true">✓ </span>Approved by {approval.by || 'Teacher'} at {new Date(approval.at || Date.now()).toLocaleString('en-ZA')}{replay ? ' (replay: saved on this phone only)' : ''}. The Delivery tab is open.</p>
       : <form className="th-approve" onSubmit={event => { event.preventDefault(); onApprove(name.trim() || 'Teacher'); }}>
-          <p>Check the versions and the trace. Nothing is ready for learners until you approve.</p>
+          <p>{totals.open ? `Look at the ${totals.open === 1 ? 'check that needs' : 'checks that need'} you first. ` : ''}Nothing reaches learners until you approve.</p>
           <label>Your name<input value={name} onChange={e => setName(e.target.value)} maxLength={80} autoComplete="name" /></label>
-          <button type="submit" className="th-button th-button-big" disabled={approving}>{approving ? 'Approving…' : 'Approve'}</button>
+          <button type="submit" className="th-button th-button-big" disabled={approving}>{approving ? 'Approving…' : 'Approve the pack'}</button>
           {approveError && <p className="th-error" role="alert">{approveError}</p>}
         </form>}
-    <h4>Tactile print</h4>
+
+    <h3>Tactile print</h3>
     <TactilePreview job={job} showDownloads />
-    <h3>Full trace</h3>
-    <details className="th-details"><summary>Show every step the team took</summary><TraceLog log={log} /></details>
+
+    <h3>The detail</h3>
+    <details className="th-details"><summary>Every review ({reviews.length})</summary><ul className="th-plain">{reviews.map((r, i) => <li key={i}><Review item={r} /></li>)}</ul></details>
+    {rules.length > 0 && <details className="th-details"><summary>Tactile print rules ({rules.length})</summary><ul className="th-plain">{rules.map((c, i) => <li key={i}><p className={`th-review ${c.pass ? 'th-pass' : 'th-fail'}`}><b><span aria-hidden="true">{c.pass ? '✓ ' : '✕ '}</span>{ruleName(c.rule)}</b><span className="th-reason">{c.detail}</span></p></li>)}</ul></details>}
+    <details className="th-details"><summary>Every step the team took ({log.filter(item => item.kind === 'trace').length})</summary><TraceLog log={log} /></details>
   </>;
 }

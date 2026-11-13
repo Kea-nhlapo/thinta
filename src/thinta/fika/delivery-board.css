@@ -2,8 +2,21 @@
 .fk-board h5 { font-size: 18px; font-weight: 900; color: var(--ink); margin: 0 0 6px; }
 .fk-board h4 small { font-size: 16px; font-weight: 700; color: var(--muted); }
 .fk-muted { color: var(--muted); }
-.fk-honest { background: var(--pale); border-left-color: var(--blue-dark); }
-.fk-clock { font-size: 20px; margin: 8px 0; }
+.fk-context { margin: 0 0 10px; color: var(--muted); font-size: 16px; }
+.fk-summary-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 8px; }
+.fk-summary-head h4 { margin: 0; }
+.fk-clock { font-size: 16px; color: var(--muted); }
+.fk-clock b { color: var(--ink); }
+.fk-checker { border: 2px solid var(--line); border-radius: 14px; padding: 12px; }
+.fk-checker h4 { margin: 0 0 4px; }
+.fk-checker p { margin: 0; }
+.fk-checker-pass { border-color: #b7e4c7; }
+.fk-checker-pass h4 { color: var(--ok); }
+.fk-checker-fail { border: 3px dashed var(--bad); background: var(--bad-bg); }
+.fk-checker-fail h4 { color: var(--bad); }
+.fk-reviews { margin-top: 8px; }
+.fk-machines li { grid-template-columns: 1fr auto; align-items: center; }
+.fk-capacities { padding-left: 18px; margin: 6px 0; }
 
 .fk-learners, .fk-items, .fk-machines, .fk-counts { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .fk-learner { border: 1.5px solid var(--line); border-radius: 14px; padding: 12px; background: #fff; }
@@ -12,7 +25,9 @@
 .fk-item p { margin: 0; }
 .fk-item-late { background: var(--bad-bg); border: 2px solid var(--bad); border-radius: 10px; padding: 8px; }
 .fk-machine, .fk-deadline { color: var(--muted); }
-.fk-eta { font-size: 18px; }
+.fk-eta { font-size: 18px; font-weight: 800; }
+.fk-item-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.fk-learner h5 { font-size: 20px; }
 .fk-late-reason { color: var(--bad); font-weight: 800; }
 
 /* Status chips: icon + word, and each status has its own border style too. */
