@@ -4,6 +4,7 @@ import Brand from '../Brand.jsx';
 import { DEFAULT_QUESTIONS, emptyJob } from './contract.js';
 import { initialRun, applyEvent, timelineFromRecording, replayDelays, agentStates } from './ui/job.js';
 import { readNdjson } from './ui/stream.js';
+import { prettyMaths } from './ui/format.js';
 import { downscaleImage } from './ui/image.js';
 import { PipelineChips, TraceLog, LatestStep, Highlights } from './ui/Trace.jsx';
 import Results from './ui/Results.jsx';
@@ -15,6 +16,8 @@ const EXAMPLE_EQUATION = 'y = x^2 - 2x - 8';
 function runReducer(state, action) {
   if (action.type === 'reset') return initialRun(action.job);
   if (action.type === 'approval') return { ...state, job: { ...state.job, approval: action.approval } };
+  // A saved pack opens finished: its trace, corrections and reviews rebuilt from the stored job in one go.
+  if (action.type === 'load') return timelineFromRecording(action.job).reduce((state, { event }) => applyEvent(state, event), initialRun());
   return applyEvent(state, action.event);
 }
 
@@ -31,12 +34,22 @@ export default function ThintaApp() {
   const [source, setSource] = useState(null); // 'live' | 'replay' once a run starts
   const [approving, setApproving] = useState(false);
   const [approveError, setApproveError] = useState('');
+  const [saved, setSaved] = useState({ packs: [], storage: null, error: '' }); // packs kept in the database
+  const [opening, setOpening] = useState('');
   const control = useRef(null);
   const resultsHeading = useRef(null);
   const traceHeading = useRef(null);
 
   useEffect(() => () => control.current?.abort(), []);
   useEffect(() => { document.title = 'Thinta · SA Educate'; }, []);
+  // The saved packs list refreshes each time the snap screen shows. Offline, it just stays empty.
+  useEffect(() => {
+    if (source !== null) return undefined;
+    const abort = new AbortController();
+    fetch('/api/thinta/packs', { signal: abort.signal }).then(r => (r.ok ? r.json() : null))
+      .then(data => data && setSaved({ packs: data.packs || [], storage: data.storage, error: '' })).catch(() => {});
+    return () => abort.abort();
+  }, [source]);
   // Focus moves to the results once the team finishes, so screen readers land there.
   useEffect(() => { if (run.status === 'done') resultsHeading.current?.focus(); }, [run.status]);
 
@@ -109,6 +122,18 @@ export default function ThintaApp() {
     } catch (error) { setApproveError(`${error.message} Try again.`); } finally { setApproving(false); }
   };
 
+  const openPack = async id => {
+    setOpening(id);
+    try {
+      const response = await fetch(`/api/thinta/packs/${encodeURIComponent(id)}`);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.job) throw Error(data.error || 'That pack could not be opened.');
+      control.current?.abort();
+      setSource('saved'); setApproveError('');
+      dispatch({ type: 'load', job: data.job });
+    } catch (error) { setSaved(current => ({ ...current, error: friendlyError(error) })); } finally { setOpening(''); }
+  };
+
   const restart = () => { control.current?.abort(); setSource(null); dispatch({ type: 'reset' }); };
 
   const isReplay = source === 'replay' || run.job.mode === 'replay';
@@ -163,8 +188,11 @@ export default function ThintaApp() {
         </button>
       </section>}
 
+      {!started && (saved.packs.length > 0 || saved.error) && <SavedPacks saved={saved} opening={opening} onOpen={openPack} />}
+
       {started && <section className="th-card" aria-labelledby="th-trace">
         <h2 id="th-trace" ref={traceHeading} tabIndex={-1}>2. Watch the team work</h2>
+        {source === 'saved' && <p className="th-notice th-saved-note"><span aria-hidden="true">🗄 </span>A saved pack, reopened from the {saved.storage === 'postgres' ? 'database' : 'server'}. Made {formatWhen(run.job.createdAt)}.</p>}
         {isReplay && <p className="th-notice th-replay-note"><span aria-hidden="true">⟲ </span>Replay: {replayInfo?.label || (source === 'replay' ? 'loading the recorded run…' : 'the server sent saved example data, not a live run')}.</p>}
         <p className="th-status" role={run.status === 'running' ? undefined : 'status'}>{statusText(run.status)}</p>
         {run.status === 'done' ? <TeamFinished job={run.job} /> : <PipelineChips job={run.job} status={run.status} />}
@@ -188,6 +216,29 @@ export default function ThintaApp() {
       </section>}
     </main>
   </div>;
+}
+
+const formatWhen = iso => (iso ? new Date(iso).toLocaleString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '');
+
+// Packs the team made before, kept on the server: tap one to reopen it as it was left.
+function SavedPacks({ saved, opening, onOpen }) {
+  return <section className="th-card" aria-labelledby="th-saved">
+    <h2 id="th-saved">Saved packs</h2>
+    <p className="th-muted">{saved.storage === 'postgres' ? 'Kept in the database, so they survive restarts.' : 'Kept on this server.'}</p>
+    {saved.error && <p className="th-error" role="alert">{saved.error}</p>}
+    <ul className="th-saved-list">
+      {saved.packs.map(pack => <li key={pack.id}>
+        <button type="button" className="th-saved-pack" onClick={() => onOpen(pack.id)} disabled={Boolean(opening)}>
+          <b>{prettyMaths(pack.equation || 'Graph pack')}</b>
+          <span>{formatWhen(pack.createdAt)}</span>
+          <span className={pack.approved ? 'th-saved-approved' : 'th-saved-waiting'}>
+            <span aria-hidden="true">{pack.approved ? '✓ ' : '⏸ '}</span>{pack.approved ? `Approved by ${pack.approvedBy}` : 'Waiting for approval'}
+          </span>
+          {opening === pack.id && <span role="status">Opening…</span>}
+        </button>
+      </li>)}
+    </ul>
+  </section>;
 }
 
 // After the run, the chips fold into one line; the headlines below carry the story.

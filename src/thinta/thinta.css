@@ -195,3 +195,12 @@
   .th-chip-working { animation: none; }
 }
 .th-finished { margin: 0 0 6px; padding: 8px 12px; border-radius: 12px; background: var(--ok-bg); border: 2px solid var(--ok); color: var(--ok); font-weight: 900; }
+
+/* Saved packs: each a full-width button with its equation, date and approval in words. */
+.th-saved-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.th-saved-pack { width: 100%; display: grid; gap: 2px; text-align: left; font: inherit; color: var(--ink); background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; min-height: 56px; cursor: pointer; }
+.th-saved-pack:hover { border-color: var(--blue); }
+.th-saved-pack span { font-size: 16px; color: var(--muted); }
+.th-saved-pack .th-saved-approved { color: var(--ok); font-weight: 800; }
+.th-saved-pack .th-saved-waiting { color: var(--warn); font-weight: 800; }
+.th-saved-note { background: var(--pale); border-left-color: var(--blue-dark); padding: 6px 10px; font-size: 16px; }
