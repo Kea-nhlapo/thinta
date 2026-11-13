@@ -157,3 +157,14 @@ test("H's real scheduler output: on time, tracked to the end, then every tactile
   assert.equal(out.numberCheck.pass, true);
   assert.deepEqual([out.summary.ready, out.summary.late], [5, 4]);
 });
+
+test('an isiZulu translation that changes a day or time is withheld (live-run regression)', async () => {
+  const dispatch = structuredClone(EXAMPLE_DISPATCH);
+  const zuFrom = text => async () => text;
+  const en = (await notify({ dispatch, school: DEMO_SCHOOL, translate: zuFrom('') })).summary.en;
+  const wrong = await notify({ dispatch, school: DEMO_SCHOOL, translate: zuFrom('Izinto zizolunga ngo-2:34 ntambama, isifundo ngoLwesibili ngo-08:00.') });
+  assert.equal(wrong.summary.zu, '');
+  assert.ok(wrong.warnings.some(w => /withheld/.test(w)));
+  const right = await notify({ dispatch, school: DEMO_SCHOOL, translate: zuFrom('Abafundi aba-2 banezinto. Okuthintekayo: 0 kwangu-1; konke ngoLwesine ngo-14:34, ngaphambi kwesifundo sangoLwesihlanu ngo-08:00.') });
+  assert.notEqual(right.summary.zu, '', JSON.stringify({ en, warnings: right.warnings }));
+});

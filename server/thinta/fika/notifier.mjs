@@ -67,7 +67,7 @@ export function notifyPrompt(facts, feedback = []) {
 FACTS (these are the ONLY numbers, times and days you may use; write numbers and times as digits, exactly as given, e.g. "${facts.latestEta || facts.now}"; no dates, no other numbers):
 ${factsText(facts)}
 
-Write "summary": one short plain-English card, 2 to 4 sentences. Say what is with the learners now, what is ready, and what is late and why. Name every late learner. Hide nothing and do not soften a late item.
+Write "summary": one short plain-English card, 2 to 4 sentences, under 60 words. A print that has not started is waiting, not printing. Say what is with the learners now, what is ready, and what is late and why. Name every late learner. Hide nothing and do not soften a late item.
 ${feedback.length ? `\nTHE LAST VERSION FAILED THE NUMBER CHECK. Fix every one of these:\n${feedback.map(p => `- ${p}`).join('\n')}\n` : ''}
 Return JSON only.`;
 }
@@ -122,6 +122,9 @@ export function templateSummary(f) {
   return out.join(' ');
 }
 
+// isiZulu weekday names, by a stem that tells them apart ("Lwesine" is Thursday, "Lwesihlanu" Friday).
+const ZU_DAYS = { msombuluko: 'Monday', lwesibili: 'Tuesday', lwesithathu: 'Wednesday', 'lwesine\\b': 'Thursday', lwesihlanu: 'Friday', mgqibelo: 'Saturday', 'isonto\\b': 'Sunday' };
+
 // Translate one text; a failure leaves '' so the caller can warn and keep the English.
 async function toZulu(text, translate) {
   if (!translate || !text) return { zu: '', warning: 'isiZulu translation not available' };
@@ -129,7 +132,14 @@ async function toZulu(text, translate) {
     const out = await translate(text, 'en', 'zu');
     const zu = (typeof out === 'string' ? out : out?.text || '').trim();
     if (!zu) return { zu: '', warning: 'isiZulu translation came back empty' };
-    // Times and counts must survive translation as digits.
+    // A live run turned "Fri 07:30" into Tuesday and "14:46" into "4:46 ntambama" (4:46 pm): a wrong day or time
+    // must never reach the teacher, so such a translation is withheld rather than shown with a warning.
+    const en = extract(text);
+    const zuTimes = extract(zu).times;
+    const zuDays = Object.entries(ZU_DAYS).filter(([stem]) => new RegExp(stem, 'i').test(zu)).map(([, day]) => day);
+    const wrong = [...en.times.filter(t => !zuTimes.includes(t)).map(t => `the time ${t}`), ...zuDays.filter(d => !en.days.includes(d)).map(d => `the day ${d}`)];
+    if (wrong.length) return { zu: '', warning: `isiZulu summary withheld: the translation changed ${list([...new Set(wrong)])}` };
+    // Counts must survive translation as digits.
     const missing = [...new Set(parseNumbers(text))].filter(n => !parseNumbers(zu).includes(n));
     return { zu, warning: missing.length ? `isiZulu summary may be missing the number(s) ${missing.join(', ')}; check before use` : '' };
   } catch (error) { return { zu: '', warning: `isiZulu translation failed: ${error.message}` }; }
