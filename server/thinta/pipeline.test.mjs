@@ -56,7 +56,7 @@ test('retries stop at the limit and escalate to the teacher', async () => {
   const { job } = (await collect(runPipeline({ imageBase64: 'abc', learners: ['blind'] }, { deps }))).at(-1);
   assert.equal(job.reviews.filter(r => r.check === 'access').length, LIMITS.maxRetries + 1);
   assert.ok(job.trace.some(t => /escalated to the teacher/.test(t.message)));
-  assert.match(job.trace.at(-1).message, /need the teacher's eye/);
+  assert.match(job.trace.at(-1).message, /needs? the teacher's eye/);
 });
 
 test('an unreadable photo falls back to the typed equation, and fails cleanly without one', async () => {
