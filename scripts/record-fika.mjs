@@ -3,7 +3,9 @@
 //   node scripts/record-fika.mjs            (uses GEMINI_API_KEY from .env.local: about 6–10 Gemini calls)
 //   node scripts/record-fika.mjs --no-ai    (template summaries, no Gemini calls)
 //   node scripts/record-fika.mjs --out <file>
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { handleThinta } from '../server/thinta.mjs';
 
 const args = process.argv.slice(2);
@@ -44,5 +46,6 @@ for (const [kind, machineId] of [['machine-offline', 'embosser-1'], ['machine-of
   result.trace.forEach(t => console.log(`  ${t.agent}: ${t.message}`));
 }
 
+mkdirSync(dirname(out instanceof URL ? fileURLToPath(out) : out), { recursive: true });
 writeFileSync(out, JSON.stringify({ recordedAt: new Date().toISOString(), source: env.GEMINI_API_KEY ? 'live run, Gemini summaries' : 'live run, template summaries', events, actions }, null, 1));
 console.log(`\nSaved ${out instanceof URL ? out.pathname : out}`);
