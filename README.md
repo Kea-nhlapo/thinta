@@ -118,14 +118,6 @@ npm start
 | `src/thinta/fika/` | Scheduler, Schedule Checker and the Delivery tab |
 | `src/thinta/ThintaApp.jsx`, `src/thinta/ui/` | The phone app |
 
-## Honest limits
-
-- Replays are recorded real runs, and the screen says **Replay** whenever one is playing.
-- Braille labels are Grade 1 and marked beta: check with a transcriber before printing.
-- Thinta does not make sign language. Signs are left to a human SASL reviewer.
-- Fika's school, machines and capacities are demo values. It makes the schedule and the print files; it doesn't drive real printers yet.
-- The isiZulu and Sepedi interface words on the Blind tab are a first draft and should be checked by first-language speakers.
-
 ## SA Educate
 
 Thinta lives inside SA Educate, a lesson platform that turns a teacher's PDF into a lesson learners can read, hear or follow in sign language. The rest of the app is at `/app`; this README covers the Thinta and Fika work.
