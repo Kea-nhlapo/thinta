@@ -36,9 +36,10 @@ Each sub-agent updates **only its own section** at least every 45 minutes: Done,
 
 ## Orchestrator
 
-- Done: branch `thinta`, contract, Gemini helper, `/api/thinta/run` and `/approve` stubs (replay the example job), `/thinta` route placeholder, stub tests. Existing 54 tests still pass.
-- Doing: real pipeline in `server/thinta.mjs` (Planner, step cap, retries, streaming).
-- Blocked on: `GEMINI_API_KEY` in `.env.local` for live runs.
+- Done: contract, Gemini helper, pipeline (`server/thinta/pipeline.mjs`: Planner → Reader → Prover → Designer ∥ Explainer, Sonifier → fresh eyes → access tests with meaning checks; step cap 20, 2 retries, escalation to teacher), NDJSON streaming in Vercel router and Vite. A–E integrated. 122 tests pass across the repo, `npm run build` passes, `/thinta` loads in the real dev server and Replay plays end to end at 375 px.
+- Doing: live go/no-go and a real recorded run, as soon as the key is in.
+- Blocked on: `GEMINI_API_KEY` in `.env.local` (Kea adding it).
+- Before the demo: replace the contract example in Replay with a real recorded run (`src/thinta/replay/recorded-parabola.json`). The example's "3/5 → 5/5" is fixture data, not a run. `npm run build` rewrites tracked `dist/`; restore with `git checkout -- dist` before committing.
 
 ## A. Vision & Proof
 _not started_
