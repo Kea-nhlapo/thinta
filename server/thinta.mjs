@@ -78,12 +78,12 @@ export async function handleThinta(request, env = {}) {
     const data = await readJSON(request, 20000);
     if (!JOB_ID.test(data?.graphJobId || '') || !JOB_ID.test(data?.schoolId || '')) return jsonError('Say which pack and which school.', 400);
     if (!data.approved) return jsonError('The teacher must approve the pack before delivery.', 409);
-    return ndjson(runDispatch({ graphJobId: data.graphJobId, schoolId: data.schoolId, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null }));
+    return ndjson(runDispatch({ graphJobId: data.graphJobId, schoolId: data.schoolId, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null, deps: env.fikaDeps }));
   }
   if (url.pathname === '/api/thinta/dispatch/event') {
     const data = await readJSON(request, 200000);
     if (!JOB_ID.test(data?.graphJobId || '') || !['machine-offline', 'machine-online', 'urgent', 'tick'].includes(data.kind)) return jsonError('Send a pack id and an event kind.', 400);
-    const result = await dispatchEvent({ ...data, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null });
+    const result = await dispatchEvent({ graphJobId: data.graphJobId, kind: data.kind, machineId: data.machineId, dispatch: data.dispatch, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null, deps: env.fikaDeps });
     return result ? Response.json(result, { headers }) : jsonError('No delivery plan for that pack yet.', 404);
   }
   return jsonError('Not found.', 404);
