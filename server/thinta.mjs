@@ -4,6 +4,7 @@
 import { LIMITS, STREAM_CONTENT_TYPE } from '../src/thinta/contract.js';
 import gateway from './learnbridge-gateway.mjs';
 import { runPipeline } from './thinta/pipeline.mjs';
+import { runDispatch, dispatchEvent, getDispatch } from './thinta/fika.mjs';
 
 const headers = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
 const jsonError = (message, status) => Response.json({ error: message }, { status, headers });
@@ -46,8 +47,16 @@ function runInput(data) {
   };
 }
 
+const JOB_ID = /^[\w-]{1,80}$/;
+
 export async function handleThinta(request, env = {}) {
   const url = new URL(request.url);
+  // Fika: the delivery board's current state.
+  const status = url.pathname.match(/^\/api\/thinta\/dispatch\/([\w-]{1,80})$/);
+  if (status && request.method === 'GET') {
+    const dispatch = getDispatch(status[1]);
+    return dispatch ? Response.json({ dispatch }, { headers }) : jsonError('No delivery plan for that pack yet.', 404);
+  }
   if (request.method !== 'POST') return jsonError('Use POST.', 405);
   const origin = request.headers.get('origin');
   if (origin && origin !== url.origin) return jsonError('Request must come from this learning workspace.', 403);
@@ -63,6 +72,19 @@ export async function handleThinta(request, env = {}) {
     const data = await readJSON(request, 5000);
     if (!data?.jobId) return jsonError('Say which job to approve.', 400);
     return Response.json({ jobId: data.jobId, approval: { approved: true, by: String(data.by || 'Teacher').slice(0, 80), at: new Date().toISOString() } }, { headers });
+  }
+  // Fika: plan delivery for an approved pack (streamed), then replan on events.
+  if (url.pathname === '/api/thinta/dispatch') {
+    const data = await readJSON(request, 20000);
+    if (!JOB_ID.test(data?.graphJobId || '') || !JOB_ID.test(data?.schoolId || '')) return jsonError('Say which pack and which school.', 400);
+    if (!data.approved) return jsonError('The teacher must approve the pack before delivery.', 409);
+    return ndjson(runDispatch({ graphJobId: data.graphJobId, schoolId: data.schoolId, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null }));
+  }
+  if (url.pathname === '/api/thinta/dispatch/event') {
+    const data = await readJSON(request, 200000);
+    if (!JOB_ID.test(data?.graphJobId || '') || !['machine-offline', 'machine-online', 'urgent', 'tick'].includes(data.kind)) return jsonError('Send a pack id and an event kind.', 400);
+    const result = await dispatchEvent({ ...data, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null });
+    return result ? Response.json(result, { headers }) : jsonError('No delivery plan for that pack yet.', 404);
   }
   return jsonError('Not found.', 404);
 }

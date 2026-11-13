@@ -99,3 +99,45 @@ _not started_
 
 ## G. Dispatcher (stretch)
 _not started_
+
+---
+
+# Fika (delivery add-on), branch `fika` from tag `thinta-submitted`
+
+Brief: `0a4b5646-FIKA_DISPATCHER_BRIEF.md` in the session uploads. Rule one: every Thinta test and the Thinta demo must still pass after each commit.
+
+## Fika contract (frozen)
+
+- `src/thinta/contract.js`: `FIKA_AGENTS`, `ITEM_MACHINES` (tactile → swell or embosser; phone items need no machine), `ITEM_PAGES` (tactile = 2 sheets), `DISPATCH_STATUSES`, `validateDispatch`, `EXAMPLE_DISPATCH`. Dispatch also carries `graphJobId`, `clock` (simulated now) and `machines` (availability), and late jobs need a `lateReason`.
+- `src/thinta/fika-demo-school.js`: `DEMO_SCHOOL` (demo values; clock starts Thu 19 Nov 13:00, lesson Fri 20 Nov 08:00, items due 07:30, machines only run 07:30–16:30 Mon–Fri), `DEMO_DEADLINE`, `DEMO_SCHOOLS`.
+- Routes (stubbed, in `server/thinta.mjs` → `server/thinta/fika.mjs`; router and Vite middleware already cover `/api/thinta/*`, GET included):
+  - `POST /api/thinta/dispatch` `{graphJobId, schoolId, approved:true}` → NDJSON (trace, correction, review, patch) ending `{type:'done', dispatch}`. 409 if not approved.
+  - `POST /api/thinta/dispatch/event` `{graphJobId, kind:'machine-offline'|'machine-online'|'urgent'|'tick', machineId?, dispatch?}` → `{dispatch, corrections, trace}`. Send `dispatch` (the phone's last copy) too: Vercel instances don't share memory.
+  - `GET /api/thinta/dispatch/:graphJobId` → `{dispatch}`.
+
+### Module interfaces the orchestrator will call
+
+| Owner | Module | Export |
+|---|---|---|
+| H | `src/thinta/fika/scheduler.js` | `planJobs(school, graphJobId, deadline) → DispatchJob[]`, `schedule(jobs, school, {clock, machines}) → {jobs, notes}`, `replan(dispatch, school, event) → {jobs, corrections}` |
+| H | `src/thinta/fika/checker.js` | `checkSchedule(dispatch, school) → {pass, checks, problems}` |
+| I | `server/thinta/fika/tracker.mjs` | `advance(dispatch, school, {toClock}) → {dispatch, events}` (simulated clock) |
+| I | `server/thinta/fika/notifier.mjs` | `notify({dispatch, school, apiKey, fetchImpl, translate}) → {summary, numberCheck}` |
+| J | `src/thinta/fika/DeliveryBoard.jsx` | `<DeliveryBoard job={job} />` mounted as a Delivery tab after approval |
+
+## Fika orchestrator
+- Done: tag `thinta-submitted`, branch `fika`, contract extension, demo school, stubbed routes + test. 124 tests pass.
+- Doing: spawning H, I, J; then the real Fika pipeline in `server/thinta/fika.mjs`.
+- Gemini budget: Kea's quota is limited. Sub-agents make **no** live Gemini calls; the orchestrator runs one live check.
+
+## H. Scheduler & Checker
+_not started_
+
+## I. Tracker & Notifier
+_not started_
+
+## J. Delivery UI
+_not started_
+
+## K. QA & Replay
+_not started (orchestrator runs it after integration)_

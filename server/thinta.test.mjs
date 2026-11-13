@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { handleThinta } from './thinta.mjs';
-import { EXAMPLE_PARABOLA_JOB, EXAMPLE_BAR_JOB, validateJob, emptyJob } from '../src/thinta/contract.js';
+import { EXAMPLE_PARABOLA_JOB, EXAMPLE_BAR_JOB, validateJob, validateDispatch, emptyJob } from '../src/thinta/contract.js';
 
 const post = (path, body) => new Request(`http://localhost${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
 const readEvents = async response => (await response.text()).trim().split('\n').map(line => JSON.parse(line));
@@ -53,4 +53,17 @@ test('rejects GET, foreign origins and oversized photos', async () => {
   const foreign = new Request('http://localhost/api/thinta/run', { method: 'POST', headers: { origin: 'https://evil.example' }, body: '{}' });
   assert.equal((await handleThinta(foreign, {})).status, 403);
   assert.equal((await handleThinta(post('/api/thinta/run', { imageBase64: 'a'.repeat(3_600_000) }), {})).status, 413);
+});
+
+test('Fika: dispatch needs approval, streams a plan, replans on events and reports status', async () => {
+  assert.equal((await handleThinta(post('/api/thinta/dispatch', { graphJobId: 'g-1', schoolId: 'demo-school' }), {})).status, 409);
+  const events = await readEvents(await handleThinta(post('/api/thinta/dispatch', { graphJobId: 'g-1', schoolId: 'demo-school', approved: true }), {}));
+  assert.equal(events.at(-1).type, 'done');
+  assert.deepEqual(validateDispatch(events.at(-1).dispatch), []);
+  const replan = await (await handleThinta(post('/api/thinta/dispatch/event', { graphJobId: 'g-1', kind: 'machine-offline', machineId: 'embosser-1' }), {})).json();
+  assert.deepEqual(validateDispatch(replan.dispatch), []);
+  assert.equal((await handleThinta(post('/api/thinta/dispatch/event', { graphJobId: 'g-1', kind: 'explode' }), {})).status, 400);
+  const status = await handleThinta(new Request('http://localhost/api/thinta/dispatch/g-1'), {});
+  assert.equal(status.status, 200);
+  assert.equal((await handleThinta(new Request('http://localhost/api/thinta/dispatch/nope'), {})).status, 404);
 });

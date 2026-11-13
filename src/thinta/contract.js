@@ -31,6 +31,8 @@
  */
 
 export const AGENTS = ['Planner', 'Reader', 'Prover', 'Designer', 'Sonifier', 'Explainer', 'Reviewer', 'Teacher'];
+// Fika, the delivery step after approval.
+export const FIKA_AGENTS = ['Dispatcher', 'Schedule Checker', 'Tracker', 'Notifier'];
 
 // Pass rules from the brief (section 4.4).
 export const LIMITS = {
@@ -88,7 +90,8 @@ export function validateJob(job) {
     if (!Array.isArray(job.proof.samples) || !job.proof.samples.length) problems.push('proof.samples must be a non-empty array');
   }
   if (job.tactile && typeof job.tactile.svg !== 'string') problems.push('tactile.svg must be a string');
-  for (const entry of job.trace || []) if (!AGENTS.includes(entry.agent) && entry.agent !== 'Dispatcher') problems.push(`unknown agent ${entry.agent}`);
+  for (const entry of job.trace || []) if (!AGENTS.includes(entry.agent) && !FIKA_AGENTS.includes(entry.agent)) problems.push(`unknown agent ${entry.agent}`);
+  if (job.dispatch) problems.push(...validateDispatch(job.dispatch));
   for (const c of job.corrections || []) if (!c.agent || !c.field || !c.reason) problems.push('correction needs agent, field and reason');
   return problems;
 }
@@ -170,4 +173,77 @@ export const EXAMPLE_BAR_JOB = {
   deafSolution: { steps: [{ text: 'Each bar is one month. Taller bar = more rain.', visual: 'point to each bar in turn' }, { text: 'January is tallest: 120 mm.', visual: 'highlight the January bar' }], keyTerms: ['BAR', 'RAINFALL'] },
   reviews: [], corrections: [], approval: { approved: false },
   trace: [{ t: 0, agent: 'Planner', status: 'done', message: 'Bar chart pack' }],
+};
+
+// ---------------------------------------------------------------------------------------------------------
+// Fika contract extension (frozen with the Fika brief; orchestrator-only, changes go on THINTA_STATUS.md).
+// After approval, Fika schedules the tactile prints across the school's machines; phone packs arrive at once.
+
+/**
+ * @typedef {{id:string, label:string, pages:number}} QueuedWork  Other work already on a machine (not ours).
+ * @typedef {{id:string, name:string, kind:'swell'|'embosser'|'printer', pagesPerHour:number, online:boolean, queue:QueuedWork[]}} Machine
+ * @typedef {'tactile'|'phone-blind'|'deaf-solution'} DeliveryItem
+ * @typedef {{id:string, name:string, needs:DeliveryItem[]}} Learner
+ * @typedef {{id:string, name:string, timezone:string, hours:{open:string, close:string, days:number[]}, machines:Machine[], learners:Learner[], lesson:{title:string, at:string}, clockStart:string, demoValues:boolean}} School
+ *   `hours`: machines only run while the school is open ("07:30"–"16:30", days 1–5 = Mon–Fri, local time).
+ *   `clockStart`: the simulated "now" the demo begins at. `demoValues`: capacities are demo values; the UI says so.
+ *
+ * @typedef {Object} DispatchJob
+ * @property {string} id
+ * @property {string} graphJobId
+ * @property {string} learnerId
+ * @property {DeliveryItem} item
+ * @property {number} pages        0 for phone items
+ * @property {string} deadline     ISO time
+ * @property {string} [machineId]  printed items only
+ * @property {string} [start]      ISO time printing starts
+ * @property {string} [eta]        ISO time ready (phone items: the clock time they were delivered)
+ * @property {'queued'|'printing'|'ready'|'delivered'|'late'} status
+ * @property {string} [lateReason] why it can't meet the deadline, in plain words
+ *
+ * @typedef {Object} Dispatch      GraphJob.dispatch
+ * @property {string} schoolId
+ * @property {string} graphJobId
+ * @property {string} clock        simulated now, ISO
+ * @property {{id:string, online:boolean}[]} machines  availability as Fika last saw it
+ * @property {DispatchJob[]} jobs
+ * @property {{rule:string, pass:boolean, detail:string}[]} checks
+ * @property {{t:string, kind:'machine-offline'|'machine-online'|'job-done'|'urgent', detail:string, machineId?:string}[]} events
+ * @property {{en:string, zu:string, ready:number, late:number}} summary
+ */
+
+// Which machine kinds can make each item. Phone items need no machine: they are delivered at once.
+export const ITEM_MACHINES = { tactile: ['swell', 'embosser'], 'phone-blind': [], 'deaf-solution': [] };
+// Pages in one learner's copy: the tactile graph sheet plus its braille key sheet.
+export const ITEM_PAGES = { tactile: 2, 'phone-blind': 0, 'deaf-solution': 0 };
+export const DISPATCH_STATUSES = ['queued', 'printing', 'ready', 'delivered', 'late'];
+// Fika streams the same events as a Thinta run (trace, correction, review, patch) and ends with {type:'done', dispatch}.
+
+export function validateDispatch(dispatch) {
+  const problems = [];
+  if (!dispatch || typeof dispatch !== 'object') return ['dispatch is not an object'];
+  for (const key of ['schoolId', 'jobs', 'checks', 'events', 'summary']) if (!(key in dispatch)) problems.push(`dispatch missing ${key}`);
+  for (const job of dispatch.jobs || []) {
+    if (!ITEM_MACHINES[job.item]) problems.push(`dispatch job ${job.id}: unknown item ${job.item}`);
+    if (!DISPATCH_STATUSES.includes(job.status)) problems.push(`dispatch job ${job.id}: unknown status ${job.status}`);
+    if (job.status === 'late' && !job.lateReason) problems.push(`dispatch job ${job.id}: late without a reason`);
+  }
+  return problems;
+}
+
+// Example dispatch for building UIs against. Fixture values, not scheduler output.
+export const EXAMPLE_DISPATCH = {
+  schoolId: 'demo-school', graphJobId: 'example-parabola', clock: '2026-11-19T13:00:00+02:00',
+  machines: [{ id: 'swell-1', online: true }, { id: 'embosser-1', online: true }, { id: 'printer-1', online: true }],
+  jobs: [
+    { id: 'd1', graphJobId: 'example-parabola', learnerId: 'l1', item: 'phone-blind', pages: 0, deadline: '2026-11-20T07:30:00+02:00', eta: '2026-11-19T13:00:00+02:00', status: 'delivered' },
+    { id: 'd2', graphJobId: 'example-parabola', learnerId: 'l1', item: 'tactile', pages: 2, deadline: '2026-11-20T07:30:00+02:00', machineId: 'embosser-1', start: '2026-11-19T14:30:00+02:00', eta: '2026-11-19T14:34:00+02:00', status: 'queued' },
+    { id: 'd3', graphJobId: 'example-parabola', learnerId: 'l4', item: 'deaf-solution', pages: 0, deadline: '2026-11-20T07:30:00+02:00', eta: '2026-11-19T13:00:00+02:00', status: 'delivered' },
+  ],
+  checks: [
+    { rule: 'capacity', pass: true, detail: 'No machine is booked beyond its pages per hour' },
+    { rule: 'deadlines', pass: true, detail: 'Every item is ready before Fri 07:30' },
+  ],
+  events: [],
+  summary: { en: 'Phone packs are with 5 learners. The tactile prints will be ready on Thu at 14:34, before the lesson.', zu: '', ready: 2, late: 0 },
 };
