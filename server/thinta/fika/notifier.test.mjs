@@ -62,8 +62,8 @@ test('the number check reads digits, spoken times, am/pm and day names', () => {
   assert.deepEqual(numberCheck('Phone packs are with 7 learners.', f).problems, ['the number 7 is not in the facts']);
   assert.deepEqual(numberCheck('Phone packs are with six learners.', f).problems, ['the number 6 is not in the facts']);
   assert.deepEqual(numberCheck('Everything is ready by Wednesday.', f).problems, ['Wednesday is not a day in the facts']);
-  // The contract's example text claims 5 learners for a dispatch that has 2.
-  assert.equal(numberCheck(EXAMPLE_DISPATCH.summary.en, deliveryFacts(EXAMPLE_DISPATCH, DEMO_SCHOOL)).pass, false);
+  // The contract's example text matches its own dispatch.
+  assert.equal(numberCheck(EXAMPLE_DISPATCH.summary.en, deliveryFacts(EXAMPLE_DISPATCH, DEMO_SCHOOL)).pass, true);
 });
 
 test('a correct Gemini summary passes first time; ready and late come from the dispatch', async () => {
