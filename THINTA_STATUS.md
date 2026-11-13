@@ -29,8 +29,8 @@ Each sub-agent updates **only its own section** at least every 45 minutes: Done,
 
 | Check | Result |
 |---|---|
-| Gemini reads a phone photo of the parabola into `reading` | pending |
-| Gemini reads a rendered tactile SVG back (fresh eyes) | pending |
+| Gemini reads a phone photo of the parabola into `reading` | blocked: no GEMINI_API_KEY. Run `node server/thinta/smoke-a.mjs [photo.jpg] ["y = x^2 - 2x - 8"]` (A) |
+| Gemini reads a rendered tactile SVG back (fresh eyes) | blocked: no GEMINI_API_KEY (same smoke script). Rasterising works: `@resvg/resvg-js` renders B's SVG to PNG locally; geometry fallback reads B's SVG to roots [-2, 4], TP (1, -9) (A) |
 | liblouis loads, or fallback table chosen | pending |
 | Vibration + Web Audio on the demo Android phone | pending (needs the real phone) |
 
