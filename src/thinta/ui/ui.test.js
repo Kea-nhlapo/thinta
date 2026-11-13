@@ -100,8 +100,18 @@ test('formatting uses real minus signs and (x, y) points', () => {
   assert.equal(formatPoint({ x: 1, y: -9 }), '(1, −9)');
   assert.equal(formatValue([-2, 4]), '−2, 4');
   assert.equal(formatValue('3/5'), '3/5');
-  assert.equal(prettyMaths('y = x^2 - 2x - 8'), 'y = x² − 2x − 8');
+  assert.equal(prettyMaths('y = x^2 - 2x - 8'), 'y = x² − 2x − 8');
   assert.equal(prettyMaths('-2 < x < 4'), '−2 < x < 4');
   assert.equal(prettyMaths('the y-intercept'), 'the y-intercept');
   assert.equal(fieldLabel('reading.turningPoint'), 'turning point');
+});
+
+test('chunkText splits at sentences under the /api/speak limit', async () => {
+  const { chunkText } = await import('./speech.js');
+  const text = 'A U-shaped curve. '.repeat(40);
+  const pieces = chunkText(text);
+  assert.ok(pieces.length > 1);
+  assert.ok(pieces.every(p => p.length <= 400 && p.endsWith('.')));
+  assert.equal(pieces.join(' ').replace(/\s+/g, ' '), text.trim().replace(/\s+/g, ' '));
+  assert.deepEqual(chunkText('x'.repeat(900)).map(p => p.length), [400, 400, 100]);
 });

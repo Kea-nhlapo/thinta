@@ -1,6 +1,193 @@
-// Placeholder for /thinta until sub-agent E lands the phone UI.
-import React from 'react';
+// Thinta on the phone: snap a graph, watch the agent team work, then check and approve the pack.
+import React, { useEffect, useReducer, useRef, useState } from 'react';
+import Brand from '../Brand.jsx';
+import { DEFAULT_QUESTIONS, emptyJob } from './contract.js';
+import { initialRun, applyEvent, timelineFromRecording, replayDelays } from './ui/job.js';
+import { readNdjson } from './ui/stream.js';
+import { downscaleImage } from './ui/image.js';
+import { PipelineChips, TraceLog } from './ui/Trace.jsx';
+import Results from './ui/Results.jsx';
+import { loadReplay } from './replay/index.js';
+import './thinta.css';
+
+const EXAMPLE_EQUATION = 'y = x^2 - 2x - 8';
+
+function runReducer(state, action) {
+  if (action.type === 'reset') return initialRun(action.job);
+  if (action.type === 'approval') return { ...state, job: { ...state.job, approval: action.approval } };
+  return applyEvent(state, action.event);
+}
+
+const prefersReducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export default function ThintaApp() {
-  return <main style={{ padding: 16, fontSize: 18 }}><h1>Thinta</h1><p>The agent team is being built.</p></main>;
+  const [photo, setPhoto] = useState(null);
+  const [photoError, setPhotoError] = useState('');
+  const [equation, setEquation] = useState('');
+  const [questions, setQuestions] = useState(DEFAULT_QUESTIONS.join('\n'));
+  const [replayMode, setReplayMode] = useState(false);
+  const [replayInfo, setReplayInfo] = useState(null);
+  const [run, dispatch] = useReducer(runReducer, undefined, () => initialRun());
+  const [source, setSource] = useState(null); // 'live' | 'replay' once a run starts
+  const [approving, setApproving] = useState(false);
+  const [approveError, setApproveError] = useState('');
+  const control = useRef(null);
+  const resultsHeading = useRef(null);
+  const traceHeading = useRef(null);
+
+  useEffect(() => () => control.current?.abort(), []);
+  useEffect(() => { document.title = 'Thinta · SA Educate'; }, []);
+  // Focus moves to the results once the team finishes, so screen readers land there.
+  useEffect(() => { if (run.status === 'done') resultsHeading.current?.focus(); }, [run.status]);
+
+  const choosePhoto = async event => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setPhotoError('');
+    try { setPhoto(await downscaleImage(file)); } catch (error) { setPhoto(null); setPhotoError(error.message || 'Could not open that picture.'); }
+  };
+
+  const begin = mode => {
+    control.current?.abort();
+    control.current = new AbortController();
+    setSource(mode);
+    setApproveError('');
+    dispatch({ type: 'reset', job: emptyJob({ mode, input: { equationHint: equation.trim() || undefined, questions: questionList(questions) } }) });
+    setTimeout(() => traceHeading.current?.focus(), 0);
+    return control.current.signal;
+  };
+
+  const startLive = async () => {
+    if (!photo) { setPhotoError('Take or choose a photo of the graph first.'); return; }
+    const signal = begin('live');
+    let finished = false;
+    const onEvent = event => { if (event.type === 'done' || event.type === 'error') finished = true; dispatch({ event }); };
+    try {
+      const response = await fetch('/api/thinta/run', {
+        method: 'POST', signal, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: photo.base64, mimeType: photo.mimeType, equationHint: equation.trim() || undefined, questions: questionList(questions), learners: ['blind', 'deaf', 'sighted'] }),
+      });
+      if (!response.ok || !/ndjson/.test(response.headers.get('content-type') || '')) {
+        const data = await response.json().catch(() => ({}));
+        throw Error(data.error || `Thinta could not start (error ${response.status}).`);
+      }
+      await readNdjson(response, onEvent);
+      if (!finished) throw Error('The connection closed before the team finished.');
+    } catch (error) {
+      if (signal.aborted) return;
+      dispatch({ event: { type: 'error', message: error.message === 'Failed to fetch' ? 'No connection to Thinta. Check the network.' : error.message } });
+    }
+  };
+
+  // Replays a saved run with its original timing (sped up), fully offline.
+  const startReplay = async () => {
+    const signal = begin('replay');
+    const info = await loadReplay();
+    setReplayInfo(info);
+    const timeline = timelineFromRecording(info.recording);
+    const delays = replayDelays(timeline, { speed: prefersReducedMotion() ? 8 : 4 });
+    for (let i = 0; i < timeline.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, delays[i]));
+      if (signal.aborted) return;
+      let { event } = timeline[i];
+      // The replayed pack waits for this teacher's approval, like a live one.
+      if (event.type === 'done' && event.job) event = { ...event, job: { ...event.job, mode: 'replay', approval: { approved: false } } };
+      dispatch({ event });
+    }
+  };
+
+  const approve = async by => {
+    setApproveError('');
+    if (source === 'replay') { dispatch({ type: 'approval', approval: { approved: true, by, at: new Date().toISOString() } }); return; }
+    setApproving(true);
+    try {
+      const response = await fetch('/api/thinta/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jobId: run.job.id, by }) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.approval) throw Error(data.error || 'Approval was not saved.');
+      dispatch({ type: 'approval', approval: data.approval });
+    } catch (error) { setApproveError(`${error.message} Try again.`); } finally { setApproving(false); }
+  };
+
+  const restart = () => { control.current?.abort(); setSource(null); dispatch({ type: 'reset' }); };
+
+  const isReplay = source === 'replay' || run.job.mode === 'replay';
+  const started = source !== null;
+
+  return <div className="thinta">
+    {isReplay && started && <p className="th-badge" role="status"><span aria-hidden="true">⟲ </span><b>Replay</b> · a saved run, not live</p>}
+    <header className="th-header">
+      <Brand href="/" />
+      <h1>Thinta <span>touch the maths</span></h1>
+      <p>Photograph a graph. A team of agents builds a checked version for blind and Deaf learners.</p>
+    </header>
+
+    <main>
+      {!started && <section className="th-card" aria-labelledby="th-snap">
+        <h2 id="th-snap">1. Snap the graph</h2>
+        <label className="th-replay-toggle">
+          <input type="checkbox" checked={replayMode} onChange={e => setReplayMode(e.target.checked)} />
+          <span>Replay a recorded run <small>(works offline, no photo needed)</small></span>
+        </label>
+        {!replayMode && <>
+          <div className="th-photo-buttons">
+            <label className="th-button th-button-big th-file">
+              <span aria-hidden="true">📷 </span>Take a photo
+              <input type="file" accept="image/*" capture="environment" onChange={choosePhoto} />
+            </label>
+            <label className="th-button th-button-outline th-file">
+              <span aria-hidden="true">🖼 </span>Choose a picture
+              <input type="file" accept="image/*" onChange={choosePhoto} />
+            </label>
+          </div>
+          {photoError && <p className="th-error" role="alert">{photoError}</p>}
+          {photo && <figure className="th-preview">
+            <img src={photo.dataUrl} alt="Your photo of the graph" />
+            <figcaption>{photo.width} × {photo.height}, {sizeText(photo.base64.length)} to send</figcaption>
+          </figure>}
+          <label className="th-field">Equation (optional)
+            <input value={equation} onChange={e => setEquation(e.target.value)} placeholder={EXAMPLE_EQUATION} inputMode="text" autoCapitalize="off" autoCorrect="off" spellCheck="false" />
+          </label>
+          {!equation && <button type="button" className="th-link" onClick={() => setEquation(EXAMPLE_EQUATION)}>Use the example equation</button>}
+          <details className="th-details">
+            <summary>Worksheet questions ({questionList(questions).length})</summary>
+            <label className="th-field">One question per line
+              <textarea rows={6} value={questions} onChange={e => setQuestions(e.target.value)} />
+            </label>
+            <button type="button" className="th-link" onClick={() => setQuestions(DEFAULT_QUESTIONS.join('\n'))}>Reset to the default questions</button>
+          </details>
+        </>}
+        <button type="button" className="th-button th-button-big th-start" onClick={replayMode ? startReplay : startLive}>
+          {replayMode ? 'Play the recorded run' : 'Start the team'}
+        </button>
+      </section>}
+
+      {started && <section className="th-card" aria-labelledby="th-trace">
+        <h2 id="th-trace" ref={traceHeading} tabIndex={-1}>2. Watch the team work</h2>
+        {isReplay && <p className="th-notice th-replay-note"><span aria-hidden="true">⟲ </span>Replay: {replayInfo?.label || (source === 'replay' ? 'loading the recorded run…' : 'the server sent saved example data, not a live run')}.</p>}
+        <p className="th-status" role="status">{statusText(run.status)}</p>
+        <PipelineChips job={run.job} status={run.status} />
+        <h3>What each agent did</h3>
+        <TraceLog log={run.log} live />
+        {run.status === 'error' && <div className="th-error-box" role="alert">
+          <p><b>Thinta stopped:</b> {run.error}</p>
+          <button type="button" className="th-button" onClick={() => { setReplayMode(true); startReplay(); }}>Replay a recorded run</button>
+        </div>}
+        <button type="button" className="th-button th-button-outline" onClick={restart}>{run.status === 'running' ? 'Stop and start again' : 'Start again'}</button>
+      </section>}
+
+      {run.status === 'done' && <section className="th-card" aria-labelledby="th-results">
+        <h2 id="th-results" ref={resultsHeading} tabIndex={-1}>3. The checked pack</h2>
+        {!run.job.approval?.approved && <p className="th-notice"><span aria-hidden="true">⏸ </span>Waiting for teacher approval. Nothing is ready for learners yet.</p>}
+        <Results job={run.job} log={run.log} replay={isReplay} onApprove={approve} approving={approving} approveError={approveError} />
+      </section>}
+    </main>
+  </div>;
+}
+
+const sizeText = bytes => bytes < 1e6 ? `${Math.max(1, Math.round(bytes / 1e3))} KB` : `${(bytes / 1e6).toFixed(1)} MB`;
+const questionList = text => text.split('\n').map(q => q.trim()).filter(Boolean).slice(0, 10);
+
+function statusText(status) {
+  return { idle: 'Starting…', running: 'The team is working…', done: 'Done. The pack is ready for the teacher to check.', error: 'Stopped with an error.' }[status];
 }

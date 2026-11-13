@@ -15,7 +15,7 @@ export function prettyMaths(text) {
   return String(text)
     .replace(/\^2\b/g, '²').replace(/\^3\b/g, '³')
     .replace(/(^|[\s(=,<>])-(?=[\d.a-z(])/gi, `$1${MINUS}`)
-    .replace(/(\S) - (?=\S)/g, `$1 ${MINUS} `);
+    .replace(/(\S) - (?=\S)/g, `$1 ${MINUS} `); // no-break spaces keep "− 8" together
 }
 
 const isPoint = v => v && typeof v === 'object' && Number.isFinite(v.x) && Number.isFinite(v.y);
