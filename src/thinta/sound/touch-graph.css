@@ -1,0 +1,27 @@
+.th-touch { display: grid; gap: 12px; width: 100%; max-width: 640px; font-size: 1rem; color: #111; }
+.th-touch-status { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.th-touch-sound { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 1rem; padding: 6px 12px; border-radius: 999px; border: 2px dashed #555; background: #fff; }
+.th-touch-sound.is-on { border-style: solid; border-color: #0b6b2e; background: #e6f6ea; color: #0b4d22; }
+.th-touch button { font: inherit; font-size: 1.05rem; font-weight: 700; min-height: 48px; padding: 8px 14px; border-radius: 12px; border: 2px solid #0c5bd0; background: #fff; color: #0c4aa8; cursor: pointer; }
+.th-touch button:focus-visible, .th-touch input:focus-visible { outline: 3px solid #111; outline-offset: 3px; }
+.th-touch-note { margin: 0; font-size: 1rem; color: #3a3a3a; }
+.th-touch-graph { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; border: 2px solid #111; border-radius: 12px; cursor: crosshair; }
+.th-touch-bg { fill: #fff; }
+.th-touch-axis { stroke: #333; stroke-width: 2; }
+.th-touch-tick { font-size: 17px; fill: #111; font-weight: 600; }
+.th-touch-curve { fill: none; stroke: #111; stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; }
+.th-touch-mark { fill: #fff; stroke: #111; stroke-width: 3.5; }
+.th-touch-bar { fill: #d8d8d8; stroke: #111; stroke-width: 3; }
+.th-touch-bar.is-current { fill: #fff; stroke-width: 5; stroke-dasharray: 8 4; }
+.th-touch-cursor line { stroke: #0c5bd0; stroke-width: 2.5; stroke-dasharray: 6 5; }
+.th-touch-cursor circle { fill: #0c5bd0; stroke: #fff; stroke-width: 2.5; }
+.th-touch-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; padding: 0; list-style: none; font-size: 1rem; }
+.th-touch-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.th-touch-said { min-height: 1.6em; margin: 0; font-size: 1.15rem; font-weight: 800; }
+.th-touch-slider { display: grid; gap: 6px; font-weight: 700; font-size: 1rem; }
+.th-touch-slider input { width: 100%; height: 44px; margin: 0; accent-color: #0c5bd0; }
+.th-touch-readout { margin: 0; font-size: 1rem; color: #222; }
+.th-touch-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.th-touch-buttons .th-touch-play { grid-column: 1 / -1; background: #0c5bd0; color: #fff; }
+.th-touch-buttons .th-touch-play[aria-pressed="true"] { background: #111; border-color: #111; }
+.th-touch-empty { font-size: 1rem; }
