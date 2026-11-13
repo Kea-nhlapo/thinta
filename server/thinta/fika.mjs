@@ -58,7 +58,7 @@ function scheduleChecked(deps, rec, jobs, school, clock, reviews) {
     if (check.pass) { rec.trace_('Schedule Checker', 'done', `${check.checks.filter(c => c.pass).length}/${check.checks.length} checks pass: capacity, deadlines, no machine double-booked`); return { jobs: result.jobs, checks: check.checks }; }
     if (attempt === LIMITS.maxRetries) { rec.trace_('Schedule Checker', 'fail', `Still failing after ${attempt} reschedules: ${review.reason}. Flagged for the teacher`); return { jobs: result.jobs, checks: check.checks }; }
     rec.trace_('Schedule Checker', 'retry', `Sent back to the Dispatcher: ${review.reason}`);
-    avoid = check.problems;
+    avoid = deps.avoidFromProblems ? deps.avoidFromProblems(check.problems) : check.problems;
   }
   return { jobs: result.jobs, checks: [] };
 }
@@ -66,7 +66,9 @@ function scheduleChecked(deps, rec, jobs, school, clock, reviews) {
 function lateNotes(rec, jobs, school) {
   const late = jobs.filter(j => j.status === 'late');
   if (!late.length) return;
-  rec.trace_('Dispatcher', 'fail', `Can't meet ${school.lesson.title.split(':')[0]} lesson for ${plural(late.length, 'tactile print')}: ${[...new Set(late.map(j => j.lateReason))].join('; ')}. Flagged for the teacher; the phone pack is the fallback`);
+  // The lesson day in South African time (fixed UTC+2), e.g. "Friday's lesson".
+  const day = new Date(Date.parse(school.lesson.at) + 2 * 3600_000).toLocaleDateString('en-ZA', { weekday: 'long', timeZone: 'UTC' });
+  rec.trace_('Dispatcher', 'fail', `Can't meet ${day}'s lesson for ${plural(late.length, 'tactile print')}: ${[...new Set(late.map(j => j.lateReason))].join('; ')}. Flagged for the teacher; the phone pack is the fallback`);
 }
 
 async function summarise(deps, rec, dispatch, school, ctx) {
@@ -138,8 +140,10 @@ export async function dispatchEvent({ graphJobId, kind, machineId, dispatch: sen
     const replanned = deps.replan(next, school, event);
     (replanned.notes || []).forEach(note => rec.trace_('Dispatcher', 'done', note));
     replanned.corrections.forEach(c => rec.correct(c));
-    const updated = schoolNow(school, { machines: school.machines.map(m => ({ id: m.id, online: m.id === machineId ? kind === 'machine-online' : m.online })) });
-    next = { ...next, jobs: replanned.jobs, machines: updated.machines.map(({ id, online }) => ({ id, online })), events: [...(current.events || []), event] };
+    // The scheduler returns the machines' new availability; fall back to applying the event ourselves.
+    const machines = replanned.machines || school.machines.map(m => ({ id: m.id, online: m.id === machineId ? kind === 'machine-online' : m.online }));
+    const updated = schoolNow(school, { machines });
+    next = { ...next, jobs: replanned.jobs, machines: machines.map(({ id, online }) => ({ id, online })), clock: replanned.clock || next.clock, events: [...(current.events || []), { ...event, ...(replanned.event || {}) }] };
     rec.trace_('Dispatcher', 'done', replanned.corrections.length ? `Replanned: ${plural(replanned.corrections.length, 'change')}` : 'Replanned: nothing had to move');
     const check = deps.checkSchedule(next, updated);
     next.checks = check.checks;
