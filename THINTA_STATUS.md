@@ -50,7 +50,15 @@ _not started_
 _not started_
 
 ## D. Explainer & Reviewer
-_not started_
+- Done: `server/thinta/explainer.mjs`, `server/thinta/reviewer.mjs`, 10 tests (`node --test server/thinta/explainer.test.mjs server/thinta/reviewer.test.mjs`, all pass), live smoke script `server/thinta/smoke-d.mjs`.
+- Exports:
+  - `explain({proof, reading, feedback?, apiKey, fetchImpl, translate}) → {description:{en, zu}, deafSolution:{steps, keyTerms}, meaning:{description, deafSolution}, warnings}`. One Gemini call (25 s timeout) with the proof facts as the only allowed numbers. `meaning` is our own meaning check on the result (`{pass, problems}` each); if it fails, pass `feedbackFrom(meaning.description)` back in as `feedback`. `translate(text,'en','zu')` may return a string or `{text}`; on failure `zu` is `''` and `warnings` says why. Warns if numbers went missing in the isiZulu.
+  - `speakDescription({description, speak}) → {en, zu}`: each is whatever `speak(text, lang)` returns, an array of clips if the text was over the 400-char `/api/speak` limit, or `null` on failure. Optional; skip when short of time.
+  - `accessTest({version:'audio'|'deaf', text, proof, questions, apiKey, fetchImpl}) → {agent:'Reviewer', check:'access-audio'|'access-deaf', pass, score, total, failed:[{question, expected, got}], reason, answers}`. Gemini sees only `text`; grading is deterministic against `proof.answers`. Pass = score ≥ `LIMITS.accessPassMark` (scaled if not 5 questions). For the Deaf version pass `deafText(deafSolution)`.
+  - `meaningCheck(text, proof) → {pass, problems:[{sentence, reason}]}`: deterministic. Checks turning point, roots, y-intercept claims (signed), above/below/less/greater than against the curve, and flags any number not derivable from the proof. Handles "negative 9", "minus two", unicode minus.
+  - `feedbackFrom(reviewOrMeaning) → string[]` for `explain({feedback})`.
+- Smoke: not run, no `.env.local` / `GEMINI_API_KEY` here. Orchestrator: `node server/thinta/smoke-d.mjs` runs thin description → access test → rewrite with feedback → re-test, plus the Deaf access test, and prints the "n/5 → n/5" loop.
+- Blocked on: nothing. Interface changes requested: none (`explain` takes no `speak`; audio is the separate `speakDescription`).
 
 ## E. Phone UI & Trace
 _not started_
