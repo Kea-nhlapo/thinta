@@ -17,26 +17,31 @@ class Guard extends React.Component {
 }
 
 const TABS = [['blind', 'Blind'], ['deaf', 'Deaf'], ['teacher', 'Teacher']];
+// Fika (J): a Delivery tab appears once the teacher approves; the board loads only when opened.
+const DeliveryBoard = React.lazy(() => import('../fika/DeliveryBoard.jsx'));
+const DELIVERY_TAB = ['delivery', 'Delivery'];
 
 export default function Results({ job, log, replay, onApprove, approving, approveError }) {
   const [tab, setTab] = useState('blind');
   const tabRefs = useRef({});
+  const tabs = job.approval?.approved ? [...TABS, DELIVERY_TAB] : TABS; // Fika (J)
   const onKey = event => {
-    const i = TABS.findIndex(([id]) => id === tab);
+    const i = tabs.findIndex(([id]) => id === tab);
     const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
     if (!step) return;
-    const next = TABS[(i + step + TABS.length) % TABS.length][0];
+    const next = tabs[(i + step + tabs.length) % tabs.length][0];
     setTab(next);
     tabRefs.current[next]?.focus();
   };
   return <div className="th-results">
-    <div className="th-tabs" role="tablist" aria-label="Versions of the pack" onKeyDown={onKey}>
-      {TABS.map(([id, label]) => <button key={id} ref={el => (tabRefs.current[id] = el)} role="tab" id={`th-tab-${id}`} aria-controls={`th-panel-${id}`} aria-selected={tab === id} tabIndex={tab === id ? 0 : -1} onClick={() => setTab(id)}>{label}</button>)}
+    <div className="th-tabs" role="tablist" aria-label="Versions of the pack" onKeyDown={onKey} style={tabs.length > 3 ? { gridTemplateColumns: `repeat(${tabs.length}, 1fr)` } : undefined}>
+      {tabs.map(([id, label]) => <button key={id} ref={el => (tabRefs.current[id] = el)} role="tab" id={`th-tab-${id}`} aria-controls={`th-panel-${id}`} aria-selected={tab === id} tabIndex={tab === id ? 0 : -1} onClick={() => setTab(id)}>{label}</button>)}
     </div>
     <section role="tabpanel" id={`th-panel-${tab}`} aria-labelledby={`th-tab-${tab}`} className="th-panel">
       {tab === 'blind' && <BlindTab job={job} replay={replay} />}
       {tab === 'deaf' && <DeafTab job={job} />}
       {tab === 'teacher' && <TeacherTab job={job} log={log} replay={replay} onApprove={onApprove} approving={approving} approveError={approveError} />}
+      {tab === 'delivery' && job.approval?.approved && <Guard fallback={<NotReady>The delivery board could not start on this phone.</NotReady>}><React.Suspense fallback={<p>Loading the delivery board…</p>}><DeliveryBoard job={job} replay={replay} /></React.Suspense></Guard>}
     </section>
   </div>;
 }

@@ -114,6 +114,8 @@ test('readableLog shows ETA corrections as day and time', () => {
   assert.equal(out[0].before, 'Thu 15:10');
   assert.equal(out[0].after, 'Fri 08:10');
   assert.equal(out[1], log[1]);
+  const [machine] = readableLog([{ kind: 'correction', field: 'dispatch.jobs.d2.machineId', before: 'embosser-1', after: 'swell-1' }], undefined, { 'embosser-1': 'Braille embosser', 'swell-1': 'Swell-paper heater' });
+  assert.deepEqual([machine.field, machine.before, machine.after], ['machine', 'Braille embosser', 'Swell-paper heater']);
 });
 
 test('replayPlan accepts events, {events, actions} and a bare dispatch', () => {

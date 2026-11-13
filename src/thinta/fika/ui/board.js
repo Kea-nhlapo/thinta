@@ -139,9 +139,15 @@ export function fikaAgentStates(log = [], status = 'running') {
   return states;
 }
 
-// Log lines for the trace with ETA values shown as "Thu 15:10" instead of raw ISO times.
-export function readableLog(log, format = formatClock) {
-  return log.map(item => (item.kind === 'correction' && etaJobId(item.field) ? { ...item, before: format(item.before), after: format(item.after) } : item));
+// Log lines for the trace with ETAs as "Thu 15:10" and machine ids as names, instead of raw values.
+export function readableLog(log, format = formatClock, machineNames = {}) {
+  const name = id => (id == null ? null : machineNames[id] || id);
+  return log.map(item => {
+    if (item.kind !== 'correction') return item;
+    if (etaJobId(item.field)) return { ...item, before: format(item.before), after: format(item.after) };
+    if (/\.machineId$/.test(item.field || '')) return { ...item, field: 'machine', before: name(item.before), after: name(item.after) };
+    return item;
+  });
 }
 
 // A recorded Fika run in any shape we save: {events, actions?}, a list of events (optionally {t, event}),

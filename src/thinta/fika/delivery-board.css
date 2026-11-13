@@ -1,0 +1,53 @@
+/* Fika Delivery tab. Mobile first at 375 px; builds on thinta.css colours. All text 16 px or larger. */
+.fk-board h5 { font-size: 18px; font-weight: 900; color: var(--ink); margin: 0 0 6px; }
+.fk-board h4 small { font-size: 16px; font-weight: 700; color: var(--muted); }
+.fk-muted { color: var(--muted); }
+.fk-honest { background: var(--pale); border-left-color: var(--blue-dark); }
+.fk-clock { font-size: 20px; margin: 8px 0; }
+
+.fk-learners, .fk-items, .fk-machines, .fk-counts { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.fk-learner { border: 1.5px solid var(--line); border-radius: 14px; padding: 12px; background: #fff; }
+.fk-item { border-top: 1px solid #e3ecf5; padding-top: 8px; display: grid; gap: 4px; }
+.fk-item:first-child { border-top: 0; padding-top: 0; }
+.fk-item p { margin: 0; }
+.fk-item-late { background: var(--bad-bg); border: 2px solid var(--bad); border-radius: 10px; padding: 8px; }
+.fk-machine, .fk-deadline { color: var(--muted); }
+.fk-eta { font-size: 18px; }
+.fk-late-reason { color: var(--bad); font-weight: 800; }
+
+/* Status chips: icon + word, and each status has its own border style too. */
+.fk-status { justify-self: start; display: inline-flex; align-items: center; gap: 2px; padding: 2px 10px; border-radius: 999px;
+  border: 2px solid #b8cbe0; font-weight: 900; font-size: 16px; background: #fff; color: var(--ink); }
+.fk-status-queued { border-style: dashed; color: var(--muted); }
+.fk-status-printing { border-color: var(--blue); background: var(--pale); color: var(--blue-dark); }
+.fk-status-ready { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); }
+.fk-status-delivered { border-color: var(--ok); background: var(--ok); color: #fff; }
+.fk-status-late { border-color: var(--bad); background: var(--bad-bg); color: var(--bad); border-width: 3px; }
+.fk-online { border-color: var(--ok); color: var(--ok); }
+.fk-offline { border-color: var(--bad); color: var(--bad); border-style: dotted; border-width: 3px; }
+.fk-machines li { display: grid; gap: 4px; border: 1px solid #e3ecf5; border-radius: 10px; padding: 8px 10px; }
+
+.fk-failure { background: var(--bad-bg); border: 3px solid var(--bad); border-radius: 14px; padding: 12px; margin: 12px 0; }
+.fk-failure h4 { color: var(--bad); margin: 0 0 6px; font-size: 20px; }
+.fk-failure p, .fk-failure ul { margin: 6px 0; }
+
+.fk-summary { border: 2px solid var(--blue); border-radius: 14px; padding: 12px; margin: 12px 0; background: #fff; }
+.fk-summary h4 { margin-top: 0; }
+.fk-counts { grid-template-columns: 1fr 1fr; margin-bottom: 8px; }
+.fk-counts li { border: 1.5px solid var(--line); border-radius: 10px; padding: 6px 10px; font-size: 18px; }
+.fk-counts b { font-size: 24px; }
+.fk-summary-text { margin: 8px 0 0; }
+.fk-lang { display: flex; gap: 6px; }
+.fk-lang button { font: inherit; font-weight: 800; font-size: 16px; min-height: 44px; padding: 6px 14px; border-radius: 10px; border: 2px solid var(--blue); background: #fff; color: var(--blue-dark); cursor: pointer; }
+.fk-lang button[aria-pressed="true"] { background: var(--blue); color: #fff; text-decoration: underline; }
+
+.fk-demo { border: 2px dashed #9a5b00; border-radius: 14px; padding: 12px; margin: 16px 0; background: var(--warn-bg); }
+.fk-demo h4 { margin-top: 0; color: var(--warn); }
+.fk-demo-buttons { display: grid; gap: 8px; margin: 10px 0; }
+.fk-demo .th-button:disabled { cursor: not-allowed; }
+.fk-last { margin: 8px 0 0; }
+.fk-checker { margin: 12px 0; }
+
+@media (min-width: 700px) {
+  .fk-demo-buttons { grid-template-columns: 1fr 1fr; }
+}
