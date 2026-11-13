@@ -1,8 +1,9 @@
 // Thinta: a team of agents that turns a photo of a maths graph into a checked pack for blind, Deaf and
 // sighted learners (see src/thinta/contract.js). POST /api/thinta/run streams the trace as NDJSON and ends
 // with the final GraphJob; POST /api/thinta/approve records the teacher's approval.
-// STUB: until the pipeline lands, /run replays the contract's example job so the UI can be built against it.
-import { EXAMPLE_PARABOLA_JOB, LIMITS, STREAM_CONTENT_TYPE } from '../src/thinta/contract.js';
+import { LIMITS, STREAM_CONTENT_TYPE } from '../src/thinta/contract.js';
+import gateway from './learnbridge-gateway.mjs';
+import { runPipeline } from './thinta/pipeline.mjs';
 
 const headers = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
 const jsonError = (message, status) => Response.json({ error: message }, { status, headers });
@@ -26,10 +27,23 @@ function ndjson(events) {
   return new Response(body, { headers: { ...headers, 'content-type': STREAM_CONTENT_TYPE } });
 }
 
-async function* stubRun() {
-  const job = structuredClone(EXAMPLE_PARABOLA_JOB);
-  for (const entry of job.trace) yield { type: 'trace', entry };
-  yield { type: 'done', job };
+// isiZulu through SA Educate's own /api/translate (NLLB, Gemini fallback), called in-process.
+const translator = env => async (text, from, to) => {
+  const response = await gateway.fetch(new Request('http://thinta.local/api/translate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, from, to }) }), env);
+  if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error || 'Translation failed.');
+  return (await response.json()).text;
+};
+
+const LEARNERS = ['blind', 'deaf', 'sighted'];
+function runInput(data) {
+  const learners = Array.isArray(data.learners) ? data.learners.filter(l => LEARNERS.includes(l)) : [];
+  const questions = Array.isArray(data.questions) ? data.questions.filter(q => typeof q === 'string' && q.trim()).slice(0, 8).map(q => q.trim().slice(0, 300)) : [];
+  return {
+    imageBase64: typeof data.imageBase64 === 'string' ? data.imageBase64.replace(/^data:[^,]+,/, '') : '',
+    mimeType: /^image\/(jpeg|png|webp)$/.test(data.mimeType) ? data.mimeType : 'image/jpeg',
+    equationHint: typeof data.equationHint === 'string' ? data.equationHint.trim().slice(0, 120) : '',
+    questions, learners: learners.length ? learners : LEARNERS,
+  };
 }
 
 export async function handleThinta(request, env = {}) {
@@ -40,7 +54,10 @@ export async function handleThinta(request, env = {}) {
   if (url.pathname === '/api/thinta/run') {
     const data = await readJSON(request, LIMITS.maxImageBytes + 20000);
     if (!data) return jsonError('Send a photo under 3.5 MB.', 413);
-    return ndjson(stubRun(data, env));
+    if (!env.GEMINI_API_KEY) return jsonError('Live runs need GEMINI_API_KEY on the server. Use Replay instead.', 501);
+    const input = runInput(data);
+    if (!input.imageBase64 && !input.equationHint) return jsonError('Send a photo or type the equation.', 400);
+    return ndjson(runPipeline(input, { apiKey: env.GEMINI_API_KEY, translate: translator(env), deps: env.thintaDeps }));
   }
   if (url.pathname === '/api/thinta/approve') {
     const data = await readJSON(request, 5000);

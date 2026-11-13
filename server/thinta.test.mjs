@@ -13,14 +13,32 @@ test('example jobs and an empty job follow the contract', () => {
   assert.deepEqual(EXAMPLE_PARABOLA_JOB.proof.turningPoint, { x: 1, y: -9 });
 });
 
+// Minimal agents that replay the example job's values, enough to exercise the HTTP streaming.
+const ex = EXAMPLE_PARABOLA_JOB;
+const thintaDeps = {
+  plan: async () => ex.plan, readGraph: async () => ex.reading, prove: () => ({ proof: ex.proof, corrections: ex.corrections }),
+  designTactile: () => ({ ...ex.tactile, corrections: [] }), fixTactile: () => ex.tactile, sonify: () => ex.sound,
+  freshEyes: async () => ({ review: { agent: 'Reviewer', check: 'fresh-eyes', pass: true, reason: 'match' } }),
+  explain: async () => ({ description: ex.description, deafSolution: ex.deafSolution }),
+  accessTest: async () => ({ agent: 'Reviewer', check: 'access', pass: true, score: 5, total: 5, failed: [] }),
+  meaningCheck: () => ({ pass: true, problems: [] }), feedbackFrom: () => [],
+};
+
+test('run without a key says to use Replay', async () => {
+  const response = await handleThinta(post('/api/thinta/run', { equationHint: 'y = x^2 - 2x - 8' }), {});
+  assert.equal(response.status, 501);
+});
+
 test('run streams trace events and ends with a GraphJob', async () => {
-  const response = await handleThinta(post('/api/thinta/run', { imageBase64: '', equationHint: 'y = x^2 - 2x - 8' }), {});
+  const response = await handleThinta(post('/api/thinta/run', { imageBase64: 'data:image/jpeg;base64,abcd', equationHint: 'y = x^2 - 2x - 8' }), { GEMINI_API_KEY: 'test', thintaDeps });
   assert.equal(response.status, 200);
   assert.match(response.headers.get('content-type'), /ndjson/);
   const events = await readEvents(response);
   assert.equal(events.at(-1).type, 'done');
   assert.deepEqual(validateJob(events.at(-1).job), []);
   assert.ok(events.some(e => e.type === 'trace'));
+  assert.ok(events.some(e => e.type === 'correction'));
+  assert.ok(events.some(e => e.type === 'patch' && e.job.proof));
 });
 
 test('approve records who approved and when', async () => {
