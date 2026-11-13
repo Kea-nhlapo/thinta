@@ -175,7 +175,7 @@ export default function TouchGraph({ job, durationMs = 4000 }) {
         <rect x="0" y="0" width={W} height={H} className="th-touch-bg" />
         <line x1={PAD.left} x2={W - PAD.right} y1={xAxisY} y2={xAxisY} className="th-touch-axis" />
         <line x1={yAxisX} x2={yAxisX} y1={PAD.top} y2={H - PAD.bottom} className="th-touch-axis" />
-        {xTicks.map(t => <g key={`x${t}`}><line x1={sx(t)} x2={sx(t)} y1={xAxisY - 4} y2={xAxisY + 4} className="th-touch-axis" /><text x={sx(t)} y={Math.min(H - 4, xAxisY + 22)} className="th-touch-tick" textAnchor="middle">{t}</text></g>)}
+        {xTicks.map(t => <g key={`x${t}`}><line x1={sx(t)} x2={sx(t)} y1={xAxisY - 4} y2={xAxisY + 4} className="th-touch-axis" /><text x={sx(t)} y={Math.min(H - 4, xAxisY + 28)} className="th-touch-tick" textAnchor="middle">{t}</text></g>)}
         {yTicks.map(t => <g key={`y${t}`}><line x1={yAxisX - 4} x2={yAxisX + 4} y1={sy(t)} y2={sy(t)} className="th-touch-axis" /><text x={PAD.left - 8} y={sy(t) + 6} className="th-touch-tick" textAnchor="end">{t}</text></g>)}
         {isBar
           ? sound.samples.map((p, i) => (

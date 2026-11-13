@@ -47,7 +47,25 @@ _not started_
 _not started_
 
 ## C. Sound & Touch
-_not started_
+- **Done:**
+  - `src/thinta/sound/sonify.js` (pure, Node-safe): `sonify(proof) → {samples, keyPoints}` (roots, turning-point, y-intercept, or one `bar` per bar at x = 0, 1, 2 …; key points sorted by x), `pitchFor(y, [min,max])` (220–880 Hz, log scale), `yAt(samples, x)`, `nearestKeyPoint(x, keyPoints, tol)`, `crossedKeyPoints(fromX, toX, keyPoints)`, `yRange`, `turningKind`, `spokenNumber`, `describeKeyPoint`, `describeX`, `stopsFor`, `sweepPlan`.
+  - `src/thinta/sound/audio-engine.js` (browser): `createAudioEngine()` (unlock on gesture incl. iOS silent-buffer trick, finger tone, ticks with distinct timbres per kind, stereo-panned `playSweep`, mute) plus `playSweep(sound, {durationMs})`, `vibrate(kind)`, `canVibrate()`.
+  - `src/thinta/sound/TouchGraph.jsx` (default export) + `touch-graph.css`: `<TouchGraph job={job} durationMs={4000} />`. Uses `job.sound` if filled, else `sonify(job.proof)`. Drag to trace (pointer events, `touch-action: none`), key points tick + vibrate + `aria-live="assertive"` announcement. Screen reader path: native range slider (TalkBack/VoiceOver swipe up/down) stepping through a grid plus every key point, `aria-valuetext` reads x, y and the key point; buttons Play the whole curve/chart, Previous key point, Next key point, Mute. Shapes not colour (circle root, square turning point, triangle y-intercept), text ≥ 16 px, "Sound on" pill, "Vibration works on Android only" note when unsupported.
+  - Dev page: `/src/thinta/sound/dev.html` (`?job=bar` for the bar chart). Needs Vite; at the time of testing the shared `vite.config.mjs` failed to load (`server/thinta/pipeline.mjs` imports files that did not exist yet), so I ran Vite with a bare config.
+  - Tests: `node --test src/thinta/sound/*.test.js`: 13 pass.
+  - Desktop check (built-in browser, 375 px mobile emulation): Web Audio context reaches `running` after a tap; drag announces the roots, y-intercept and turning point in order; Next/Previous and Play announce correctly; bar chart steps Jan → Feb → Mar; no console errors.
+- **Doing:** nothing; ready for E to mount `<TouchGraph job={job}/>` in the Blind tab.
+- **Blocked on:** the real Android phone for the go/no-go.
+- **Interface changes requested:** none.
+- **Phone go/no-go checklist (Vibration + Web Audio):**
+  1. Android Chrome, media volume up, not on silent: open the Blind tab (or `/src/thinta/sound/dev.html` on the dev server). Pill says "Sound starts when you touch the graph".
+  2. Drag a finger left to right: hear a smooth tone that falls then rises; pill turns to "Sound on". Page does not scroll while dragging.
+  3. At x = −2 and x = 4: bright click + one short buzz. At (1, −9): low double "boop" + a long buzz pattern. At (0, −8): woodblock + double buzz. Announcement text updates.
+  4. Tap "Play the whole curve": the curve plays in about 4 s, moving left ear to right ear on headphones, with ticks at the key points.
+  5. TalkBack on: swipe to the "Explore x" slider, swipe up/down (or volume keys): each step reads "x …, y …" and lands exactly on "Root at x equals minus 2". Next/Previous key point buttons read the point. Dragging on the graph with TalkBack is not expected to work (TalkBack takes the gesture).
+  6. Bar chart: each bar its own note, label read ("Jan, 120 mm. Bar 1 of 3").
+  7. iPhone Safari: same, with the ring/silent switch OFF (Web Audio is muted on silent); the "Vibration works on Android only" note shows; VoiceOver swipe up/down moves the slider.
+  Result: pending (needs the real phone).
 
 ## D. Explainer & Reviewer
 - Done: `server/thinta/explainer.mjs`, `server/thinta/reviewer.mjs`, 10 tests (`node --test server/thinta/explainer.test.mjs server/thinta/reviewer.test.mjs`, all pass), live smoke script `server/thinta/smoke-d.mjs`.
