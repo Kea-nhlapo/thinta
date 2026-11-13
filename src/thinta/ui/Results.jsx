@@ -50,22 +50,47 @@ export default function Results({ job, log, replay, onApprove, approving, approv
 
 function NotReady({ children }) { return <p className="th-notice"><span aria-hidden="true">⏸ </span>{children}</p>; }
 
+// The Blind tab speaks one language at a time, picked by the learner. The words below are a first draft for
+// isiZulu and Sepedi: check them with a first-language speaker. Maths terms stay in English, the language
+// South African schools teach maths in from Grade 4.
+const BLIND_LANGS = { en: 'English', zu: 'isiZulu', nso: 'Sepedi' };
+const BLIND_WORDS = {
+  en: { language: 'Language', touch: 'Touch the graph', description: 'Audio description', tactile: 'Tactile print', read: 'Read aloud', stop: 'Stop' },
+  zu: { language: 'Ulimi', touch: 'Thinta igrafu', description: 'Incazelo yokulalelwa', tactile: 'Igrafu ethintwayo', read: 'Funda ngezwi', stop: 'Misa' },
+  nso: { language: 'Polelo', touch: 'Kgoma kerafo', description: 'Tlhaloso ya go theeletšwa', tactile: 'Kerafo ya go kgongwa', read: 'Bala ka lentšu', stop: 'Emiša' },
+};
+const savedLang = () => { try { return BLIND_LANGS[localStorage.getItem('thinta-blind-lang')] ? localStorage.getItem('thinta-blind-lang') : 'en'; } catch { return 'en'; } };
+
 function BlindTab({ job, replay }) {
-  return <>
-    <h3>Touch the graph</h3>
+  const [lang, setLang] = useState(savedLang);
+  const choose = value => { setLang(value); try { localStorage.setItem('thinta-blind-lang', value); } catch { /* private mode */ } };
+  const words = BLIND_WORDS[lang];
+  const text = job.description?.[lang];
+  return <div lang={lang}>
+    <div className="th-blind-head">
+      <h3>{words.touch}</h3>
+      <label className="th-lang">
+        <span>{words.language}</span>
+        <select value={lang} onChange={event => choose(event.target.value)}>
+          {Object.entries(BLIND_LANGS).map(([code, name]) => <option key={code} value={code} lang={code}>{name}</option>)}
+        </select>
+      </label>
+    </div>
     {TouchGraph
       ? <Guard fallback={<NotReady>Touch-the-graph could not start on this phone.</NotReady>}><React.Suspense fallback={<p>Loading touch graph…</p>}><TouchGraph job={job} /></React.Suspense></Guard>
       : <NotReady>Touch-the-graph is still being built.</NotReady>}
     <KeyPoints job={job} />
-    <h3>Audio description</h3>
-    {job.description ? <>
-      <Description lang="en" title="English" text={job.description.en} url={job.description.audioUrls?.en} replay={replay} />
-      <Description lang="zu" title="isiZulu" text={job.description.zu} url={job.description.audioUrls?.zu} replay={replay} />
-      <Description lang="nso" title="Sepedi" text={job.description.nso} url={job.description.audioUrls?.nso} replay={replay} />
-    </> : <NotReady>No description in this pack.</NotReady>}
-    <h3>Tactile print</h3>
+    <h3>{words.description}</h3>
+    {!job.description ? <NotReady>No description in this pack.</NotReady>
+      : text ? <Description key={lang} lang={lang} text={text} url={job.description.audioUrls?.[lang]} replay={replay} words={words} />
+      : <>
+          {/* Older packs and replays were made before Sepedi; say so and fall back to English rather than show nothing. */}
+          <NotReady>This pack has no {BLIND_LANGS[lang]} version yet, so here it is in English.</NotReady>
+          <Description key="en" lang="en" text={job.description.en} url={job.description.audioUrls?.en} replay={replay} words={BLIND_WORDS.en} />
+        </>}
+    <h3>{words.tactile}</h3>
     <TactilePreview job={job} />
-  </>;
+  </div>;
 }
 
 function KeyPoints({ job }) {
@@ -79,7 +104,7 @@ function KeyPoints({ job }) {
   </ul>;
 }
 
-function Description({ lang, title, text, url, replay }) {
+function Description({ lang, text, url, replay, words }) {
   const [state, setState] = useState('idle');
   const [error, setError] = useState('');
   const control = useRef(null);
@@ -98,11 +123,10 @@ function Description({ lang, title, text, url, replay }) {
     } catch (failure) { setState('failed'); setError(failure?.message || 'Could not read this aloud on this phone.'); }
   };
   return <article className="th-description" lang={lang}>
-    <h4>{title}</h4>
-    <p>{prettyMaths(text)}</p>
-    <button type="button" className="th-button th-button-outline" onClick={play} aria-pressed={state === 'playing'}>
-      <span aria-hidden="true">{state === 'playing' ? '■ ' : '▶ '}</span>{state === 'playing' ? `Stop ${title}` : `Read aloud in ${title}`}
+    <button type="button" className="th-button th-read-aloud" onClick={play} aria-pressed={state === 'playing'}>
+      <span aria-hidden="true">{state === 'playing' ? '■ ' : '▶ '}</span>{state === 'playing' ? words.stop : words.read}
     </button>
+    <p>{prettyMaths(text)}</p>
     {state === 'playing' && <p className="th-muted" role="status">Getting the voice and reading. The first words can take a few seconds.</p>}
     {state === 'failed' && <p className="th-error" role="alert">{error}</p>}
   </article>;

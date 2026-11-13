@@ -204,3 +204,11 @@
 .th-saved-pack .th-saved-approved { color: var(--ok); font-weight: 800; }
 .th-saved-pack .th-saved-waiting { color: var(--warn); font-weight: 800; }
 .th-saved-note { background: var(--pale); border-left-color: var(--blue-dark); padding: 6px 10px; font-size: 16px; }
+
+/* Blind tab: heading with the language picker on the same row; Read aloud above the transcript. */
+.th-blind-head { display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; margin-top: 12px; }
+.th-blind-head h3 { margin: 0; }
+.th-lang { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; }
+.th-lang select { font: inherit; font-weight: 800; min-height: 48px; padding: 6px 10px; border: 2px solid var(--blue); border-radius: 10px; background: #fff; color: var(--blue-dark); }
+.th-read-aloud { width: 100%; margin-bottom: 8px; }
+.th-description p { margin: 4px 0 0; }
