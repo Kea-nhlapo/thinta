@@ -18,7 +18,7 @@ test('geometry: data-kind key points in any attribute order, else printed labels
   assert.deepEqual(svgKeyPoints(SVG), { roots: [-2, 4], turningPoint: { x: 1, y: -9 }, source: 'data' });
   assert.deepEqual(svgKeyPoints(printedSvg(SVG)), { roots: [-2, 4], turningPoint: { x: 1, y: -9 }, source: 'labels' });
   assert.deepEqual(svgKeyPoints('<svg><text>x = -2</text><text>x = 4</text><text>(0, -8)</text></svg>'), { roots: [-2, 4], source: 'labels' });
-  assert.ok(!printedSvg(SVG).includes('data-'));
+  assert.ok(!printedSvg(SVG).includes('data-') && !printedSvg(SVG).includes('<title'));
 });
 
 test('compareWithProof names each missing or wrong value', () => {
@@ -50,6 +50,7 @@ test('a disagreeing fresh read fails with the values that differ; SVG text is us
   assert.match(out.review.reason, /root 4 missing/);
   assert.match(out.review.reason, /turning point \(1, -8\) vs proof \(1, -9\)/);
   assert.match(out.review.reason, /unclear: root at 4 has no label/);
+  assert.deepEqual(out.feedback, { missing: ['roots'], unclear: ['turningPoint'] });
   assert.deepEqual(out.review.before, { roots: [-2], turningPoint: { x: 1, y: -8 } });
   assert.deepEqual(out.review.after, { roots: [-2, 4], turningPoint: { x: 1, y: -9 } });
 });

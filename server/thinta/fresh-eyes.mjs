@@ -56,8 +56,9 @@ export async function rasteriseSvg(svg) {
   } catch { return null; }
 }
 
-// What the learner sees, without our machine-readable answers: data-* attributes are removed before Gemini reads it.
-export const printedSvg = svg => String(svg).replace(/\sdata-[\w-]+\s*=\s*("[^"]*"|'[^']*')/g, '');
+// What is printed on the paper, without our machine-readable answers: data-* attributes and the screen-reader
+// <title>/<desc> (which spell out every key point) are removed before Gemini reads it.
+export const printedSvg = svg => String(svg).replace(/\sdata-[\w-]+\s*=\s*("[^"]*"|'[^']*')/g, '').replace(/<(title|desc)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
 
 const near = (a, b) => Math.abs(a - b) <= LIMITS.valueTolerance;
 const show = v => v === undefined || v === null ? 'missing' : typeof v === 'number' ? String(v) : Array.isArray(v) ? `[${v.join(', ')}]` : `(${v.x}, ${v.y})`;
@@ -119,5 +120,15 @@ export async function freshEyes({ svg, proof, apiKey, fetchImpl, rasterise = ras
   return {
     reading: { roots: seen.roots, turningPoint: seen.turningPoint ?? null, ...(seen.bars && { bars: seen.bars }), method: gemini ? (png ? 'png' : 'svg-text') : 'geometry', geometry },
     review: { agent: 'Reviewer', check: 'fresh-eyes', pass, before, after, reason },
+    feedback: toFeedback([...geminiProblems, ...geometryProblems], gemini?.unclear || []),
   };
+}
+
+// Problems → the {missing, unclear} keys B's fixTactile(proof, tactile, feedback) understands.
+const KEY = s => /root|x-axis|x-intercept/i.test(s) ? 'roots' : /turning|vertex|minimum|maximum/i.test(s) ? 'turningPoint' : /y-axis|y-intercept/i.test(s) ? 'yIntercept' : /bar/i.test(s) ? 'bars' : null;
+export function toFeedback(problems, unclear = []) {
+  const missing = new Set(), vague = new Set();
+  for (const p of problems) { const k = KEY(p); if (k) (/missing/.test(p) ? missing : vague).add(k); }
+  for (const u of unclear) { const k = KEY(u); if (k && !missing.has(k)) vague.add(k); }
+  return { missing: [...missing], unclear: [...vague].filter(k => !missing.has(k)) };
 }
