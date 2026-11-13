@@ -38,6 +38,9 @@ export function applyEvent(state, event) {
   }
 }
 
+// An empty plan ({steps:[]}) from emptyJob does not count as the Planner's output.
+const hasOutput = value => Boolean(value) && !(Array.isArray(value.steps) && !value.steps.length && Array.isArray(value.versions) && !value.versions.length);
+
 // waiting | working | done | retry | failed | skipped for each pipeline agent.
 export function agentStates(job, status = 'running') {
   const states = Object.fromEntries(PIPELINE_AGENTS.map(agent => [agent, 'waiting']));
@@ -46,7 +49,7 @@ export function agentStates(job, status = 'running') {
     states[entry.agent] = { start: 'working', done: 'done', fail: 'failed', retry: 'retry' }[entry.status] || states[entry.agent];
   }
   for (const agent of PIPELINE_AGENTS) {
-    const filled = (AGENT_FIELDS[agent] || []).some(field => job?.[field]);
+    const filled = (AGENT_FIELDS[agent] || []).some(field => hasOutput(job?.[field]));
     if (states[agent] === 'waiting' && filled) states[agent] = 'done';
     if (agent === 'Reviewer' && states[agent] === 'waiting' && job?.reviews?.length) states[agent] = 'done';
     if (status === 'done' && (states[agent] === 'waiting' || states[agent] === 'working')) states[agent] = states[agent] === 'working' ? 'done' : 'skipped';

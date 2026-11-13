@@ -76,7 +76,7 @@ export default function ThintaApp() {
       if (!finished) throw Error('The connection closed before the team finished.');
     } catch (error) {
       if (signal.aborted) return;
-      dispatch({ event: { type: 'error', message: error.message === 'Failed to fetch' ? 'No connection to Thinta. Check the network.' : error.message } });
+      dispatch({ event: { type: 'error', message: friendlyError(error) } });
     }
   };
 
@@ -185,6 +185,8 @@ export default function ThintaApp() {
   </div>;
 }
 
+// Browser network failures say "Failed to fetch" or "network error"; say what happened instead.
+const friendlyError = error => error instanceof TypeError ? 'The connection to Thinta dropped. Check the network, or replay a recorded run.' : error.message;
 const sizeText = bytes => bytes < 1e6 ? `${Math.max(1, Math.round(bytes / 1e3))} KB` : `${(bytes / 1e6).toFixed(1)} MB`;
 const questionList = text => text.split('\n').map(q => q.trim()).filter(Boolean).slice(0, 10);
 

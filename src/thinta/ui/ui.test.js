@@ -72,6 +72,7 @@ test('agentStates follows the trace and marks failures and retries', () => {
   assert.equal(states.Reviewer, 'waiting');
   assert.equal(agentStates(job, 'error').Reader, 'failed');
   assert.equal(agentStates(job, 'done').Reviewer, 'skipped');
+  assert.equal(agentStates(emptyJob(), 'error').Planner, 'waiting', 'an empty plan is not Planner output');
 });
 
 test('replayTimeline places corrections after their agent and ends with done', () => {
