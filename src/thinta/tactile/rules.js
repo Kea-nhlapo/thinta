@@ -7,7 +7,10 @@ export const RULES = {
   minLabelGapMm: LIMITS.minLabelGapMm, // label to curve (or bar outline), from the edge of the stroke
   minAxisGapMm: 1.5,                   // labels must not sit on an axis line, or a finger reads them as one
   minLabelSpaceMm: 1.5,                // label to label and label to marker
+  maxOwnPointMm: 15,                   // a moved label stays by its own point, or readers pair it wrongly
 };
+
+const OWNED = ['point', 'value', 'category'];
 
 const r1 = v => Math.round(v * 10) / 10;
 const rectOf = (l, at = l) => ({ x: at.x, y: at.y, w: l.w, h: l.h });
@@ -27,11 +30,15 @@ export function labelProblems(layout, label, rect = rectOf(label), { ignoreOptio
     ...layout.markers.filter(m => pointRectDist(m, rect) - m.r < RULES.minLabelSpaceMm).map(m => `marker ${m.name}`),
   ];
   const inPage = rectInside(rect, contentBox(layout));
-  return {
-    curveGap, axisGap, overlaps, inPage,
-    hard: curveGap >= RULES.minLabelGapMm && !overlaps.length && inPage,
-    ok: curveGap >= RULES.minLabelGapMm && !overlaps.length && inPage && axisGap >= RULES.minAxisGapMm,
-  };
+  // Own point: within 15 mm and strictly nearer than any other key point.
+  let ownDist = 0, nearOwn = true;
+  if (OWNED.includes(label.role) && label.anchor) {
+    ownDist = pointRectDist(label.anchor, rect);
+    const others = layout.markers.filter(m => m.name !== label.name && Math.hypot(m.x - label.anchor.x, m.y - label.anchor.y) > 0.01);
+    nearOwn = ownDist <= RULES.maxOwnPointMm && others.every(m => pointRectDist(m, rect) > ownDist);
+  }
+  const hard = curveGap >= RULES.minLabelGapMm && !overlaps.length && inPage && nearOwn;
+  return { curveGap, axisGap, overlaps, inPage, ownDist, nearOwn, hard, ok: hard && axisGap >= RULES.minAxisGapMm };
 }
 
 const fmt = v => (Number.isFinite(v) ? `${r1(Math.max(v, 0))} mm` : 'clear');
@@ -43,6 +50,7 @@ export function checkRules(layout) {
   const overlapFail = failing(p => p.overlaps.length);
   const pageFail = failing(p => !p.inPage);
   const axisFail = failing(p => p.axisGap < RULES.minAxisGapMm);
+  const ownFail = failing(p => !p.nearOwn);
   const closest = Math.min(...per.map(([, p]) => p.curveGap));
   const { data, axis } = layout.strokes;
   return [
@@ -50,6 +58,7 @@ export function checkRules(layout) {
     { rule: 'stroke-hierarchy', pass: data > axis, detail: `${layout.dataName} ${data} mm vs axes ${axis} mm` },
     { rule: 'label-overlap', pass: !overlapFail.length, labels: overlapFail, detail: overlapFail.length ? `${overlapFail.join(', ')} overlap another label or marker` : `No labels overlap (min space ${RULES.minLabelSpaceMm} mm)` },
     { rule: 'label-in-page', pass: !pageFail.length, labels: pageFail, detail: pageFail.length ? `${pageFail.join(', ')} outside the printable area` : 'All labels inside the printable area' },
+    { rule: 'label-near-own-point', pass: !ownFail.length, labels: ownFail, detail: ownFail.length ? `${ownFail.join(', ')} more than ${RULES.maxOwnPointMm} mm from their point, or nearer another key point` : `Every point label within ${RULES.maxOwnPointMm} mm of its own point and nearest to it` },
     { rule: 'label-axis-gap', pass: !axisFail.length, labels: axisFail, detail: axisFail.length ? `${axisFail.join(', ')} touch an axis line` : `All labels at least ${RULES.minAxisGapMm} mm from the axes` },
   ];
 }
@@ -71,7 +80,7 @@ export function placeAt(label, side, d) {
 
 // Nearest position that passes every rule; falls back to one that only touches an axis.
 function search(layout, label) {
-  const steps = [0, 2, 4, 7, 10, 14, 19, 25];
+  const steps = [0, 1, 2, 3, 4, 5, 7, 9, 11, 13, 15];
   let fallback = null;
   for (const step of steps) {
     for (const side of label.sides || ALL_SIDES) {
@@ -90,6 +99,7 @@ function describe(p, dataName = 'curve') {
   if (p.curveGap < RULES.minLabelGapMm) why.push(`${fmt(p.curveGap)} from the ${dataName} (needs ${RULES.minLabelGapMm} mm)`);
   if (p.overlaps.length) why.push(`overlapped ${p.overlaps.join(', ')}`);
   if (!p.inPage) why.push('ran off the printable area');
+  if (!p.nearOwn) why.push(`${fmt(p.ownDist)} from its own point or nearer another one`);
   if (p.axisGap < RULES.minAxisGapMm) why.push(`${fmt(p.axisGap)} from an axis line`);
   return why.join('; ');
 }

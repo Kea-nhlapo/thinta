@@ -92,3 +92,15 @@ test('downloads: SVG data URL and a well-formed vector PDF', () => {
   assert.match(all, /\/MediaBox \[0 0 841\.89 595\.276\]/);
   assert.ok(svgToPdfDataUrl(svg).startsWith('data:application/pdf;base64,JVBERi0xLjQ'));
 });
+
+test('label-near-own-point: a label parked by another key point fails, and auto-fix brings it home', () => {
+  const layout = functionLayout(parabola);
+  const label = layout.labels.find(l => l.name === 'root1');
+  const other = layout.markers.find(m => m.name === 'root2');
+  Object.assign(label, { x: other.x - label.w / 2, y: other.y - 6 - label.h });
+  assert.deepEqual(checkRules(layout).find(c => c.rule === 'label-near-own-point').labels, ['root1']);
+  const { layout: fixed } = autoFix(layout);
+  const p = labelProblems(fixed, fixed.labels.find(l => l.name === 'root1'));
+  assert.ok(p.nearOwn && p.ownDist <= 15);
+  for (const l of designTactile(parabola).layout.labels.filter(x => x.role === 'point')) assert.ok(labelProblems(designTactile(parabola).layout, l).nearOwn, l.name);
+});
