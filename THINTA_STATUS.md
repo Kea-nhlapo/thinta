@@ -131,7 +131,20 @@ Brief: `0a4b5646-FIKA_DISPATCHER_BRIEF.md` in the session uploads. Rule one: eve
 - Gemini budget: Kea's quota is limited. Sub-agents make **no** live Gemini calls; the orchestrator runs one live check.
 
 ## H. Scheduler & Checker
-_not started_
+- Done (commit `H: working-hours time maths...`): `src/thinta/fika/time.js`, `scheduler.js`, `checker.js`, 16 tests (`node --test src/thinta/fika/*.test.js`). All Thinta tests still pass. Pure JS, no AI.
+- Signatures:
+  - `planJobs(school, graphJobId, deadline, clock = school.clockStart) → DispatchJob[]` ids `${graphJobId}-${learnerId}-${item}`; phone items `delivered`, `eta = clock`.
+  - `schedule(jobs, school, {clock, machines?, avoid?, queueFrom?}) → {jobs, notes}`. `machines` = `[{id, online}]`; `avoid` = `[{jobId?, machineId}]`; `queueFrom` (default `school.clockStart`) is when other classes' queues started, so a later clock doesn't re-count them. Ready/delivered never move; printing stays unless its machine is offline.
+  - `replan(dispatch, school, event) → {jobs, machines, clock, corrections, notes, event}`. Events: `machine-offline|machine-online {machineId}`, `urgent {learnerId?, pages=4, deadline=today 16:00, item='tactile'}`, anything else (`tick`) just recomputes; optional `at`, `avoid`. Corrections: one per changed `eta`/`machineId`/`status`, field `dispatch.jobs.<id>.<field>`, before/after ISO, plain-English reason. `event` is ready to push onto `dispatch.events`; store `machines`/`clock` back on the dispatch.
+  - `checkSchedule(dispatch, school) → {pass, checks, problems, late}`; rules `capacity, offline, deadlines, coverage, phone-first, working-hours`. Late-with-reason passes `deadlines` (detail says "N late with a reason"); `late` lists them for the teacher flag.
+  - Retry loop: `schedule(dispatch.jobs, school, {clock, machines, avoid: avoidFromProblems(problems)})` (from `checker.js`).
+  - `time.js`: `addWorkingMinutes(iso, min, hours)`, `formatEta(iso) → 'Thu 14:34'`, `workingMinutesBetween`, `inWorkingHours`, `toIso`/`toMs`. Fixed +02:00 (SA has no DST).
+- Demo school ETAs (clock Thu 13:00; embosser free 14:30, swell free 15:00):
+  - Normal: all 4 prints on the embosser, Thu 14:34 / 14:38 / 14:42 / 14:46. Checker passes.
+  - Embosser offline: all move to the swell heater, Thu 15:03 / 15:06 / 15:09 / 15:12 (8 corrections: eta + machineId each). Still on time.
+  - Both offline: 4 prints `late`, "No tactile machine is online"; phone packs delivered; checker `late` = 4.
+  - Urgent 4 pages for Learner C due Thu 16:00: embosser 14:30–14:38, others pushed to 14:42–14:54.
+- Demo note (optional, no change needed): the embosser-offline strike-through is visible (Thu ~~14:34~~ → 15:03) but nothing becomes late. If you want "offline embosser → late on the swell heater, busy until Fri ...", give `swell-1` a queue of ~400 pages (it is then busy until Fri 14:00, and the reason reads "The braille embosser is offline and the swell-paper heater is busy until Fri 14:00").
 
 ## I. Tracker & Notifier
 _not started_
