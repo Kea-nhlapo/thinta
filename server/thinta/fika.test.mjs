@@ -3,21 +3,24 @@ import assert from 'node:assert/strict';
 import { runDispatch, dispatchEvent, getDispatch } from './fika.mjs';
 import { validateDispatch } from '../../src/thinta/contract.js';
 import { fakeFikaDeps } from './fika-fakes.mjs';
+import { createStore } from './store.mjs';
+
+const store = await createStore({ file: null });
 
 const collect = async gen => { const out = []; for await (const e of gen) out.push(e); return out; };
 
 test('approval → phone packs delivered at once, tactile prints scheduled and checked', async () => {
-  const events = await collect(runDispatch({ graphJobId: 'fika-a', schoolId: 'demo-school', deps: fakeFikaDeps() }));
+  const events = await collect(runDispatch({ graphJobId: 'fika-a', schoolId: 'demo-school', store, deps: fakeFikaDeps() }));
   const { dispatch } = events.at(-1);
   assert.deepEqual(validateDispatch(dispatch), []);
   assert.ok(dispatch.jobs.filter(j => j.item !== 'tactile').every(j => j.status === 'delivered'));
   assert.ok(dispatch.jobs.filter(j => j.item === 'tactile').every(j => j.machineId && j.eta));
   assert.ok(events.some(e => e.type === 'review' && e.review.agent === 'Schedule Checker' && e.review.pass));
-  assert.deepEqual(getDispatch('fika-a').jobs, dispatch.jobs);
+  assert.deepEqual((await getDispatch('fika-a', store)).jobs, dispatch.jobs);
 });
 
 test('a failing check is sent back to the Dispatcher, then passes', async () => {
-  const events = await collect(runDispatch({ graphJobId: 'fika-b', schoolId: 'demo-school', deps: fakeFikaDeps({ checkFailsFirst: 1 }) }));
+  const events = await collect(runDispatch({ graphJobId: 'fika-b', schoolId: 'demo-school', store, deps: fakeFikaDeps({ checkFailsFirst: 1 }) }));
   const reviews = events.filter(e => e.type === 'review' && e.review.check === 'schedule').map(e => e.review.pass);
   assert.deepEqual(reviews, [false, true]);
   assert.ok(events.some(e => e.type === 'trace' && e.entry.status === 'retry' && e.entry.agent === 'Schedule Checker'));
@@ -25,12 +28,12 @@ test('a failing check is sent back to the Dispatcher, then passes', async () => 
 
 test('taking a machine offline replans with real corrections; all offline is flagged honestly', async () => {
   const deps = fakeFikaDeps();
-  await collect(runDispatch({ graphJobId: 'fika-c', schoolId: 'demo-school', deps }));
-  const first = await dispatchEvent({ graphJobId: 'fika-c', kind: 'machine-offline', machineId: 'swell-1', deps });
+  await collect(runDispatch({ graphJobId: 'fika-c', schoolId: 'demo-school', deps, store }));
+  const first = await dispatchEvent({ graphJobId: 'fika-c', kind: 'machine-offline', machineId: 'swell-1', deps, store });
   assert.ok(first.corrections.length > 0);
   assert.ok(first.corrections.every(c => c.before !== c.after));
   assert.equal(first.dispatch.machines.find(m => m.id === 'swell-1').online, false);
-  const second = await dispatchEvent({ graphJobId: 'fika-c', kind: 'machine-offline', machineId: 'embosser-1', deps });
+  const second = await dispatchEvent({ graphJobId: 'fika-c', kind: 'machine-offline', machineId: 'embosser-1', deps, store });
   const tactile = second.dispatch.jobs.filter(j => j.item === 'tactile');
   assert.ok(tactile.every(j => j.status === 'late' && j.lateReason));
   assert.ok(second.dispatch.jobs.filter(j => j.item !== 'tactile').every(j => j.status === 'delivered'));
@@ -39,10 +42,20 @@ test('taking a machine offline replans with real corrections; all offline is fla
 
 test('the phone can resend its copy when the server has forgotten the plan', async () => {
   const deps = fakeFikaDeps();
-  const { dispatch } = (await collect(runDispatch({ graphJobId: 'fika-d', schoolId: 'demo-school', deps }))).at(-1);
+  const { dispatch } = (await collect(runDispatch({ graphJobId: 'fika-d', schoolId: 'demo-school', deps, store }))).at(-1);
   const copy = { ...dispatch, graphJobId: 'fika-unknown' };
-  const result = await dispatchEvent({ graphJobId: 'fika-unknown', kind: 'tick', dispatch: copy, deps });
+  const result = await dispatchEvent({ graphJobId: 'fika-unknown', kind: 'tick', dispatch: copy, deps, store });
   assert.ok(result);
   assert.notEqual(result.dispatch.clock, dispatch.clock);
-  assert.equal(await dispatchEvent({ graphJobId: 'nothing-here', kind: 'tick', deps }), null);
+  assert.equal(await dispatchEvent({ graphJobId: 'nothing-here', kind: 'tick', deps, store }), null);
+});
+
+test('opening Delivery again reopens the saved plan, replans and all, instead of planning afresh', async () => {
+  const deps = fakeFikaDeps();
+  await collect(runDispatch({ graphJobId: 'fika-e', schoolId: 'demo-school', deps, store }));
+  const replanned = await dispatchEvent({ graphJobId: 'fika-e', kind: 'machine-offline', machineId: 'swell-1', deps, store });
+  const again = await collect(runDispatch({ graphJobId: 'fika-e', schoolId: 'demo-school', deps, store }));
+  assert.deepEqual(again.at(-1).dispatch.jobs, replanned.dispatch.jobs);
+  assert.equal(again.at(-1).dispatch.machines.find(m => m.id === 'swell-1').online, false);
+  assert.match(again[0].entry.message, /reopened from the database/);
 });

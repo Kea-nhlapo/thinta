@@ -62,7 +62,8 @@ export const DEFAULT_QUESTIONS = [
   'For which values of x is y less than 0?',
 ];
 
-export function emptyJob({ id = `job-${Date.now().toString(36)}`, mode = 'live', input = {} } = {}) {
+// Ids are stored as database keys, so a random suffix keeps two runs in the same millisecond apart.
+export function emptyJob({ id = `job-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, mode = 'live', input = {} } = {}) {
   return {
     id, createdAt: new Date().toISOString(), mode,
     input: { imageBase64: '', learners: ['blind', 'deaf', 'sighted'], ...input },

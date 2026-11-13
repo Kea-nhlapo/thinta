@@ -2,20 +2,13 @@
 // the Schedule Checker validates the schedule (sending it back up to 2 times), the Tracker runs the simulated clock
 // and the Notifier tells the teacher. Phone packs are delivered at once; only tactile prints wait on machines.
 // Agents are injected (deps) so tests run with fakes; defaults load H's scheduler/checker and I's tracker/notifier.
-import { readFileSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { LIMITS, ITEM_MACHINES } from '../../src/thinta/contract.js';
 import { DEMO_SCHOOLS, DEMO_DEADLINE } from '../../src/thinta/fika-demo-school.js';
+import { defaultStore } from './store.mjs';
 
-// State lives in memory per graph job; locally it is also written to a JSON file so a dev-server restart keeps it.
-// On Vercel, instances do not share memory, so callers may send their last copy of the dispatch with each event.
-const FILE = join(tmpdir(), 'thinta-dispatch.json');
-const store = new Map(Object.entries((() => { try { return JSON.parse(readFileSync(FILE, 'utf8')); } catch { return {}; } })()));
-const save = () => { try { writeFileSync(FILE, JSON.stringify(Object.fromEntries(store))); } catch { /* read-only file system on Vercel */ } };
-
-export const getDispatch = graphJobId => store.get(graphJobId) || null;
-export function putDispatch(dispatch) { store.set(dispatch.graphJobId, dispatch); save(); return dispatch; }
+// Delivery plans live in the store (Postgres in production), so a replan survives restarts and redeploys.
+// Callers may also send their last copy of the dispatch with each event, in case the store has never seen it.
+export const getDispatch = async (graphJobId, store) => (await (store || defaultStore())).getDispatch(graphJobId);
 
 export async function defaultFikaDeps() {
   const [scheduler, checker, tracker, notifier] = await Promise.all([
@@ -81,13 +74,22 @@ async function summarise(deps, rec, dispatch, school, ctx) {
 }
 
 // Plans delivery for an approved pack. Yields stream events and ends with {type:'done', dispatch}.
-export async function* runDispatch({ graphJobId, schoolId, apiKey, translate, fetchImpl, deps }) {
+export async function* runDispatch({ graphJobId, schoolId, apiKey, translate, fetchImpl, deps, store }) {
   const school = DEMO_SCHOOLS[schoolId];
   if (!school) { yield { type: 'error', message: 'Unknown school.' }; return; }
   const clock = school.clockStart;
   const rec = recorder(() => clock);
   const flush = function* () { while (rec.events.length) yield rec.events.shift(); };
   try {
+    store = await (store || defaultStore());
+    // A pack that already has a delivery plan reopens it as it was left, replans and all.
+    const saved = await store.getDispatch(graphJobId);
+    if (saved) {
+      rec.trace_('Dispatcher', 'done', `Delivery plan reopened from the database (demo clock ${saved.clock.slice(11, 16)}, ${plural((saved.events || []).length, 'event')} so far)`);
+      yield* flush();
+      yield { type: 'done', dispatch: { ...saved, trace: rec.trace, corrections: [], reviews: [] } };
+      return;
+    }
     deps = deps || await defaultFikaDeps();
     const learners = school.learners.length;
     rec.trace_('Dispatcher', 'start', `Planning delivery for ${plural(learners, 'learner')} before ${school.lesson.title}`);
@@ -102,7 +104,7 @@ export async function* runDispatch({ graphJobId, schoolId, apiKey, translate, fe
     let dispatch = { schoolId, graphJobId, clock, machines: school.machines.map(({ id, online }) => ({ id, online })), jobs, checks, events: [], summary: { en: '', zu: '', ready: 0, late: 0 } };
     yield { type: 'patch', dispatch };
     dispatch.summary = await summarise(deps, rec, dispatch, school, { apiKey, translate, fetchImpl });
-    putDispatch(dispatch);
+    await store.saveDispatch(dispatch);
     yield* flush();
     yield { type: 'done', dispatch: { ...dispatch, trace: rec.trace, corrections: rec.corrections, reviews } };
   } catch (error) {
@@ -113,8 +115,9 @@ export async function* runDispatch({ graphJobId, schoolId, apiKey, translate, fe
 }
 
 // Replans after an event and returns {dispatch, corrections, trace, reviews}. 'tick' advances the demo clock an hour.
-export async function dispatchEvent({ graphJobId, kind, machineId, dispatch: sent, apiKey, translate, fetchImpl, deps }) {
-  const current = getDispatch(graphJobId) || (sent?.graphJobId === graphJobId ? sent : null);
+export async function dispatchEvent({ graphJobId, kind, machineId, dispatch: sent, apiKey, translate, fetchImpl, deps, store }) {
+  store = await (store || defaultStore());
+  const current = (await store.getDispatch(graphJobId)) || (sent?.graphJobId === graphJobId ? sent : null);
   if (!current) return null;
   if (!DEMO_SCHOOLS[current.schoolId]) return null;
   const school = schoolNow(DEMO_SCHOOLS[current.schoolId], current);
@@ -157,6 +160,6 @@ export async function dispatchEvent({ graphJobId, kind, machineId, dispatch: sen
   const unchanged = kind === 'tick' && next.events.length === (current.events || []).length && current.summary?.en;
   if (unchanged) rec.trace_('Notifier', 'done', 'Nothing new to tell the teacher');
   else next.summary = await summarise(deps, rec, next, school, { apiKey, translate, fetchImpl });
-  putDispatch(next);
+  await store.saveDispatch(next);
   return { dispatch: next, corrections: rec.corrections, trace: rec.trace, reviews };
 }

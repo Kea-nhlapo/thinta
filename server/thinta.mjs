@@ -1,10 +1,12 @@
 // Thinta: a team of agents that turns a photo of a maths graph into a checked pack for blind, Deaf and
 // sighted learners (see src/thinta/contract.js). POST /api/thinta/run streams the trace as NDJSON and ends
-// with the final GraphJob; POST /api/thinta/approve records the teacher's approval.
+// with the final GraphJob, which is saved; POST /api/thinta/approve records the teacher's approval on it, and
+// GET /api/thinta/packs[/:id] lists and reopens saved packs. Fika's delivery routes follow.
 import { LIMITS, STREAM_CONTENT_TYPE } from '../src/thinta/contract.js';
 import gateway from './learnbridge-gateway.mjs';
 import { runPipeline } from './thinta/pipeline.mjs';
-import { runDispatch, dispatchEvent, getDispatch } from './thinta/fika.mjs';
+import { runDispatch, dispatchEvent } from './thinta/fika.mjs';
+import { defaultStore } from './thinta/store.mjs';
 
 const headers = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
 const jsonError = (message, status) => Response.json({ error: message }, { status, headers });
@@ -48,14 +50,31 @@ function runInput(data) {
 }
 
 const JOB_ID = /^[\w-]{1,80}$/;
+// A database hiccup must not stop a demo: approval and delivery carry on, just without saving.
+const orElse = (promise, fallback) => promise.catch(error => { console.error('Thinta store:', error.message); return fallback; });
+
+// Saves the finished pack as the stream ends, so it can be approved, reopened and delivered later.
+async function* saving(events, store) {
+  for await (const event of events) {
+    if (event.type === 'done' && event.job) {
+      try { await store.savePack(event.job); event.job.saved = true; }
+      catch (error) { console.error('Thinta: could not save pack', error.message); event.job.saved = false; }
+    }
+    yield event;
+  }
+}
 
 export async function handleThinta(request, env = {}) {
   const url = new URL(request.url);
-  // Fika: the delivery board's current state.
-  const status = url.pathname.match(/^\/api\/thinta\/dispatch\/([\w-]{1,80})$/);
-  if (status && request.method === 'GET') {
-    const dispatch = getDispatch(status[1]);
-    return dispatch ? Response.json({ dispatch }, { headers }) : jsonError('No delivery plan for that pack yet.', 404);
+  const store = await (env.store || defaultStore());
+  if (request.method === 'GET') {
+    // Saved packs: the latest ten, or one pack in full.
+    if (url.pathname === '/api/thinta/packs') return Response.json({ packs: await store.listPacks(10), storage: store.kind }, { headers });
+    const pack = url.pathname.match(/^\/api\/thinta\/packs\/([\w-]{1,80})$/);
+    if (pack) { const job = await store.getPack(pack[1]); return job ? Response.json({ job }, { headers }) : jsonError('No saved pack with that id.', 404); }
+    // Fika: the delivery board's current state.
+    const status = url.pathname.match(/^\/api\/thinta\/dispatch\/([\w-]{1,80})$/);
+    if (status) { const dispatch = await store.getDispatch(status[1]); return dispatch ? Response.json({ dispatch }, { headers }) : jsonError('No delivery plan for that pack yet.', 404); }
   }
   if (request.method !== 'POST') return jsonError('Use POST.', 405);
   const origin = request.headers.get('origin');
@@ -66,24 +85,29 @@ export async function handleThinta(request, env = {}) {
     if (!env.GEMINI_API_KEY) return jsonError('Live runs need GEMINI_API_KEY on the server. Use Replay instead.', 501);
     const input = runInput(data);
     if (!input.imageBase64 && !input.equationHint) return jsonError('Send a photo or type the equation.', 400);
-    return ndjson(runPipeline(input, { apiKey: env.GEMINI_API_KEY, translate: translator(env), deps: env.thintaDeps }));
+    return ndjson(saving(runPipeline(input, { apiKey: env.GEMINI_API_KEY, translate: translator(env), deps: env.thintaDeps }), store));
   }
   if (url.pathname === '/api/thinta/approve') {
     const data = await readJSON(request, 5000);
-    if (!data?.jobId) return jsonError('Say which job to approve.', 400);
-    return Response.json({ jobId: data.jobId, approval: { approved: true, by: String(data.by || 'Teacher').slice(0, 80), at: new Date().toISOString() } }, { headers });
+    if (!JOB_ID.test(data?.jobId || '')) return jsonError('Say which job to approve.', 400);
+    const approval = { approved: true, by: String(data.by || 'Teacher').slice(0, 80), at: new Date().toISOString() };
+    // saved: false means the pack was never stored (e.g. a replay), so the approval lives on this phone only.
+    const saved = await orElse(store.approvePack(data.jobId, approval), false);
+    return Response.json({ jobId: data.jobId, approval, saved }, { headers });
   }
   // Fika: plan delivery for an approved pack (streamed), then replan on events.
   if (url.pathname === '/api/thinta/dispatch') {
     const data = await readJSON(request, 20000);
     if (!JOB_ID.test(data?.graphJobId || '') || !JOB_ID.test(data?.schoolId || '')) return jsonError('Say which pack and which school.', 400);
-    if (!data.approved) return jsonError('The teacher must approve the pack before delivery.', 409);
-    return ndjson(runDispatch({ graphJobId: data.graphJobId, schoolId: data.schoolId, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null, deps: env.fikaDeps }));
+    // A saved pack must be approved on the server, not just on the phone.
+    const pack = await orElse(store.getPack(data.graphJobId), null);
+    if (!data.approved || (pack && !pack.approval?.approved)) return jsonError('The teacher must approve the pack before delivery.', 409);
+    return ndjson(runDispatch({ graphJobId: data.graphJobId, schoolId: data.schoolId, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null, deps: env.fikaDeps, store }));
   }
   if (url.pathname === '/api/thinta/dispatch/event') {
     const data = await readJSON(request, 200000);
     if (!JOB_ID.test(data?.graphJobId || '') || !['machine-offline', 'machine-online', 'urgent', 'tick'].includes(data.kind)) return jsonError('Send a pack id and an event kind.', 400);
-    const result = await dispatchEvent({ graphJobId: data.graphJobId, kind: data.kind, machineId: data.machineId, dispatch: data.dispatch, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null, deps: env.fikaDeps });
+    const result = await dispatchEvent({ graphJobId: data.graphJobId, kind: data.kind, machineId: data.machineId, dispatch: data.dispatch, apiKey: env.GEMINI_API_KEY, translate: env.GEMINI_API_KEY ? translator(env) : null, deps: env.fikaDeps, store });
     return result ? Response.json(result, { headers }) : jsonError('No delivery plan for that pack yet.', 404);
   }
   return jsonError('Not found.', 404);

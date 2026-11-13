@@ -2,6 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { handleThinta } from './thinta.mjs';
 import { fakeFikaDeps } from './thinta/fika-fakes.mjs';
+import { createStore } from './thinta/store.mjs';
+
+// Each test file gets its own in-memory store, so nothing leaks between runs.
+const store = await createStore({ file: null });
 import { EXAMPLE_PARABOLA_JOB, EXAMPLE_BAR_JOB, validateJob, validateDispatch, emptyJob } from '../src/thinta/contract.js';
 
 const post = (path, body) => new Request(`http://localhost${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
@@ -26,12 +30,12 @@ const thintaDeps = {
 };
 
 test('run without a key says to use Replay', async () => {
-  const response = await handleThinta(post('/api/thinta/run', { equationHint: 'y = x^2 - 2x - 8' }), {});
+  const response = await handleThinta(post('/api/thinta/run', { equationHint: 'y = x^2 - 2x - 8' }), { store });
   assert.equal(response.status, 501);
 });
 
 test('run streams trace events and ends with a GraphJob', async () => {
-  const response = await handleThinta(post('/api/thinta/run', { imageBase64: 'data:image/jpeg;base64,abcd', equationHint: 'y = x^2 - 2x - 8' }), { GEMINI_API_KEY: 'test', thintaDeps });
+  const response = await handleThinta(post('/api/thinta/run', { imageBase64: 'data:image/jpeg;base64,abcd', equationHint: 'y = x^2 - 2x - 8' }), { GEMINI_API_KEY: 'test', thintaDeps, store });
   assert.equal(response.status, 200);
   assert.match(response.headers.get('content-type'), /ndjson/);
   const events = await readEvents(response);
@@ -43,30 +47,30 @@ test('run streams trace events and ends with a GraphJob', async () => {
 });
 
 test('approve records who approved and when', async () => {
-  const response = await handleThinta(post('/api/thinta/approve', { jobId: 'example-parabola', by: 'Ms Dlamini' }), {});
+  const response = await handleThinta(post('/api/thinta/approve', { jobId: 'example-parabola', by: 'Ms Dlamini' }), { store });
   const data = await response.json();
   assert.equal(data.approval.approved, true);
   assert.equal(data.approval.by, 'Ms Dlamini');
 });
 
 test('rejects GET, foreign origins and oversized photos', async () => {
-  assert.equal((await handleThinta(new Request('http://localhost/api/thinta/run'), {})).status, 405);
+  assert.equal((await handleThinta(new Request('http://localhost/api/thinta/run'), { store })).status, 405);
   const foreign = new Request('http://localhost/api/thinta/run', { method: 'POST', headers: { origin: 'https://evil.example' }, body: '{}' });
   assert.equal((await handleThinta(foreign, {})).status, 403);
-  assert.equal((await handleThinta(post('/api/thinta/run', { imageBase64: 'a'.repeat(3_600_000) }), {})).status, 413);
+  assert.equal((await handleThinta(post('/api/thinta/run', { imageBase64: 'a'.repeat(3_600_000) }), { store })).status, 413);
 });
 
 const fikaDeps = fakeFikaDeps();
 
 test('Fika: dispatch needs approval, streams a plan, replans on events and reports status', async () => {
-  assert.equal((await handleThinta(post('/api/thinta/dispatch', { graphJobId: 'g-1', schoolId: 'demo-school' }), {})).status, 409);
-  const events = await readEvents(await handleThinta(post('/api/thinta/dispatch', { graphJobId: 'g-1', schoolId: 'demo-school', approved: true }), { fikaDeps }));
+  assert.equal((await handleThinta(post('/api/thinta/dispatch', { graphJobId: 'g-1', schoolId: 'demo-school' }), { store })).status, 409);
+  const events = await readEvents(await handleThinta(post('/api/thinta/dispatch', { graphJobId: 'g-1', schoolId: 'demo-school', approved: true }), { fikaDeps, store }));
   assert.equal(events.at(-1).type, 'done');
   assert.deepEqual(validateDispatch(events.at(-1).dispatch), []);
-  const replan = await (await handleThinta(post('/api/thinta/dispatch/event', { graphJobId: 'g-1', kind: 'machine-offline', machineId: 'embosser-1' }), { fikaDeps })).json();
+  const replan = await (await handleThinta(post('/api/thinta/dispatch/event', { graphJobId: 'g-1', kind: 'machine-offline', machineId: 'embosser-1' }), { fikaDeps, store })).json();
   assert.deepEqual(validateDispatch(replan.dispatch), []);
-  assert.equal((await handleThinta(post('/api/thinta/dispatch/event', { graphJobId: 'g-1', kind: 'explode' }), {})).status, 400);
-  const status = await handleThinta(new Request('http://localhost/api/thinta/dispatch/g-1'), {});
+  assert.equal((await handleThinta(post('/api/thinta/dispatch/event', { graphJobId: 'g-1', kind: 'explode' }), { store })).status, 400);
+  const status = await handleThinta(new Request('http://localhost/api/thinta/dispatch/g-1'), { store });
   assert.equal(status.status, 200);
-  assert.equal((await handleThinta(new Request('http://localhost/api/thinta/dispatch/nope'), {})).status, 404);
+  assert.equal((await handleThinta(new Request('http://localhost/api/thinta/dispatch/nope'), { store })).status, 404);
 });
