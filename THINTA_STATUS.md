@@ -147,7 +147,9 @@ Brief: `0a4b5646-FIKA_DISPATCHER_BRIEF.md` in the session uploads. Rule one: eve
 - Demo note (optional, no change needed): the embosser-offline strike-through is visible (Thu ~~14:34~~ → 15:03) but nothing becomes late. If you want "offline embosser → late on the swell heater, busy until Fri ...", give `swell-1` a queue of ~400 pages (it is then busy until Fri 14:00, and the reason reads "The braille embosser is offline and the swell-paper heater is busy until Fri 14:00").
 
 ## I. Tracker & Notifier
-_not started_
+- Done: `server/thinta/fika/tracker.mjs`, `notifier.mjs` + tests (14 pass, incl. one against H's real scheduler). Times via H's `time.js`. No live Gemini calls made.
+- Tracker: `advance(dispatch, school, {toClock}) → {dispatch, events}` (pure; queued→printing at `start`, →ready at `eta`; phone items stay delivered; late jobs that finish become ready and keep `lateReason` plus `lateNote`; jobs on an offline machine don't progress; never edits eta/machineId; clock never goes back). Events `{t: eta, kind:'job-done', detail, jobId, machineId}`. `nextClock(dispatch, {minutes} | {speed, realSeconds} | {} | {to:'end'})` → ISO or null; `boundaries(dispatch)`; `finish(dispatch, school)` (jump to final statuses).
+- Notifier: `notify({dispatch, school, apiKey, fetchImpl, translate}) → {summary:{en, zu, ready, late}, numberCheck:{pass, problems}, warnings, source:'gemini'|'template', facts}`. Gemini gets only the facts; deterministic number check (digits, spoken numbers, `15:10`/`15h10`/`3:10 pm`, day names, every late learner named, honest-failure wording); one retry with problems, then the fixed template (`templateSummary(facts)`), which also covers no key / Gemini errors. `ready` = ready+delivered jobs, `late` = jobs that miss their deadline (a print finished late counts in both).
 
 ## J. Delivery UI
 _not started_
