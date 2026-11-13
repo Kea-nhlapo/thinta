@@ -155,7 +155,7 @@ export async function* runPipeline(input, { apiKey, fetchImpl = fetch, translate
         if (attempt === LIMITS.maxRetries) { trace('Reviewer', 'fail', `Fresh eyes still disagree after ${attempt} fixes; escalated to the teacher`); break; }
         trace('Reviewer', 'retry', `Fresh eyes disagree: ${result.review.reason}. Sending back to the Designer`);
         yield* flush();
-        const fixed = deps.fixTactile(proof, tactile, result.review.feedback || result.review);
+        const fixed = deps.fixTactile(proof, tactile, result.feedback || { missing: [], unclear: ['roots', 'turningPoint', 'yIntercept'] });
         (fixed.corrections || []).forEach(correct);
         tactile = fixed;
         patch({ tactile: { svg: fixed.svg, warnings: fixed.warnings || [], ruleChecks: fixed.ruleChecks || [] } });
