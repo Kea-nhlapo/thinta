@@ -7,7 +7,8 @@ const tryNextModel = (status, detail) => [0, 429, 500, 503].includes(status) || 
 export class GeminiError extends Error {}
 
 // parts: Gemini content parts ({text} or {inlineData:{mimeType,data}}). Returns the parsed JSON object.
-export async function geminiJSON({ apiKey, parts, schema, models = MODELS, temperature = 0.2, timeoutMs = 45000, fetchImpl = fetch }) {
+// 20 s per model: these calls normally take 4–14 s, and on the deployed server a hung model at 45 s doubled a run.
+export async function geminiJSON({ apiKey, parts, schema, models = MODELS, temperature = 0.2, timeoutMs = 20000, fetchImpl = fetch }) {
   if (!apiKey) throw new GeminiError('Set GEMINI_API_KEY to run Thinta live.');
   let last = 'Gemini did not answer.';
   for (const model of models) {
