@@ -31,7 +31,7 @@ Each sub-agent updates **only its own section** at least every 45 minutes: Done,
 |---|---|
 | Gemini reads a phone photo of the parabola into `reading` | blocked: no GEMINI_API_KEY. Run `node server/thinta/smoke-a.mjs [photo.jpg] ["y = x^2 - 2x - 8"]` (A) |
 | Gemini reads a rendered tactile SVG back (fresh eyes) | blocked: no GEMINI_API_KEY (same smoke script). Rasterising works: `@resvg/resvg-js` renders B's SVG to PNG locally; geometry fallback reads B's SVG to roots [-2, 4], TP (1, -9) (A) |
-| liblouis loads, or fallback table chosen | pending |
+| liblouis loads, or fallback table chosen | **No-go for liblouis** (multi-MB emscripten build, too heavy for the phone bundle). Built-in Grade 1 UEB-style table chosen (`src/thinta/tactile/braille.js`). Maths braille labelled beta on every sheet |
 | Vibration + Web Audio on the demo Android phone | pending (needs the real phone) |
 
 ## Orchestrator
@@ -44,7 +44,15 @@ Each sub-agent updates **only its own section** at least every 45 minutes: Done,
 _not started_
 
 ## B. Tactile Designer
-_not started_
+- **Done:** `src/thinta/tactile/` (pure JS, runs in Node and the browser, no new packages). 10 tests pass: `node --test src/thinta/tactile/*.test.js`.
+  - `designTactile(proof, {type?, title?, yLabel?}) → {svg, warnings, ruleChecks, corrections, layout, initialChecks, options}`. `type` defaults from `proof.bars`. Store the whole object as `job.tactile` so `fixTactile` can reuse `options`/`layout`.
+  - `fixTactile(proof, tactile, {missing:[], unclear:[]})`: keys `roots`, `turningPoint`, `yIntercept`, `bars`. Those labels get larger print (`C: turning point (1, -9)`) and braille coordinates at the point, then the rule checker re-runs. Adds Designer corrections for the change.
+  - `checkRules(layout)`, `autoFix(layout)`, `toBraille(text)`, `svgToDataUrl(svg)`, `svgToPdf(svg) → Uint8Array`, `svgToPdfDataUrl(svg)`.
+  - Rules: `label-gap` (≥ 3.2 mm from the curve or bar outline stroke edge), `stroke-hierarchy`, `label-overlap`, `label-in-page`, `label-axis-gap` (≥ 1.5 mm). On the demo parabola, the natural label positions really do hit the curve. The fixer moves root1, root2, turningPoint and yIntercept and logs a correction for each, e.g. `{agent:'Designer', field:'tactile.labels.turningPoint', before:{x,y}, after:{x,y}, reason:'Label 0 mm from the curve (needs 3.2 mm)…'}` (mm, label centre).
+- **SVG conventions (A and E depend on these):** `width="277mm" height="190mm" viewBox="0 0 277 190"` (1 unit = 1 mm), `<title id="thinta-title">`, `<desc id="thinta-desc">` (has every key point in words). Key points: `<g class="key-point" data-kind="root|turning-point|y-intercept" data-x data-y data-key="A" data-name="root1">`, with **maths** coordinates. Bars: `<g class="bar" data-kind="bar" data-x="<index>" data-y="<value>" data-label data-texture>`. Curve: `<polyline id="curve" data-kind="curve" points=…>` in mm. `<g id="plot" data-x-min data-x-max data-y-min data-y-max data-left data-right data-top data-bottom data-x-axis-y data-y-axis-x>` maps mm back to maths. Labels: `<g class="label" data-name data-role data-braille data-print>`. Print text is a real `<text>` with an ASCII minus, e.g. `A (-2, 0)`. Braille is drawn as true-size circles (1.5 mm dots, 2.5/6 mm spacing), not a font, so resvg rasterises it without braille fonts.
+- **Doing:** nothing. Done unless asked.
+- **Blocked on:** nothing.
+- **Interface changes requested:** none (the extra return fields are additive).
 
 ## C. Sound & Touch
 - **Done:**
