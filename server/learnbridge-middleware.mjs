@@ -18,7 +18,9 @@ export function learnBridgeMiddleware(hfToken, geminiKey) {
         chunks.push(chunk);
       }
       const body = Buffer.concat(chunks);
-      const request = new Request(`http://${req.headers.host}${req.url}`, { method: req.method, headers: req.headers, ...(body.length ? { body } : {}) });
+      // Behind a hosting proxy the phone is on https; keep that, or the gateway's origin check refuses the app itself.
+      const proto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https' ? 'https' : 'http';
+      const request = new Request(`${proto}://${req.headers.host}${req.url}`, { method: req.method, headers: req.headers, ...(body.length ? { body } : {}) });
       const response = await gateway.fetch(request, { HF_TOKEN: hfToken, GEMINI_API_KEY: geminiKey });
       res.writeHead(response.status, Object.fromEntries(response.headers));
       res.end(Buffer.from(await response.arrayBuffer()));

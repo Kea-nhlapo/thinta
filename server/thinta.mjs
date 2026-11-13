@@ -113,6 +113,10 @@ export async function handleThinta(request, env = {}) {
   return jsonError('Not found.', 404);
 }
 
+// Behind a hosting proxy the server sees plain http while the phone is on https; the proxy says which in
+// x-forwarded-proto. Without it the origin check compared "https://site" with "http://site" and refused the app itself.
+export const forwardedProto = req => (String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https' ? 'https' : 'http');
+
 // The same routes inside the Vite dev/preview server, streaming the response as it is produced.
 export function thintaMiddleware(env) {
   return async (req, res, next) => {
@@ -122,7 +126,7 @@ export function thintaMiddleware(env) {
       const chunks = [];
       for await (const chunk of req) chunks.push(chunk);
       const body = Buffer.concat(chunks);
-      const request = new Request(`http://${req.headers.host}${req.url}`, { method: req.method, headers: req.headers, ...(body.length ? { body } : {}) });
+      const request = new Request(`${forwardedProto(req)}://${req.headers.host}${req.url}`, { method: req.method, headers: req.headers, ...(body.length ? { body } : {}) });
       const response = await handleThinta(request, env());
       res.writeHead(response.status, Object.fromEntries(response.headers));
       if (!response.body) return res.end();

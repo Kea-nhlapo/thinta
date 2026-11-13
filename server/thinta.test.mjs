@@ -74,3 +74,17 @@ test('Fika: dispatch needs approval, streams a plan, replans on events and repor
   assert.equal(status.status, 200);
   assert.equal((await handleThinta(new Request('http://localhost/api/thinta/dispatch/nope'), { store })).status, 404);
 });
+
+test('behind an https proxy, the app itself passes the origin check (Railway regression)', async () => {
+  const { thintaMiddleware } = await import('./thinta.mjs');
+  const { Readable } = await import('node:stream');
+  const call = headers => new Promise(resolve => {
+    const req = Object.assign(Readable.from([Buffer.from('{}')]), { method: 'POST', url: '/api/thinta/run', headers: { host: 'thinta.example', 'content-type': 'application/json', ...headers } });
+    const res = { headersSent: false, statusCode: 200, writeHead(status) { this.statusCode = status; }, write() {}, end() { resolve(this.statusCode); } };
+    thintaMiddleware(() => ({ store }))(req, res, () => resolve('next'));
+  });
+  // 501 = past the origin check (no key in tests); 403 = refused as a foreign site.
+  assert.equal(await call({ origin: 'https://thinta.example', 'x-forwarded-proto': 'https' }), 501);
+  assert.equal(await call({ origin: 'https://evil.example', 'x-forwarded-proto': 'https' }), 403);
+  assert.equal(await call({ origin: 'http://thinta.example' }), 501);
+});
