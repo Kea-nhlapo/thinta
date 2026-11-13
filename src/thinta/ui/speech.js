@@ -94,7 +94,9 @@ async function serverAudio(text, lang, signal) {
 
 // Plays every chunk in turn. offline=true (replay) never calls the network. Returns which voice was used.
 export async function readAloud(text, lang, { signal, offline = false } = {}) {
-  const pieces = chunkText(text);
+  // About a sentence a piece: the voice takes ~4 s per sentence, so the first words start sooner and the rest
+  // are made in parallel while it plays.
+  const pieces = chunkText(text, 160);
   let i = 0;
   if (!offline) {
     try {
