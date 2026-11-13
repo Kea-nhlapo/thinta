@@ -15,7 +15,7 @@ export function chunkText(text, max = 400) {
   return out;
 }
 
-const LANGS = { en: ['en-ZA', 'en'], zu: ['zu-ZA', 'zu'] };
+const LANGS = { en: ['en-ZA', 'en'], zu: ['zu-ZA', 'zu'], nso: ['nso-ZA', 'nso'] };
 
 function deviceSpeak(text, lang, signal) {
   return new Promise((resolve, reject) => {
@@ -25,6 +25,8 @@ function deviceSpeak(text, lang, signal) {
     const [code, prefix] = LANGS[lang] || LANGS.en;
     utterance.lang = code;
     const voice = speechSynthesis.getVoices().find(v => v.lang.toLowerCase().replace('_', '-').startsWith(prefix));
+    // An English voice reading isiZulu or Sepedi is worse than saying so.
+    if (!voice && lang !== 'en') return reject(Error(`This phone has no ${lang === 'zu' ? 'isiZulu' : 'Sepedi'} voice, and the voice service could not be reached.`));
     if (voice) utterance.voice = voice;
     utterance.onend = () => resolve();
     utterance.onerror = () => resolve();
@@ -33,7 +35,41 @@ function deviceSpeak(text, lang, signal) {
   });
 }
 
+// Phones only let a page start sound from a tap. The voice takes a few seconds to arrive from the server, by
+// which time Android no longer counts the tap and blocks audio.play() silently. So the tap unlocks one shared
+// Web Audio context straight away (call unlockAudio() first thing in the click handler), and every clip plays
+// through it later, however long the download took.
+let context = null;
+export function unlockAudio() {
+  const AudioContextClass = globalThis.AudioContext || globalThis.webkitAudioContext;
+  if (!AudioContextClass) return null;
+  try {
+    context ||= new AudioContextClass();
+    if (context.state === 'suspended') context.resume();
+    // iOS also wants a sound started inside the tap: an empty one is enough.
+    const source = context.createBufferSource();
+    source.buffer = context.createBuffer(1, 1, 22050);
+    source.connect(context.destination);
+    source.start(0);
+  } catch { context = null; }
+  return context;
+}
+
+async function playThroughContext(blob, signal) {
+  const buffer = await context.decodeAudioData(await blob.arrayBuffer());
+  if (signal?.aborted) return;
+  await new Promise(resolve => {
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(context.destination);
+    source.onended = resolve;
+    signal?.addEventListener('abort', () => { try { source.stop(); } catch { /* already stopped */ } resolve(); }, { once: true });
+    source.start();
+  });
+}
+
 function playBlob(blob, signal) {
+  if (context && context.state !== 'closed') return playThroughContext(blob, signal);
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
@@ -62,9 +98,12 @@ export async function readAloud(text, lang, { signal, offline = false } = {}) {
   let i = 0;
   if (!offline) {
     try {
+      // Ask for every piece at once, so piece 2 is ready by the time piece 1 finishes.
+      const clips = pieces.map(piece => serverAudio(piece, lang, signal));
+      clips.forEach(clip => clip.catch(() => {}));
       for (; i < pieces.length; i++) {
         if (signal?.aborted) return 'stopped';
-        await playBlob(await serverAudio(pieces[i], lang, signal), signal);
+        await playBlob(await clips[i], signal);
       }
       return 'server';
     } catch {

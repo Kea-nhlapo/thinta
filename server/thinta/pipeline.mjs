@@ -167,7 +167,8 @@ export async function* runPipeline(input, { apiKey, fetchImpl = fetch, translate
     const explained = yield* pump(ai(() => deps.explain({ proof, reading: read, translate, ...ctx })));
     patch({ description: explained.description, deafSolution: explained.deafSolution });
     (explained.warnings || []).forEach(warning => trace('Explainer', 'fail', warning));
-    trace('Explainer', 'done', `Description written${explained.description.zu ? ' in English and isiZulu' : ' in English (isiZulu failed)'}; ${explained.deafSolution.steps.length} Deaf solution steps`);
+    const languages = ['English', explained.description.zu && 'isiZulu', explained.description.nso && 'Sepedi'].filter(Boolean);
+    trace('Explainer', 'done', `Description written in ${languages.join(', ').replace(/, ([^,]*)$/, ' and $1')}; ${explained.deafSolution.steps.length} Deaf solution steps`);
 
     // Reviewer 2 and 3: answer the worksheet from each version alone, plus a meaning check; both versions in parallel.
     const accessLoop = async version => {

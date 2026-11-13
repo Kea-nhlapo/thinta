@@ -13,6 +13,15 @@ export function vibrate(kind) {
   try { return navigator.vibrate(VIBRATION[kind] || [50]); } catch { return false; }
 }
 
+// A short pulse, repeated while the finger stays off the curve: a rumble that feels different from the key-point patterns.
+export function buzzOffCurve() {
+  if (!canVibrate()) return false;
+  try { return navigator.vibrate(25); } catch { return false; }
+}
+export function stopBuzz() {
+  if (canVibrate()) try { navigator.vibrate(0); } catch { /* nothing to stop */ }
+}
+
 export function createAudioEngine() {
   let ctx = null, master = null, tone = null, sweep = null, muted = false;
   const listeners = new Set();

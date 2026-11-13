@@ -56,18 +56,21 @@ ${fixes.length ? `\nTHE LAST VERSION FAILED A CHECK. Fix every one of these:\n${
 Return JSON only.`;
 }
 
+const LANGUAGE_NAMES = { zu: 'isiZulu', nso: 'Sepedi' };
+
 // Translate one text; a failure leaves '' so the caller can warn and keep the English.
-async function toZulu(text, translate) {
-  if (!translate || !text) return { zu: '', warning: 'isiZulu translation not available' };
+async function translated(text, lang, translate) {
+  const name = LANGUAGE_NAMES[lang];
+  if (!translate || !text) return { text: '', warning: `${name} translation not available` };
   try {
     // Spoken negatives go in as "−2": in a live run the translation dropped "negative" and flipped a root's sign.
-    const out = await translate(text.replace(/\bnegative\s+(\d+(?:\.\d+)?)/gi, '−$1'), 'en', 'zu');
-    const zu = (typeof out === 'string' ? out : out?.text || '').trim();
-    if (!zu) return { zu: '', warning: 'isiZulu translation came back empty' };
+    const out = await translate(text.replace(/\bnegative\s+(\d+(?:\.\d+)?)/gi, '−$1'), 'en', lang);
+    const result = (typeof out === 'string' ? out : out?.text || '').trim();
+    if (!result) return { text: '', warning: `${name} translation came back empty` };
     // Numbers, signs included, must survive translation; NLLB sometimes drops or changes them.
-    const missing = [...new Set(parseNumbers(text))].filter(n => !parseNumbers(zu).includes(n));
-    return { zu, warning: missing.length ? `isiZulu text may be missing the number(s) ${missing.join(', ')}; check before use` : '' };
-  } catch (error) { return { zu: '', warning: `isiZulu translation failed: ${error.message}` }; }
+    const missing = [...new Set(parseNumbers(text))].filter(n => !parseNumbers(result).includes(n));
+    return { text: result, warning: missing.length ? `${name} text may be missing the number(s) ${missing.join(', ')}; check before use` : '' };
+  } catch (error) { return { text: '', warning: `${name} translation failed: ${error.message}` }; }
 }
 
 export async function explain({ proof, reading, feedback, apiKey, fetchImpl = fetch, translate, timeoutMs = 25000 }) {
@@ -80,11 +83,12 @@ export async function explain({ proof, reading, feedback, apiKey, fetchImpl = fe
     description: meaningCheck(en, proof),
     deafSolution: meaningCheck(steps.flatMap(s => [s.text, s.visual]).join('\n'), proof),
   };
-  const { zu, warning } = await toZulu(en, translate);
-  const warnings = [warning].filter(Boolean);
+  // isiZulu and Sepedi side by side, so the second language adds no waiting.
+  const [zu, nso] = await Promise.all([translated(en, 'zu', translate), translated(en, 'nso', translate)]);
+  const warnings = [zu.warning, nso.warning].filter(Boolean);
   if (!en) warnings.push('Gemini returned no description');
   if (!steps.length) warnings.push('Gemini returned no Deaf solution steps');
-  return { description: { en, zu }, deafSolution: { steps, keyTerms }, meaning, warnings };
+  return { description: { en, zu: zu.text, nso: nso.text }, deafSolution: { steps, keyTerms }, meaning, warnings };
 }
 
 // Sentence-sized pieces under the /api/speak limit.

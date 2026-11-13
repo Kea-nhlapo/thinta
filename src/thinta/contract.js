@@ -21,7 +21,8 @@
  *   Ground truth from algebra, never from AI. `answers` are the Prover-derived answers the Reviewer grades against.
  * @property {{svg:string, warnings:string[], ruleChecks:{rule:string, pass:boolean, detail:string}[]}} tactile
  * @property {{samples:Point[], keyPoints:{x:number, y:number, kind:'root'|'turning-point'|'y-intercept'|'bar'}[]}} sound
- * @property {{en:string, zu:string, audioUrls?:{en?:string, zu?:string}}} description
+ * @property {{en:string, zu:string, nso?:string, audioUrls?:{en?:string, zu?:string, nso?:string}}} description
+ *   nso (Sepedi) was added with the Railway deploy; older packs and replays have only en and zu.
  * @property {{steps:{text:string, visual:string}[], keyTerms:string[]}} deafSolution
  *   `visual` is a short instruction for the step's picture (e.g. "highlight the roots on the x-axis"), never sign language.
  * @property {Review[]} reviews

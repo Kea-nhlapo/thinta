@@ -114,3 +114,12 @@ test('sweep plan: bars are separate held notes, tallest highest', () => {
   assert.ok(plan.tones[0].end < plan.tones[1].start);
   assert.deepEqual(plan.ticks.map(t => t.t), [0, 1, 2]);
 });
+
+test('curveSide says which way the finger has drifted, with a tolerance around the line', async () => {
+  const { curveSide } = await import('./sonify.js');
+  assert.equal(curveSide(100, 100, 30), null);
+  assert.equal(curveSide(125, 100, 30), null);
+  assert.equal(curveSide(60, 100, 30), 'above');
+  assert.equal(curveSide(140, 100, 30), 'below');
+  assert.equal(curveSide(NaN, 100, 30), null);
+});

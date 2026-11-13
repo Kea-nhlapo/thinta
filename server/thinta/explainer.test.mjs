@@ -19,13 +19,14 @@ test('the prompt lists the proof values as the only allowed numbers and carries 
   assert.doesNotMatch(explainPrompt(ex.proof, ex.reading), /FAILED/);
 });
 
-test('explain returns description, Deaf steps, uppercase key terms and isiZulu', async () => {
+test('explain returns description, Deaf steps, uppercase key terms, isiZulu and Sepedi', async () => {
   const calls = [];
   const out = await explain({ proof: ex.proof, reading: ex.reading, apiKey: 'k', fetchImpl: geminiReturning(good),
     translate: async (text, from, to) => { calls.push([from, to]); return { text: 'Ijika ... u-x elingana no-negethivu 2 no-4, 1, negethivu 9, negethivu 8, 0' }; } });
   assert.equal(out.description.en, ex.description.en);
   assert.match(out.description.zu, /negethivu/);
-  assert.deepEqual(calls, [['en', 'zu']]);
+  assert.deepEqual(calls, [['en', 'zu'], ['en', 'nso']]);
+  assert.ok(out.description.nso);
   assert.deepEqual(out.deafSolution.keyTerms, ['ROOT', 'TURNING POINT', 'MINIMUM']);
   assert.equal(out.deafSolution.steps.length, 5);
   assert.equal(out.meaning.description.pass, true);

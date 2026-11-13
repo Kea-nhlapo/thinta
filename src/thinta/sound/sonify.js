@@ -139,3 +139,12 @@ export function sweepPlan(sound, { durationMs = 4000 } = {}) {
   const glide = samples.map(p => ({ t: at(p.x), freq: pitchFor(p.y, range), pan: pan(p.x), x: p.x }));
   return { seconds, glide, tones: [], ticks: keyPoints.map(p => ({ t: at(p.x), kind: p.kind, point: p })) };
 }
+
+// Where the finger is against the curve, in screen units (y grows downwards): 'above', 'below' or null when it is
+// within `tolerance` of the line. Drives the off-curve buzz and the "move up / move down" announcement.
+export function curveSide(fingerY, curveY, tolerance) {
+  if (!Number.isFinite(fingerY) || !Number.isFinite(curveY)) return null;
+  if (fingerY < curveY - tolerance) return 'above';
+  if (fingerY > curveY + tolerance) return 'below';
+  return null;
+}

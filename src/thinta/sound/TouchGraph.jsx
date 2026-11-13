@@ -2,11 +2,14 @@
 // ticks, vibration (Android) and spoken announcements at the roots and turning point. Screen reader users,
 // whose drags TalkBack and VoiceOver take over, step through x with a native slider and key-point buttons.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { sonify, yAt, yRange, pitchFor, crossedKeyPoints, nearestKeyPoint, describeKeyPoint, describeX, stopsFor, spokenNumber } from './sonify.js';
-import { createAudioEngine, vibrate, canVibrate } from './audio-engine.js';
+import { sonify, yAt, yRange, pitchFor, crossedKeyPoints, nearestKeyPoint, describeKeyPoint, describeX, stopsFor, spokenNumber, curveSide } from './sonify.js';
+import { createAudioEngine, vibrate, canVibrate, buzzOffCurve, stopBuzz } from './audio-engine.js';
 import './touch-graph.css';
 
 const W = 360, H = 280, PAD = { left: 44, right: 14, top: 16, bottom: 34 };
+// How far (in graph units, about a fingertip) the finger may stray from the curve before the phone buzzes.
+const OFF_CURVE = 30;
+const BUZZ_EVERY_MS = 220;
 const SHAPE_NAMES = { root: 'circle', 'turning-point': 'square', 'y-intercept': 'triangle' };
 
 // A key point's marker. Shapes, not colours, say what kind it is.
@@ -109,8 +112,22 @@ export default function TouchGraph({ job, durationMs = 4000 }) {
     const near = !isBar && nearestKeyPoint(x, sound.keyPoints, (x1 - x0) / 60);
     if (near) { reach(near); lastX.current = x; setCursor(x); } else follow(x);
   };
-  const onPointerMove = event => { if (dragging.current) follow(xFromPointer(event)); };
-  const onPointerUp = () => { dragging.current = false; lastX.current = null; getEngine().stopTone(); };
+  // While tracing, a finger that drifts off the curve gets a repeating buzz and a spoken "move up" or "move down".
+  const offCurve = useRef({ side: null, last: 0 });
+  const guide = (event, x) => {
+    if (isBar) return;
+    const box = event.currentTarget.getBoundingClientRect();
+    const side = curveSide((event.clientY - box.top) / box.height * H, sy(valueAt(x)), OFF_CURVE);
+    const state = offCurve.current;
+    const now = performance.now();
+    if (side) {
+      if (side !== state.side) announce(`Off the curve. Move ${side === 'above' ? 'down' : 'up'}`);
+      if (now - state.last > BUZZ_EVERY_MS) { buzzOffCurve(); state.last = now; }
+    } else if (state.side) { stopBuzz(); announce('Back on the curve'); }
+    state.side = side;
+  };
+  const onPointerMove = event => { if (!dragging.current) return; const x = xFromPointer(event); follow(x); guide(event, x); };
+  const onPointerUp = () => { dragging.current = false; lastX.current = null; offCurve.current = { side: null, last: 0 }; stopBuzz(); getEngine().stopTone(); };
 
   // Slider and buttons: move to an x, play a short note there and tick if it is a key point.
   const goTo = (x, { speak = false } = {}) => {
@@ -150,19 +167,18 @@ export default function TouchGraph({ job, durationMs = 4000 }) {
   { const s = tickStep(y1 - y0); for (let t = Math.ceil(y0 / s) * s; t <= y1 + 1e-9; t += s) if (Math.abs(t) > 1e-9 || isBar) yTicks.push(+t.toFixed(6)); }
   const cursorY = cursor === null ? null : valueAt(cursor);
   const kinds = [...new Set(sound.keyPoints.map(p => p.kind))].filter(k => k !== 'bar');
-  const soundLabel = !audio.supported ? 'Sound not supported on this browser' : audio.muted ? 'Sound off' : audio.running ? 'Sound on' : 'Sound starts when you touch the graph';
+  // One toggle: sound is on unless the learner turned it off (it starts playing at the first touch).
+  const soundOn = audio.supported && !audio.muted;
+  const toggleSound = () => { const e = getEngine(); e.unlock(); e.setMuted(soundOn); announce(soundOn ? 'Sound off' : 'Sound on'); };
 
   if (!sound.samples.length) return <p className="th-touch-empty">No graph to play yet.</p>;
 
   return (
     <section className="th-touch" aria-label={`Touch the graph: ${title}`}>
       <div className="th-touch-status">
-        <span className={`th-touch-sound ${audio.running && !audio.muted ? 'is-on' : ''}`} role="status">
-          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d={audio.running && !audio.muted ? 'M3 9v6h4l5 5V4L7 9zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z' : 'M3 9v6h4l5 5V4L7 9zm13.6 3 2.7-2.7-1.4-1.4-2.7 2.7-2.7-2.7-1.4 1.4 2.7 2.7-2.7 2.7 1.4 1.4 2.7-2.7 2.7 2.7 1.4-1.4z'} /></svg>
-          {soundLabel}
-        </span>
-        <button type="button" className="th-touch-mute" aria-pressed={audio.muted} onClick={() => { const e = getEngine(); e.unlock(); e.setMuted(!audio.muted); }}>
-          {audio.muted ? 'Turn sound on' : 'Mute'}
+        <button type="button" className={`th-touch-sound ${soundOn ? 'is-on' : ''}`} aria-pressed={soundOn} disabled={!audio.supported} onClick={toggleSound}>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d={soundOn ? 'M3 9v6h4l5 5V4L7 9zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z' : 'M3 9v6h4l5 5V4L7 9zm13.6 3 2.7-2.7-1.4-1.4-2.7 2.7-2.7-2.7-1.4 1.4 2.7 2.7-2.7 2.7 1.4 1.4 2.7-2.7 2.7 2.7 1.4-1.4z'} /></svg>
+          {!audio.supported ? 'Sound not supported here' : soundOn ? 'Sound on' : 'Sound off'}
         </button>
       </div>
       {!vibrates && <p className="th-touch-note">Vibration works on Android only. You will hear a tick at each key point instead.</p>}

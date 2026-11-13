@@ -4,7 +4,7 @@ import { TraceLog, Review } from './Trace.jsx';
 import { checkOutcomes, outcomeSummary } from './highlights.js';
 import StepPicture from './StepPicture.jsx';
 import { formatPoint, formatValue, prettyMaths } from './format.js';
-import { readAloud } from './speech.js';
+import { readAloud, unlockAudio } from './speech.js';
 
 // Sub-agent C's touch graph and sub-agent B's PDF export load only if their files exist.
 const touchModules = import.meta.glob('../sound/TouchGraph.jsx');
@@ -61,6 +61,7 @@ function BlindTab({ job, replay }) {
     {job.description ? <>
       <Description lang="en" title="English" text={job.description.en} url={job.description.audioUrls?.en} replay={replay} />
       <Description lang="zu" title="isiZulu" text={job.description.zu} url={job.description.audioUrls?.zu} replay={replay} />
+      <Description lang="nso" title="Sepedi" text={job.description.nso} url={job.description.audioUrls?.nso} replay={replay} />
     </> : <NotReady>No description in this pack.</NotReady>}
     <h3>Tactile print</h3>
     <TactilePreview job={job} />
@@ -80,26 +81,30 @@ function KeyPoints({ job }) {
 
 function Description({ lang, title, text, url, replay }) {
   const [state, setState] = useState('idle');
+  const [error, setError] = useState('');
   const control = useRef(null);
   useEffect(() => () => control.current?.abort(), []);
   if (!text) return null;
   const play = async () => {
+    // Unlock sound now, inside the tap: the voice arrives seconds later, after the phone stops counting the tap.
+    unlockAudio();
     if (state === 'playing') { control.current?.abort(); setState('idle'); return; }
     control.current = new AbortController();
-    setState('playing');
+    setState('playing'); setError('');
     try {
       if (url && !replay) { const audio = new Audio(url); control.current.signal.addEventListener('abort', () => audio.pause()); await audio.play(); await new Promise(r => { audio.onended = r; }); }
       else await readAloud(text, lang, { signal: control.current.signal, offline: replay });
       setState('idle');
-    } catch { setState('failed'); }
+    } catch (failure) { setState('failed'); setError(failure?.message || 'Could not read this aloud on this phone.'); }
   };
-  return <article className="th-description" lang={lang === 'zu' ? 'zu' : 'en'}>
+  return <article className="th-description" lang={lang}>
     <h4>{title}</h4>
     <p>{prettyMaths(text)}</p>
     <button type="button" className="th-button th-button-outline" onClick={play} aria-pressed={state === 'playing'}>
       <span aria-hidden="true">{state === 'playing' ? '■ ' : '▶ '}</span>{state === 'playing' ? `Stop ${title}` : `Read aloud in ${title}`}
     </button>
-    {state === 'failed' && <p className="th-error" role="alert">Could not read this aloud on this phone.</p>}
+    {state === 'playing' && <p className="th-muted" role="status">Getting the voice and reading. The first words can take a few seconds.</p>}
+    {state === 'failed' && <p className="th-error" role="alert">{error}</p>}
   </article>;
 }
 
