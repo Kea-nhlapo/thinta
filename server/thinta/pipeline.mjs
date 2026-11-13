@@ -23,7 +23,7 @@ export async function defaultDeps() {
     plan: planWithGemini,
     readGraph: reader.readGraph, prove: prover.prove, freshEyes: freshEyes.freshEyes,
     designTactile: tactile.designTactile, fixTactile: tactile.fixTactile,
-    explain: explainer.explain, accessTest: reviewer.accessTest, meaningCheck: reviewer.meaningCheck, feedbackFrom: reviewer.feedbackFrom,
+    explain: explainer.explain, accessTest: reviewer.accessTest, meaningCheck: reviewer.meaningCheck, feedbackFrom: reviewer.feedbackFrom, deafText: reviewer.deafText,
     sonify: sound?.sonify || fallbackSonify,
   };
 }
@@ -47,13 +47,14 @@ function fallbackSonify(proof) {
 }
 
 const versionsFor = learners => [...(learners.includes('blind') ? ['tactile', 'sound', 'audio-description'] : []), ...(learners.includes('deaf') ? ['deaf-solution'] : [])];
-const deafText = deafSolution => (deafSolution?.steps || []).map(s => s.text).join('\n');
+const joinSteps = deafSolution => (deafSolution?.steps || []).map(s => s.text).join('\n');
 const scoreText = review => (review?.score !== undefined ? `${review.score}/${review.total}` : review?.pass ? 'pass' : 'fail');
 
 class StepCapError extends Error {}
 
 // Runs one job and yields stream events (see contract.js). Never throws: failures become trace entries.
 export async function* runPipeline(input, { apiKey, fetchImpl = fetch, translate, deps, now = Date.now } = {}) {
+  let deafText = joinSteps;
   const job = emptyJob({ input: { ...input, questions: input.questions?.length ? input.questions : DEFAULT_QUESTIONS } });
   const started = now();
   const events = [];
@@ -70,6 +71,7 @@ export async function* runPipeline(input, { apiKey, fetchImpl = fetch, translate
 
   try {
     deps = deps || await defaultDeps();
+    deafText = deps.deafText || joinSteps;
     const ctx = { apiKey, fetchImpl };
 
     // Planner
@@ -135,8 +137,9 @@ export async function* runPipeline(input, { apiKey, fetchImpl = fetch, translate
     patch({ sound });
     trace('Sonifier', 'done', `${sound.keyPoints.length} key points will click and vibrate`);
     yield* flush();
-    let { description, deafSolution } = await explaining;
+    const { description, deafSolution, warnings = [] } = await explaining;
     patch({ description, deafSolution });
+    for (const warning of warnings) trace('Explainer', 'fail', warning);
     trace('Explainer', 'done', `Description written${description.zu ? ' in English and isiZulu' : ' in English (isiZulu failed)'}; ${deafSolution.steps.length} Deaf solution steps`);
     yield* flush();
 
@@ -194,6 +197,7 @@ export async function* runPipeline(input, { apiKey, fetchImpl = fetch, translate
         try {
           const rewritten = await ai(() => deps.explain({ proof, reading, feedback, translate, ...ctx }));
           const before = version === 'audio' ? job.description.en : deafText(job.deafSolution);
+          (rewritten.warnings || []).forEach(warning => trace('Explainer', 'fail', warning));
           if (version === 'audio') patch({ description: rewritten.description });
           else patch({ deafSolution: rewritten.deafSolution });
           correct({ agent: 'Explainer', field: version === 'audio' ? 'description.en' : 'deafSolution', before, after: version === 'audio' ? rewritten.description.en : deafText(rewritten.deafSolution), reason: why });
