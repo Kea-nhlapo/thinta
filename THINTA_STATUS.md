@@ -152,7 +152,11 @@ Brief: `0a4b5646-FIKA_DISPATCHER_BRIEF.md` in the session uploads. Rule one: eve
 - Notifier: `notify({dispatch, school, apiKey, fetchImpl, translate}) → {summary:{en, zu, ready, late}, numberCheck:{pass, problems}, warnings, source:'gemini'|'template', facts}`. Gemini gets only the facts; deterministic number check (digits, spoken numbers, `15:10`/`15h10`/`3:10 pm`, day names, every late learner named, honest-failure wording); one retry with problems, then the fixed template (`templateSummary(facts)`), which also covers no key / Gemini errors. `ready` = ready+delivered jobs, `late` = jobs that miss their deadline (a print finished late counts in both).
 
 ## J. Delivery UI
-_not started_
+- Done: `src/thinta/fika/DeliveryBoard.jsx` + `delivery-board.css`, helpers `src/thinta/fika/ui/board.js` (12 tests: `node --test src/thinta/fika/ui/*.test.js`). Results.jsx: one marked change, a lazy **Delivery** tab shown only after approval (4 tabs fit at 375 px).
+- Board: per-learner cards, item names in words, machine, status chip (icon + word + border style), ETA via H's `formatEta`; ETA corrections (`dispatch.jobs.<id>.eta`) show `<del>before</del> → <ins>after</ins>` + reason straight from the server. Honest-failure card (`role=alert`), teacher summary (en/isiZulu toggle, ready/late counts), Schedule Checker panel, machines (demo values), Fika agent chips + trace (ETAs and machine names made readable), demo clock, honesty label. Board state survives tab switches.
+- Demo controls POST `/dispatch/event` with `{graphJobId, kind, machineId?, dispatch}`; a `tick` also sends `toClock` = clock + 1 h (server may ignore it; the button says "Advance clock 1 hour").
+- Replay: no network. Plays `src/thinta/fika/replay/recorded-*.json` if present, else `EXAMPLE_DISPATCH` labelled "Example data, not a recorded run". Recording shape: `{recordedAt, events:[stream events], actions:[{kind, machineId?, result:{dispatch, corrections, trace}}]}`; recorded actions play from a "Play the recorded event" button, live demo controls are disabled.
+- Verified at 375 px: replay → approve → Delivery tab, no `/api` calls; live path against the real scheduler (embosser offline → 4 struck-through ETAs; swell offline too → honest-failure card; embosser back → card clears); no text under 16 px, no horizontal scroll. Build passes, all Thinta tests pass.
 
 ## K. QA & Replay
 _not started (orchestrator runs it after integration)_
