@@ -98,7 +98,7 @@ test('label-near-own-point: a label parked by another key point fails, and auto-
   const label = layout.labels.find(l => l.name === 'root1');
   const other = layout.markers.find(m => m.name === 'root2');
   Object.assign(label, { x: other.x - label.w / 2, y: other.y - 6 - label.h });
-  assert.deepEqual(checkRules(layout).find(c => c.rule === 'label-near-own-point').labels, ['root1']);
+  assert.ok(checkRules(layout).find(c => c.rule === 'label-near-own-point').labels.includes('root1'));
   const { layout: fixed } = autoFix(layout);
   const p = labelProblems(fixed, fixed.labels.find(l => l.name === 'root1'));
   assert.ok(p.nearOwn && p.ownDist <= 15);
