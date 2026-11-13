@@ -17,7 +17,7 @@ export function normalize(text = '') {
     .replace(/[²³]|\^\s*\d+/g, '')
     .replace(/\bx squared\b/g, 'x')
     .replace(new RegExp(`\\b(${WORD_RE})\\b`, 'g'), w => String(WORDS.indexOf(w)))
-    .replace(/\b(?:negative|minus)\s+(\d)/g, '-$1')
+    .replace(/\b(?:negative|minus|negethivu)\s+(\d)/g, '-$1') // negethivu: isiZulu, so translations can be checked too
     .replace(/\bis equal to\b|\bequals\b|\bis equals\b/g, '=')
     .replace(/≤/g, '<=').replace(/≥/g, '>=');
 }
@@ -34,7 +34,8 @@ export function parseNumbers(text) {
   return out;
 }
 
-const pairs = t => [...t.matchAll(new RegExp(`\\(\\s*(${NUM})\\s*[,;]\\s*(${NUM})\\s*\\)`, 'g'))].map(m => ({ x: +m[1], y: +m[2], index: m.index }));
+// "(0, -8)", or the spoken "point 0, negative 8" that descriptions for listening use.
+const pairs = t => [...t.matchAll(new RegExp(`(?:\\(\\s*(${NUM})\\s*[,;]\\s*(${NUM})\\s*\\)|\\bpoint\\s+(${NUM})\\s*,\\s*(${NUM}))`, 'g'))].map(m => [m[1] ?? m[3], m[2] ?? m[4], m.index]).map(([x, y, index]) => ({ x: +x, y: +y, index }));
 // "x = 4" but not "x = 2a" or "x = 2(...)": the number must end the term.
 const xEquals = t => [...t.matchAll(new RegExp(`(?<![\\w)])x\\s*=\\s*(${NUM})(?![\\w(]|\\.\\d)`, 'g'))].map(m => +m[1]);
 const yEquals = t => [...t.matchAll(new RegExp(`(?<![\\w)])y\\s*=\\s*(${NUM})(?![\\w(]|\\.\\d)`, 'g'))].map(m => +m[1]);
@@ -218,7 +219,9 @@ function claims(t) {
   const yint = t.match(YINT_RE);
   if (yint) {
     const after = t.slice(yint.index);
-    const p = pairs(after).find(q => near(q.x, 0));
+    // Also "at 0, negative 8" with no brackets, which a live description used three times running.
+    const bare = after.match(new RegExp(`\\bat\\s+0\\s*,\\s*(${NUM})`));
+    const p = pairs(after).find(q => near(q.x, 0)) || (bare && { y: +bare[1] });
     const values = p ? [p.y] : yEquals(after).length ? yEquals(after) : parseNumbers(after.replace(new RegExp(`x\\s*=\\s*${NUM}`, 'g'), ' '));
     if (values.length) out.push({ kind: 'y-intercept', value: values[0] });
   }

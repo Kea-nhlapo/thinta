@@ -9,7 +9,9 @@ export async function loadReplay() {
   if (key) {
     try {
       const module = await recorded[key]();
-      return { recording: module.default ?? module, label: `Recorded run (${key.replace('./', '')})`, isExample: false };
+      const recording = module.default ?? module;
+      const when = recording.recordedAt ? new Date(recording.recordedAt).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+      return { recording, label: `Recorded live run${when ? ` from ${when}` : ''}${recording.source ? `, ${recording.source}` : ''}`, isExample: false };
     } catch { /* fall through to the example */ }
   }
   return { recording: EXAMPLE_PARABOLA_JOB, label: 'Example data from the contract, not a recorded run', isExample: true };

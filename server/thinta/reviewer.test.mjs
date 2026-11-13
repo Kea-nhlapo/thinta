@@ -78,3 +78,11 @@ test('meaning check catches a wrong turning point, a wrong inequality and a wron
   assert.equal(stray.pass, false); assert.match(stray.problems[0].reason, /37 is not a value/);
   assert.match(feedbackFrom(tp)[0], /This sentence is wrong/);
 });
+
+test('a y-intercept spoken as "point 0, negative 8" is read as -8 (live-run false alarm)', () => {
+  const proof = { roots: [-2, 4], turningPoint: { x: 1, y: -9 }, yIntercept: -8, coefficients: { a: 1, b: -2, c: -8 }, domain: [-4, 6], range: [-9, 16], samples: [] };
+  assert.equal(meaningCheck('It crosses the y-axis at point 0, negative 8.', proof).pass, true);
+  assert.equal(meaningCheck('It crosses the y-axis at point 0, negative 6.', proof).pass, false);
+  assert.equal(meaningCheck('It crosses the y-axis at 0, negative 8.', proof).pass, true);
+  assert.equal(meaningCheck('It crosses the y-axis at 0, negative 6.', proof).pass, false);
+});

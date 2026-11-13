@@ -1,0 +1,2776 @@
+{
+ "recordedAt": "2026-11-13T15:27:04.431Z",
+ "source": "rendered test drawing",
+ "events": [
+  {
+   "t": 115,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 23,
+     "agent": "Planner",
+     "status": "start",
+     "message": "Planning a pack for blind, deaf, sighted learners"
+    }
+   }
+  },
+  {
+   "t": 116,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 28,
+     "agent": "Reader",
+     "status": "start",
+     "message": "Reading the photo"
+    }
+   }
+  },
+  {
+   "t": 9797,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 9676,
+     "agent": "Reader",
+     "status": "done",
+     "message": "Graph y = x^2 - 2x - 8; turning point read as (1, -9) confidence 95%"
+    }
+   }
+  },
+  {
+   "t": 14763,
+   "event": {
+    "type": "patch",
+    "job": {
+     "plan": {
+      "steps": [
+       "Reader transcribes the photograph and Prover algebraically calculates the key features of y = x^2 - 2x - 8.",
+       "Designer generates tactile print files for the parabola, vertex, and axis intercepts.",
+       "Sonifier converts the graph's curve into an interactive sound and tactile-audio layout.",
+       "Explainer writes audio descriptions in English and isiZulu, plus a plain-language guide for Deaf learners.",
+       "Reviewer conducts a final quality check across all tactile, audio, and written outputs."
+      ],
+      "versions": [
+       "tactile",
+       "sound",
+       "audio-description",
+       "deaf-solution"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 14763,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 14730,
+     "agent": "Planner",
+     "status": "done",
+     "message": "4 versions: tactile, sound, audio-description, deaf-solution. Please share the tactile printouts and audio files with blind learners and the written step-by-step guide with Deaf learners."
+    }
+   }
+  },
+  {
+   "t": 14765,
+   "event": {
+    "type": "patch",
+    "job": {
+     "reading": {
+      "type": "function",
+      "confidence": 0.95,
+      "labels": [],
+      "questions": [],
+      "axes": {
+       "x": {
+        "min": -4,
+        "max": 6
+       },
+       "y": {
+        "min": -10,
+        "max": 10
+       }
+      },
+      "equation": "y = x^2 - 2x - 8",
+      "roots": [
+       -2,
+       4
+      ],
+      "turningPoint": {
+       "x": 1,
+       "y": -9
+      }
+     }
+    }
+   }
+  },
+  {
+   "t": 14765,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 14731,
+     "agent": "Prover",
+     "status": "start",
+     "message": "Checking the maths with algebra"
+    }
+   }
+  },
+  {
+   "t": 14765,
+   "event": {
+    "type": "patch",
+    "job": {
+     "proof": {
+      "equation": "y = x^2 - 2x - 8",
+      "coefficients": {
+       "a": 1,
+       "b": -2,
+       "c": -8
+      },
+      "roots": [
+       -2,
+       4
+      ],
+      "turningPoint": {
+       "x": 1,
+       "y": -9
+      },
+      "yIntercept": -8,
+      "domain": [
+       -4,
+       6
+      ],
+      "range": [
+       -9,
+       16
+      ],
+      "samples": [
+       {
+        "x": -4,
+        "y": 16
+       },
+       {
+        "x": -3.75,
+        "y": 13.5625
+       },
+       {
+        "x": -3.5,
+        "y": 11.25
+       },
+       {
+        "x": -3.25,
+        "y": 9.0625
+       },
+       {
+        "x": -3,
+        "y": 7
+       },
+       {
+        "x": -2.75,
+        "y": 5.0625
+       },
+       {
+        "x": -2.5,
+        "y": 3.25
+       },
+       {
+        "x": -2.25,
+        "y": 1.5625
+       },
+       {
+        "x": -2,
+        "y": 0
+       },
+       {
+        "x": -1.75,
+        "y": -1.4375
+       },
+       {
+        "x": -1.5,
+        "y": -2.75
+       },
+       {
+        "x": -1.25,
+        "y": -3.9375
+       },
+       {
+        "x": -1,
+        "y": -5
+       },
+       {
+        "x": -0.75,
+        "y": -5.9375
+       },
+       {
+        "x": -0.5,
+        "y": -6.75
+       },
+       {
+        "x": -0.25,
+        "y": -7.4375
+       },
+       {
+        "x": 0,
+        "y": -8
+       },
+       {
+        "x": 0.25,
+        "y": -8.4375
+       },
+       {
+        "x": 0.5,
+        "y": -8.75
+       },
+       {
+        "x": 0.75,
+        "y": -8.9375
+       },
+       {
+        "x": 1,
+        "y": -9
+       },
+       {
+        "x": 1.25,
+        "y": -8.9375
+       },
+       {
+        "x": 1.5,
+        "y": -8.75
+       },
+       {
+        "x": 1.75,
+        "y": -8.4375
+       },
+       {
+        "x": 2,
+        "y": -8
+       },
+       {
+        "x": 2.25,
+        "y": -7.4375
+       },
+       {
+        "x": 2.5,
+        "y": -6.75
+       },
+       {
+        "x": 2.75,
+        "y": -5.9375
+       },
+       {
+        "x": 3,
+        "y": -5
+       },
+       {
+        "x": 3.25,
+        "y": -3.9375
+       },
+       {
+        "x": 3.5,
+        "y": -2.75
+       },
+       {
+        "x": 3.75,
+        "y": -1.4375
+       },
+       {
+        "x": 4,
+        "y": 0
+       },
+       {
+        "x": 4.25,
+        "y": 1.5625
+       },
+       {
+        "x": 4.5,
+        "y": 3.25
+       },
+       {
+        "x": 4.75,
+        "y": 5.0625
+       },
+       {
+        "x": 5,
+        "y": 7
+       },
+       {
+        "x": 5.25,
+        "y": 9.0625
+       },
+       {
+        "x": 5.5,
+        "y": 11.25
+       },
+       {
+        "x": 5.75,
+        "y": 13.5625
+       },
+       {
+        "x": 6,
+        "y": 16
+       }
+      ],
+      "answers": [
+       {
+        "question": "Where does the graph cross the x-axis?",
+        "answer": "x = -2 and x = 4"
+       },
+       {
+        "question": "What is the turning point of the graph?",
+        "answer": "(1, -9)"
+       },
+       {
+        "question": "Is the turning point a minimum or a maximum?",
+        "answer": "minimum"
+       },
+       {
+        "question": "Where does the graph cross the y-axis?",
+        "answer": "y = -8, at (0, -8)"
+       },
+       {
+        "question": "For which values of x is y less than 0?",
+        "answer": "-2 < x < 4"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 14765,
+   "event": {
+    "type": "review",
+    "review": {
+     "agent": "Reviewer",
+     "check": "reader-vs-prover",
+     "pass": true,
+     "reason": "The Reader agreed with the algebra"
+    }
+   }
+  },
+  {
+   "t": 14765,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 14733,
+     "agent": "Prover",
+     "status": "done",
+     "message": "roots -2 and 4, turning point (1, -9)"
+    }
+   }
+  },
+  {
+   "t": 14786,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 14733,
+     "agent": "Designer",
+     "status": "start",
+     "message": "Drawing the tactile print"
+    }
+   }
+  },
+  {
+   "t": 15061,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.root1",
+     "before": {
+      "x": 63.3,
+      "y": 116.7
+     },
+     "after": {
+      "x": 63.1,
+      "y": 107
+     },
+     "reason": "Label 0 mm from the curve (needs 3.2 mm); 0 mm from an axis line; moved upper-right, now 3.8 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 15061,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.root2",
+     "before": {
+      "x": 153.5,
+      "y": 116.7
+     },
+     "after": {
+      "x": 129.9,
+      "y": 107
+     },
+     "reason": "Label 0 mm from the curve (needs 3.2 mm); 0 mm from an axis line; moved upper-left, now 3.8 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 15061,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.turningPoint",
+     "before": {
+      "x": 109.3,
+      "y": 157
+     },
+     "after": {
+      "x": 96,
+      "y": 167.3
+     },
+     "reason": "Label 0 mm from the curve (needs 3.2 mm); overlapped yIntercept; moved below, now 3.2 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 15061,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.yIntercept",
+     "before": {
+      "x": 94.1,
+      "y": 152.6
+     },
+     "after": {
+      "x": 93.1,
+      "y": 143.3
+     },
+     "reason": "Label 0 mm from the curve (needs 3.2 mm); overlapped marker turningPoint; 4.2 mm from its own point or nearer another one; moved upper-right, now 3.2 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 15061,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.tickX_6",
+     "before": {
+      "x": 172,
+      "y": 126.8
+     },
+     "after": {
+      "x": 172,
+      "y": 127.8
+     },
+     "reason": "Label overlapped axisX; moved below, now 23.7 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 15062,
+   "event": {
+    "type": "patch",
+    "job": {
+     "tactile": {
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"277mm\" height=\"190mm\" viewBox=\"0 0 277 190\" role=\"img\" aria-labelledby=\"thinta-title thinta-desc\" data-thinta=\"tactile-v1\" data-type=\"function\" data-units=\"mm\">\n<title id=\"thinta-title\">Graph of y = x² − 2x − 8</title>\n<desc id=\"thinta-desc\">Tactile graph of y = x² − 2x − 8 for x from -4 to 6. U-shaped (opens upward, so the turning point is a minimum). Key points: root (-2, 0); root (4, 0); turning point (1, -9); y-intercept (0, -8). Solid circles are roots, the square is the turning point, the triangle is the y-intercept. Maths braille: beta, check with a transcriber.</desc>\n<rect class=\"paper\" x=\"0\" y=\"0\" width=\"277\" height=\"190\" fill=\"#fff\"/>\n<g id=\"plot\" data-left=\"20\" data-right=\"172\" data-top=\"36\" data-bottom=\"166\" data-x-min=\"-4\" data-x-max=\"6\" data-y-min=\"-11\" data-y-max=\"18\" data-x-axis-y=\"116.69\" data-y-axis-x=\"80.8\">\n<g id=\"axes\"><line class=\"axis\" x1=\"20\" y1=\"116.69\" x2=\"172\" y2=\"116.69\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"axis\" x1=\"80.8\" y1=\"36\" x2=\"80.8\" y2=\"166\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"20\" y1=\"115.19\" x2=\"20\" y2=\"118.19\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"111.2\" y1=\"115.19\" x2=\"111.2\" y2=\"118.19\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"172\" y1=\"115.19\" x2=\"172\" y2=\"118.19\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"79.3\" y1=\"71.86\" x2=\"82.3\" y2=\"71.86\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/></g>\n<g id=\"data\"><polyline id=\"curve\" class=\"curve\" data-kind=\"curve\" points=\"20,44.97 23.8,55.89 27.6,66.26 31.4,76.06 35.2,85.31 39,94 42.8,102.12 46.6,109.69 50.4,116.69 54.2,123.13 58,129.02 61.8,134.34 65.6,139.1 69.4,143.31 73.2,146.95 77,150.03 80.8,152.55 84.6,154.51 88.4,155.91 92.2,156.75 96,157.03 99.8,156.75 103.6,155.91 107.4,154.51 111.2,152.55 115,150.03 118.8,146.95 122.6,143.31 126.4,139.1 130.2,134.34 134,129.02 137.8,123.13 141.6,116.69 145.4,109.69 149.2,102.12 153,94 156.8,85.31 160.6,76.06 164.4,66.26 168.2,55.89 172,44.97\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g>\n<g id=\"key-points\"><g class=\"key-point\" data-kind=\"root\" data-x=\"-2\" data-y=\"0\" data-key=\"A\" data-name=\"root1\"><title>A: root (-2, 0)</title><circle cx=\"50.4\" cy=\"116.69\" r=\"1.75\" fill=\"#000\"/></g><g class=\"key-point\" data-kind=\"root\" data-x=\"4\" data-y=\"0\" data-key=\"B\" data-name=\"root2\"><title>B: root (4, 0)</title><circle cx=\"141.6\" cy=\"116.69\" r=\"1.75\" fill=\"#000\"/></g><g class=\"key-point\" data-kind=\"turning-point\" data-x=\"1\" data-y=\"-9\" data-key=\"C\" data-name=\"turningPoint\"><title>C: turning-point (1, -9)</title><rect x=\"94.2\" y=\"155.23\" width=\"3.6\" height=\"3.6\" fill=\"#000\"/></g><g class=\"key-point\" data-kind=\"y-intercept\" data-x=\"0\" data-y=\"-8\" data-key=\"D\" data-name=\"yIntercept\"><title>D: y-intercept (0, -8)</title><polygon points=\"80.8,150.15 83,154.15 78.6,154.15\" fill=\"#000\"/></g></g>\n</g>\n<g id=\"labels\"><g class=\"label\" data-name=\"title\" data-role=\"title\" data-braille=\"⠽⠀⠐⠶⠀⠭⠔⠼⠃⠀⠐⠤⠀⠼⠃⠭⠀⠐⠤⠀⠼⠓\" data-print=\"y = x² − 2x − 8\"><circle cx=\"10.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"10.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"13.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"13.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"13.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"25.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"28.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"28.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"31.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"31.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"40.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"40.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"43.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"43.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"46.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"49.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"52.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"55.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"55.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"55.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"58.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"58.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"73.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"76.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"79.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"88.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"91.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"91.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"91.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"94.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"94.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"100.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"100.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"115.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"118.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"121.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"130.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"136.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"136.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"139.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><text x=\"10\" y=\"19.75\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"5\" fill=\"#000\">y = x² − 2x − 8</text></g><g class=\"label\" data-name=\"betaNote\" data-role=\"note\" data-braille=\"\" data-print=\"Maths braille: beta, check with a transcriber\"><text x=\"10\" y=\"183.04\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.2\" fill=\"#000\">Maths braille: beta, check with a transcriber</text></g><g class=\"label\" data-name=\"keyHeading\" data-role=\"key\" data-braille=\"⠅⠑⠽\" data-print=\"Key\"><circle cx=\"186.75\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"186.75\" cy=\"41.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"192.75\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"195.25\" cy=\"39.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"198.75\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"198.75\" cy=\"41.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"39.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"41.75\" r=\"0.75\" fill=\"#000\"/><text x=\"204\" y=\"40.48\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">Key</text></g><g class=\"label\" data-name=\"root1\" data-role=\"point\" data-braille=\"⠁\" data-print=\"A (-2, 0)\"><circle cx=\"54.71\" cy=\"101.68\" r=\"0.75\" fill=\"#000\"/><text x=\"53.96\" y=\"112.25\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">A (-2, 0)</text></g><g class=\"label\" data-name=\"key_root1\" data-role=\"key\" data-braille=\"⠁⠀⠐⠣⠐⠤⠼⠃⠂⠼⠚⠐⠜\" data-print=\"A = root (-2, 0)\"><circle cx=\"186.75\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"225.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"225.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"225.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"228.75\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"228.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"240.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"255.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"258.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"59.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">A = root (-2, 0)</text></g><g class=\"label\" data-name=\"root2\" data-role=\"point\" data-braille=\"⠃\" data-print=\"B (4, 0)\"><circle cx=\"122.55\" cy=\"101.68\" r=\"0.75\" fill=\"#000\"/><circle cx=\"122.55\" cy=\"104.18\" r=\"0.75\" fill=\"#000\"/><text x=\"121.8\" y=\"112.25\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">B (4, 0)</text></g><g class=\"label\" data-name=\"key_root2\" data-role=\"key\" data-braille=\"⠃⠀⠐⠣⠼⠙⠂⠼⠚⠐⠜\" data-print=\"B = root (4, 0)\"><circle cx=\"186.75\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"186.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"210.75\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"228.75\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"76.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">B = root (4, 0)</text></g><g class=\"label\" data-name=\"turningPoint\" data-role=\"point\" data-braille=\"⠉\" data-print=\"C (1, -9)\"><circle cx=\"87.61\" cy=\"161.98\" r=\"0.75\" fill=\"#000\"/><circle cx=\"90.11\" cy=\"161.98\" r=\"0.75\" fill=\"#000\"/><text x=\"86.86\" y=\"172.56\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">C (1, -9)</text></g><g class=\"label\" data-name=\"key_turningPoint\" data-role=\"key\" data-braille=\"⠉⠀⠐⠣⠼⠁⠂⠐⠤⠼⠊⠐⠜\" data-print=\"C = turning point (1, -9)\"><circle cx=\"186.75\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"189.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"210.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"240.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"255.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"258.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"93.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">C = turning point (1, -9)</text></g><g class=\"label\" data-name=\"yIntercept\" data-role=\"point\" data-braille=\"⠙\" data-print=\"D (0, -8)\"><circle cx=\"84.7\" cy=\"137.95\" r=\"0.75\" fill=\"#000\"/><circle cx=\"87.2\" cy=\"137.95\" r=\"0.75\" fill=\"#000\"/><circle cx=\"87.2\" cy=\"140.45\" r=\"0.75\" fill=\"#000\"/><text x=\"83.95\" y=\"148.53\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">D (0, -8)</text></g><g class=\"label\" data-name=\"key_yIntercept\" data-role=\"key\" data-braille=\"⠙⠀⠐⠣⠼⠚⠂⠐⠤⠼⠓⠐⠜\" data-print=\"D = y-intercept (0, -8)\"><circle cx=\"186.75\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"189.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"189.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"210.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"240.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"255.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"258.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"110.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">D = y-intercept (0, -8)</text></g><g class=\"label\" data-name=\"axisX\" data-role=\"axis\" data-braille=\"⠭\" data-print=\"x\"><circle cx=\"174.75\" cy=\"114.19\" r=\"0.75\" fill=\"#000\"/><circle cx=\"174.75\" cy=\"119.19\" r=\"0.75\" fill=\"#000\"/><circle cx=\"177.25\" cy=\"114.19\" r=\"0.75\" fill=\"#000\"/><circle cx=\"177.25\" cy=\"119.19\" r=\"0.75\" fill=\"#000\"/><text x=\"180\" y=\"117.91\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">x</text></g><g class=\"label\" data-name=\"axisY\" data-role=\"axis\" data-braille=\"⠽\" data-print=\"y\"><circle cx=\"83.05\" cy=\"28.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"83.05\" cy=\"33.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"85.55\" cy=\"28.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"85.55\" cy=\"31.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"85.55\" cy=\"33.75\" r=\"0.75\" fill=\"#000\"/><text x=\"88.3\" y=\"32.48\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">y</text></g><g class=\"label\" data-name=\"tickX_-4\" data-role=\"tick\" data-braille=\"⠐⠤⠼⠙\" data-print=\"-4\"><circle cx=\"12.25\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"15.75\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"18.25\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"21.75\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"24.25\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"24.25\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"24.25\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"27.75\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"30.25\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"30.25\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><text x=\"9\" y=\"132.01\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">-4</text></g><g class=\"label\" data-name=\"tickX_2\" data-role=\"tick\" data-braille=\"⠼⠃\" data-print=\"2\"><circle cx=\"106.95\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"109.45\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"109.45\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"109.45\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"112.95\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"112.95\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><text x=\"106.2\" y=\"132.01\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">2</text></g><g class=\"label\" data-name=\"tickX_6\" data-role=\"tick\" data-braille=\"⠼⠋\" data-print=\"6\"><circle cx=\"167.75\" cy=\"127.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"170.25\" cy=\"122.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"170.25\" cy=\"124.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"170.25\" cy=\"127.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"173.75\" cy=\"122.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"173.75\" cy=\"124.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"176.25\" cy=\"122.44\" r=\"0.75\" fill=\"#000\"/><text x=\"167\" y=\"133.01\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">6</text></g><g class=\"label\" data-name=\"tickY_10\" data-role=\"tick\" data-braille=\"⠼⠁⠚\" data-print=\"10\"><circle cx=\"61.55\" cy=\"71.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"64.05\" cy=\"66.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"64.05\" cy=\"69.01\" r=\"0.75\" fill=\"#000\"/><circle cx=\"64.05\" cy=\"71.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"67.55\" cy=\"66.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"73.55\" cy=\"69.01\" r=\"0.75\" fill=\"#000\"/><circle cx=\"76.05\" cy=\"66.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"76.05\" cy=\"69.01\" r=\"0.75\" fill=\"#000\"/><text x=\"60.8\" y=\"77.09\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">10</text></g></g>\n</svg>",
+      "warnings": [],
+      "ruleChecks": [
+       {
+        "rule": "label-gap",
+        "pass": true,
+        "labels": [],
+        "detail": "All 17 labels at least 3.2 mm from the curve (closest 3.2 mm) (after auto-fix)"
+       },
+       {
+        "rule": "stroke-hierarchy",
+        "pass": true,
+        "detail": "curve 2 mm vs axes 1 mm"
+       },
+       {
+        "rule": "label-overlap",
+        "pass": true,
+        "labels": [],
+        "detail": "No labels overlap (min space 1.5 mm) (after auto-fix)"
+       },
+       {
+        "rule": "label-in-page",
+        "pass": true,
+        "labels": [],
+        "detail": "All labels inside the printable area"
+       },
+       {
+        "rule": "label-near-own-point",
+        "pass": true,
+        "labels": [],
+        "detail": "Every point label within 15 mm of its own point and nearest to it (after auto-fix)"
+       },
+       {
+        "rule": "label-axis-gap",
+        "pass": true,
+        "labels": [],
+        "detail": "All labels at least 1.5 mm from the axes (after auto-fix)"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 15062,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 14750,
+     "agent": "Designer",
+     "status": "done",
+     "message": "6/6 print rules pass, 5 labels moved"
+    }
+   }
+  },
+  {
+   "t": 15062,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 14750,
+     "agent": "Sonifier",
+     "status": "start",
+     "message": "Mapping the curve to sound"
+    }
+   }
+  },
+  {
+   "t": 15062,
+   "event": {
+    "type": "patch",
+    "job": {
+     "sound": {
+      "samples": [
+       {
+        "x": -4,
+        "y": 16
+       },
+       {
+        "x": -3.75,
+        "y": 13.5625
+       },
+       {
+        "x": -3.5,
+        "y": 11.25
+       },
+       {
+        "x": -3.25,
+        "y": 9.0625
+       },
+       {
+        "x": -3,
+        "y": 7
+       },
+       {
+        "x": -2.75,
+        "y": 5.0625
+       },
+       {
+        "x": -2.5,
+        "y": 3.25
+       },
+       {
+        "x": -2.25,
+        "y": 1.5625
+       },
+       {
+        "x": -2,
+        "y": 0
+       },
+       {
+        "x": -1.75,
+        "y": -1.4375
+       },
+       {
+        "x": -1.5,
+        "y": -2.75
+       },
+       {
+        "x": -1.25,
+        "y": -3.9375
+       },
+       {
+        "x": -1,
+        "y": -5
+       },
+       {
+        "x": -0.75,
+        "y": -5.9375
+       },
+       {
+        "x": -0.5,
+        "y": -6.75
+       },
+       {
+        "x": -0.25,
+        "y": -7.4375
+       },
+       {
+        "x": 0,
+        "y": -8
+       },
+       {
+        "x": 0.25,
+        "y": -8.4375
+       },
+       {
+        "x": 0.5,
+        "y": -8.75
+       },
+       {
+        "x": 0.75,
+        "y": -8.9375
+       },
+       {
+        "x": 1,
+        "y": -9
+       },
+       {
+        "x": 1.25,
+        "y": -8.9375
+       },
+       {
+        "x": 1.5,
+        "y": -8.75
+       },
+       {
+        "x": 1.75,
+        "y": -8.4375
+       },
+       {
+        "x": 2,
+        "y": -8
+       },
+       {
+        "x": 2.25,
+        "y": -7.4375
+       },
+       {
+        "x": 2.5,
+        "y": -6.75
+       },
+       {
+        "x": 2.75,
+        "y": -5.9375
+       },
+       {
+        "x": 3,
+        "y": -5
+       },
+       {
+        "x": 3.25,
+        "y": -3.9375
+       },
+       {
+        "x": 3.5,
+        "y": -2.75
+       },
+       {
+        "x": 3.75,
+        "y": -1.4375
+       },
+       {
+        "x": 4,
+        "y": 0
+       },
+       {
+        "x": 4.25,
+        "y": 1.5625
+       },
+       {
+        "x": 4.5,
+        "y": 3.25
+       },
+       {
+        "x": 4.75,
+        "y": 5.0625
+       },
+       {
+        "x": 5,
+        "y": 7
+       },
+       {
+        "x": 5.25,
+        "y": 9.0625
+       },
+       {
+        "x": 5.5,
+        "y": 11.25
+       },
+       {
+        "x": 5.75,
+        "y": 13.5625
+       },
+       {
+        "x": 6,
+        "y": 16
+       }
+      ],
+      "keyPoints": [
+       {
+        "x": -2,
+        "y": 0,
+        "kind": "root"
+       },
+       {
+        "x": 0,
+        "y": -8,
+        "kind": "y-intercept"
+       },
+       {
+        "x": 1,
+        "y": -9,
+        "kind": "turning-point"
+       },
+       {
+        "x": 4,
+        "y": 0,
+        "kind": "root"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 15062,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 14750,
+     "agent": "Sonifier",
+     "status": "done",
+     "message": "4 key points will click and vibrate"
+    }
+   }
+  },
+  {
+   "t": 15062,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 14750,
+     "agent": "Reviewer",
+     "status": "start",
+     "message": "Fresh eyes: reading the tactile print without the photo"
+    }
+   }
+  },
+  {
+   "t": 15062,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 14752,
+     "agent": "Explainer",
+     "status": "start",
+     "message": "Writing the audio description and the Deaf solution"
+    }
+   }
+  },
+  {
+   "t": 17153,
+   "event": {
+    "type": "review",
+    "review": {
+     "agent": "Reviewer",
+     "check": "fresh-eyes",
+     "pass": false,
+     "before": {
+      "roots": [
+       -2,
+       4
+      ],
+      "turningPoint": null
+     },
+     "after": {
+      "roots": [
+       -2,
+       4
+      ],
+      "turningPoint": {
+       "x": 1,
+       "y": -9
+      }
+     },
+     "reason": "Gemini read the rendered PNG. fresh read: turning point missing (proof (1, -9))",
+     "attempt": 0
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 16875,
+     "agent": "Reviewer",
+     "status": "retry",
+     "message": "Fresh eyes disagree: Gemini read the rendered PNG. fresh read: turning point missing (proof (1, -9)). Sending back to the Designer"
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.turningPoint",
+     "before": {
+      "braille": "⠉",
+      "print": "C (1, -9)",
+      "printSize": 3.5
+     },
+     "after": {
+      "braille": "⠼⠁⠂⠐⠤⠼⠊",
+      "print": "C: turning point (1, -9)",
+      "printSize": 4.5
+     },
+     "reason": "Fresh eyes reported turningPoint missing; label made larger with full coordinates"
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.root1",
+     "before": {
+      "x": 63.3,
+      "y": 116.7
+     },
+     "after": {
+      "x": 63.1,
+      "y": 107
+     },
+     "reason": "Label 0 mm from the curve (needs 3.2 mm); 0 mm from an axis line; moved upper-right, now 3.8 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.root2",
+     "before": {
+      "x": 153.5,
+      "y": 116.7
+     },
+     "after": {
+      "x": 129.9,
+      "y": 107
+     },
+     "reason": "Label 0 mm from the curve (needs 3.2 mm); 0 mm from an axis line; moved upper-left, now 3.8 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.turningPoint",
+     "before": {
+      "x": 131.5,
+      "y": 157
+     },
+     "after": {
+      "x": 132,
+      "y": 168.4
+     },
+     "reason": "Label 0 mm from the curve (needs 3.2 mm); overlapped yIntercept; moved lower-right, now 4 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.yIntercept",
+     "before": {
+      "x": 94.1,
+      "y": 152.6
+     },
+     "after": {
+      "x": 93.1,
+      "y": 143.3
+     },
+     "reason": "Label 0 mm from the curve (needs 3.2 mm); overlapped marker turningPoint; 4.2 mm from its own point or nearer another one; moved upper-right, now 3.2 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Designer",
+     "field": "tactile.labels.tickX_6",
+     "before": {
+      "x": 172,
+      "y": 126.8
+     },
+     "after": {
+      "x": 172,
+      "y": 127.8
+     },
+     "reason": "Label overlapped axisX; moved below, now 23.7 mm from the curve"
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "patch",
+    "job": {
+     "tactile": {
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"277mm\" height=\"190mm\" viewBox=\"0 0 277 190\" role=\"img\" aria-labelledby=\"thinta-title thinta-desc\" data-thinta=\"tactile-v1\" data-type=\"function\" data-units=\"mm\">\n<title id=\"thinta-title\">Graph of y = x² − 2x − 8</title>\n<desc id=\"thinta-desc\">Tactile graph of y = x² − 2x − 8 for x from -4 to 6. U-shaped (opens upward, so the turning point is a minimum). Key points: root (-2, 0); root (4, 0); turning point (1, -9); y-intercept (0, -8). Solid circles are roots, the square is the turning point, the triangle is the y-intercept. Maths braille: beta, check with a transcriber.</desc>\n<rect class=\"paper\" x=\"0\" y=\"0\" width=\"277\" height=\"190\" fill=\"#fff\"/>\n<g id=\"plot\" data-left=\"20\" data-right=\"172\" data-top=\"36\" data-bottom=\"166\" data-x-min=\"-4\" data-x-max=\"6\" data-y-min=\"-11\" data-y-max=\"18\" data-x-axis-y=\"116.69\" data-y-axis-x=\"80.8\">\n<g id=\"axes\"><line class=\"axis\" x1=\"20\" y1=\"116.69\" x2=\"172\" y2=\"116.69\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"axis\" x1=\"80.8\" y1=\"36\" x2=\"80.8\" y2=\"166\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"20\" y1=\"115.19\" x2=\"20\" y2=\"118.19\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"111.2\" y1=\"115.19\" x2=\"111.2\" y2=\"118.19\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"172\" y1=\"115.19\" x2=\"172\" y2=\"118.19\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"79.3\" y1=\"71.86\" x2=\"82.3\" y2=\"71.86\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/></g>\n<g id=\"data\"><polyline id=\"curve\" class=\"curve\" data-kind=\"curve\" points=\"20,44.97 23.8,55.89 27.6,66.26 31.4,76.06 35.2,85.31 39,94 42.8,102.12 46.6,109.69 50.4,116.69 54.2,123.13 58,129.02 61.8,134.34 65.6,139.1 69.4,143.31 73.2,146.95 77,150.03 80.8,152.55 84.6,154.51 88.4,155.91 92.2,156.75 96,157.03 99.8,156.75 103.6,155.91 107.4,154.51 111.2,152.55 115,150.03 118.8,146.95 122.6,143.31 126.4,139.1 130.2,134.34 134,129.02 137.8,123.13 141.6,116.69 145.4,109.69 149.2,102.12 153,94 156.8,85.31 160.6,76.06 164.4,66.26 168.2,55.89 172,44.97\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g>\n<g id=\"key-points\"><g class=\"key-point\" data-kind=\"root\" data-x=\"-2\" data-y=\"0\" data-key=\"A\" data-name=\"root1\"><title>A: root (-2, 0)</title><circle cx=\"50.4\" cy=\"116.69\" r=\"1.75\" fill=\"#000\"/></g><g class=\"key-point\" data-kind=\"root\" data-x=\"4\" data-y=\"0\" data-key=\"B\" data-name=\"root2\"><title>B: root (4, 0)</title><circle cx=\"141.6\" cy=\"116.69\" r=\"1.75\" fill=\"#000\"/></g><g class=\"key-point\" data-kind=\"turning-point\" data-x=\"1\" data-y=\"-9\" data-key=\"C\" data-name=\"turningPoint\"><title>C: turning-point (1, -9)</title><rect x=\"94.2\" y=\"155.23\" width=\"3.6\" height=\"3.6\" fill=\"#000\"/></g><g class=\"key-point\" data-kind=\"y-intercept\" data-x=\"0\" data-y=\"-8\" data-key=\"D\" data-name=\"yIntercept\"><title>D: y-intercept (0, -8)</title><polygon points=\"80.8,150.15 83,154.15 78.6,154.15\" fill=\"#000\"/></g></g>\n</g>\n<g id=\"labels\"><g class=\"label\" data-name=\"title\" data-role=\"title\" data-braille=\"⠽⠀⠐⠶⠀⠭⠔⠼⠃⠀⠐⠤⠀⠼⠃⠭⠀⠐⠤⠀⠼⠓\" data-print=\"y = x² − 2x − 8\"><circle cx=\"10.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"10.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"13.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"13.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"13.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"25.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"28.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"28.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"31.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"31.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"40.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"40.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"43.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"43.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"46.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"49.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"52.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"55.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"55.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"55.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"58.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"58.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"73.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"76.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"79.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"88.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"91.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"91.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"91.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"94.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"94.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"100.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"100.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"115.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"118.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"121.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"130.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"136.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"136.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"139.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><text x=\"10\" y=\"19.75\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"5\" fill=\"#000\">y = x² − 2x − 8</text></g><g class=\"label\" data-name=\"betaNote\" data-role=\"note\" data-braille=\"\" data-print=\"Maths braille: beta, check with a transcriber\"><text x=\"10\" y=\"183.04\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.2\" fill=\"#000\">Maths braille: beta, check with a transcriber</text></g><g class=\"label\" data-name=\"keyHeading\" data-role=\"key\" data-braille=\"⠅⠑⠽\" data-print=\"Key\"><circle cx=\"186.75\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"186.75\" cy=\"41.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"192.75\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"195.25\" cy=\"39.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"198.75\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"198.75\" cy=\"41.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"39.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"41.75\" r=\"0.75\" fill=\"#000\"/><text x=\"204\" y=\"40.48\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">Key</text></g><g class=\"label\" data-name=\"root1\" data-role=\"point\" data-braille=\"⠁\" data-print=\"A (-2, 0)\"><circle cx=\"54.71\" cy=\"101.68\" r=\"0.75\" fill=\"#000\"/><text x=\"53.96\" y=\"112.25\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">A (-2, 0)</text></g><g class=\"label\" data-name=\"key_root1\" data-role=\"key\" data-braille=\"⠁⠀⠐⠣⠐⠤⠼⠃⠂⠼⠚⠐⠜\" data-print=\"A = root (-2, 0)\"><circle cx=\"186.75\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"225.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"225.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"225.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"228.75\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"228.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"240.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"255.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"258.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"59.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">A = root (-2, 0)</text></g><g class=\"label\" data-name=\"root2\" data-role=\"point\" data-braille=\"⠃\" data-print=\"B (4, 0)\"><circle cx=\"122.55\" cy=\"101.68\" r=\"0.75\" fill=\"#000\"/><circle cx=\"122.55\" cy=\"104.18\" r=\"0.75\" fill=\"#000\"/><text x=\"121.8\" y=\"112.25\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">B (4, 0)</text></g><g class=\"label\" data-name=\"key_root2\" data-role=\"key\" data-braille=\"⠃⠀⠐⠣⠼⠙⠂⠼⠚⠐⠜\" data-print=\"B = root (4, 0)\"><circle cx=\"186.75\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"186.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"210.75\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"228.75\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"76.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">B = root (4, 0)</text></g><g class=\"label\" data-name=\"turningPoint\" data-role=\"point\" data-braille=\"⠼⠁⠂⠐⠤⠼⠊\" data-print=\"C: turning point (1, -9)\"><circle cx=\"101.4\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.9\" cy=\"162.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.9\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.9\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"107.4\" cy=\"162.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"113.4\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"121.9\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"125.4\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"127.9\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"131.4\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.9\" cy=\"162.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.9\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.9\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"137.4\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"139.9\" cy=\"162.43\" r=\"0.75\" fill=\"#000\"/><text x=\"100.65\" y=\"173.96\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"4.5\" fill=\"#000\">C: turning point (1, -9)</text></g><g class=\"label\" data-name=\"key_turningPoint\" data-role=\"key\" data-braille=\"⠉⠀⠐⠣⠼⠁⠂⠐⠤⠼⠊⠐⠜\" data-print=\"C = turning point (1, -9)\"><circle cx=\"186.75\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"189.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"210.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"240.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"255.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"258.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"93.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">C = turning point (1, -9)</text></g><g class=\"label\" data-name=\"yIntercept\" data-role=\"point\" data-braille=\"⠙\" data-print=\"D (0, -8)\"><circle cx=\"84.7\" cy=\"137.95\" r=\"0.75\" fill=\"#000\"/><circle cx=\"87.2\" cy=\"137.95\" r=\"0.75\" fill=\"#000\"/><circle cx=\"87.2\" cy=\"140.45\" r=\"0.75\" fill=\"#000\"/><text x=\"83.95\" y=\"148.53\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">D (0, -8)</text></g><g class=\"label\" data-name=\"key_yIntercept\" data-role=\"key\" data-braille=\"⠙⠀⠐⠣⠼⠚⠂⠐⠤⠼⠓⠐⠜\" data-print=\"D = y-intercept (0, -8)\"><circle cx=\"186.75\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"189.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"189.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"210.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"240.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"255.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"258.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"110.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">D = y-intercept (0, -8)</text></g><g class=\"label\" data-name=\"axisX\" data-role=\"axis\" data-braille=\"⠭\" data-print=\"x\"><circle cx=\"174.75\" cy=\"114.19\" r=\"0.75\" fill=\"#000\"/><circle cx=\"174.75\" cy=\"119.19\" r=\"0.75\" fill=\"#000\"/><circle cx=\"177.25\" cy=\"114.19\" r=\"0.75\" fill=\"#000\"/><circle cx=\"177.25\" cy=\"119.19\" r=\"0.75\" fill=\"#000\"/><text x=\"180\" y=\"117.91\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">x</text></g><g class=\"label\" data-name=\"axisY\" data-role=\"axis\" data-braille=\"⠽\" data-print=\"y\"><circle cx=\"83.05\" cy=\"28.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"83.05\" cy=\"33.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"85.55\" cy=\"28.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"85.55\" cy=\"31.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"85.55\" cy=\"33.75\" r=\"0.75\" fill=\"#000\"/><text x=\"88.3\" y=\"32.48\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">y</text></g><g class=\"label\" data-name=\"tickX_-4\" data-role=\"tick\" data-braille=\"⠐⠤⠼⠙\" data-print=\"-4\"><circle cx=\"12.25\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"15.75\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"18.25\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"21.75\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"24.25\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"24.25\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"24.25\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"27.75\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"30.25\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"30.25\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><text x=\"9\" y=\"132.01\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">-4</text></g><g class=\"label\" data-name=\"tickX_2\" data-role=\"tick\" data-braille=\"⠼⠃\" data-print=\"2\"><circle cx=\"106.95\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"109.45\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"109.45\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"109.45\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"112.95\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"112.95\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><text x=\"106.2\" y=\"132.01\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">2</text></g><g class=\"label\" data-name=\"tickX_6\" data-role=\"tick\" data-braille=\"⠼⠋\" data-print=\"6\"><circle cx=\"167.75\" cy=\"127.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"170.25\" cy=\"122.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"170.25\" cy=\"124.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"170.25\" cy=\"127.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"173.75\" cy=\"122.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"173.75\" cy=\"124.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"176.25\" cy=\"122.44\" r=\"0.75\" fill=\"#000\"/><text x=\"167\" y=\"133.01\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">6</text></g><g class=\"label\" data-name=\"tickY_10\" data-role=\"tick\" data-braille=\"⠼⠁⠚\" data-print=\"10\"><circle cx=\"61.55\" cy=\"71.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"64.05\" cy=\"66.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"64.05\" cy=\"69.01\" r=\"0.75\" fill=\"#000\"/><circle cx=\"64.05\" cy=\"71.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"67.55\" cy=\"66.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"73.55\" cy=\"69.01\" r=\"0.75\" fill=\"#000\"/><circle cx=\"76.05\" cy=\"66.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"76.05\" cy=\"69.01\" r=\"0.75\" fill=\"#000\"/><text x=\"60.8\" y=\"77.09\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">10</text></g></g>\n</svg>",
+      "warnings": [],
+      "ruleChecks": [
+       {
+        "rule": "label-gap",
+        "pass": true,
+        "labels": [],
+        "detail": "All 17 labels at least 3.2 mm from the curve (closest 3.2 mm) (after auto-fix)"
+       },
+       {
+        "rule": "stroke-hierarchy",
+        "pass": true,
+        "detail": "curve 2 mm vs axes 1 mm"
+       },
+       {
+        "rule": "label-overlap",
+        "pass": true,
+        "labels": [],
+        "detail": "No labels overlap (min space 1.5 mm) (after auto-fix)"
+       },
+       {
+        "rule": "label-in-page",
+        "pass": true,
+        "labels": [],
+        "detail": "All labels inside the printable area"
+       },
+       {
+        "rule": "label-near-own-point",
+        "pass": true,
+        "labels": [],
+        "detail": "Every point label within 15 mm of its own point and nearest to it (after auto-fix)"
+       },
+       {
+        "rule": "label-axis-gap",
+        "pass": true,
+        "labels": [],
+        "detail": "All labels at least 1.5 mm from the axes (after auto-fix)"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 16885,
+     "agent": "Designer",
+     "status": "done",
+     "message": "Tactile print regenerated with clearer labels"
+    }
+   }
+  },
+  {
+   "t": 17154,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 16885,
+     "agent": "Reviewer",
+     "status": "start",
+     "message": "Fresh eyes again after the fix (try 2)"
+    }
+   }
+  },
+  {
+   "t": 21160,
+   "event": {
+    "type": "review",
+    "review": {
+     "agent": "Reviewer",
+     "check": "fresh-eyes",
+     "pass": true,
+     "before": {
+      "roots": [
+       -2,
+       4
+      ],
+      "turningPoint": {
+       "x": 1,
+       "y": -9
+      }
+     },
+     "after": {
+      "roots": [
+       -2,
+       4
+      ],
+      "turningPoint": {
+       "x": 1,
+       "y": -9
+      }
+     },
+     "reason": "Gemini read the rendered PNG; roots and turning point match the proof within 0.25",
+     "attempt": 1
+    }
+   }
+  },
+  {
+   "t": 21160,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 21064,
+     "agent": "Reviewer",
+     "status": "done",
+     "message": "Fresh eyes agree with the proof: Gemini read the rendered PNG; roots and turning point match the proof within 0.25"
+    }
+   }
+  },
+  {
+   "t": 26865,
+   "event": {
+    "type": "patch",
+    "job": {
+     "description": {
+      "en": "An upward-opening parabola curves across a grid from x equals negative 4 to 6. It has a U-shape. It crosses the x-axis at x equals negative 2 and x equals 4. The turning point is at 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between x equals negative 2 and 4, the curve is below the x-axis. Outside these points, it is above.",
+      "zu": "Iparabola evula phezulu igobeka ngaphesheya kwegridi kusuka ku-x ilingana no -4 kuya ku -6. Sinesimo sika-U. Iwela i-x-axis lapho i-x ilingana no-2 futhi i-x ifinyelela ku-4. Iphuzu eliguqukayo liyi-1, -9, okuyiphuzu elincane. Iwela i-y-axis ngo-0, -8. Phakathi kuka-x ulingana no-2 no-4, ijika lingaphansi kwe-x-axis. Ngaphandle kwalezi zindawo, iphezulu."
+     },
+     "deafSolution": {
+      "steps": [
+       {
+        "text": "Find where the graph crosses the x-axis.",
+        "visual": "mark negative 2 and 4 on the x-axis"
+       },
+       {
+        "text": "Find the turning point of the graph.",
+        "visual": "mark the point 1, negative 9 as a minimum"
+       },
+       {
+        "text": "Find where the graph crosses the y-axis.",
+        "visual": "mark negative 8 on the y-axis at 0, negative 8"
+       },
+       {
+        "text": "Check where the graph is below the x-axis.",
+        "visual": "shade the curve between negative 2 and 4"
+       }
+      ],
+      "keyTerms": [
+       "PARABOLA",
+       "ROOT",
+       "TURNING POINT",
+       "MINIMUM"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 26865,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 26829,
+     "agent": "Explainer",
+     "status": "fail",
+     "message": "isiZulu text may be missing the number(s) 6, -2; check before use"
+    }
+   }
+  },
+  {
+   "t": 26865,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 26829,
+     "agent": "Explainer",
+     "status": "done",
+     "message": "Description written in English and isiZulu; 4 Deaf solution steps"
+    }
+   }
+  },
+  {
+   "t": 26865,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 26830,
+     "agent": "Reviewer",
+     "status": "start",
+     "message": "Answering the worksheet using only the audio description"
+    }
+   }
+  },
+  {
+   "t": 26865,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 26832,
+     "agent": "Reviewer",
+     "status": "start",
+     "message": "Answering the worksheet using only the Deaf solution"
+    }
+   }
+  },
+  {
+   "t": 29269,
+   "event": {
+    "type": "review",
+    "review": {
+     "agent": "Reviewer",
+     "check": "access-deaf",
+     "pass": false,
+     "score": 0,
+     "total": 5,
+     "failed": [
+      {
+       "question": "Where does the graph cross the x-axis?",
+       "expected": "x = -2 and x = 4",
+       "got": "not stated"
+      },
+      {
+       "question": "What is the turning point of the graph?",
+       "expected": "(1, -9)",
+       "got": "not stated"
+      },
+      {
+       "question": "Is the turning point a minimum or a maximum?",
+       "expected": "minimum",
+       "got": "not stated"
+      },
+      {
+       "question": "Where does the graph cross the y-axis?",
+       "expected": "y = -8, at (0, -8)",
+       "got": "not stated"
+      },
+      {
+       "question": "For which values of x is y less than 0?",
+       "expected": "-2 < x < 4",
+       "got": "not stated"
+      }
+     ],
+     "reason": "0/5: a reader of the Deaf solution could not answer \"Where does the graph cross the x-axis?\", \"What is the turning point of the graph?\", \"Is the turning point a minimum or a maximum?\", \"Where does the graph cross the y-axis?\", \"For which values of x is y less than 0?\"",
+     "answers": [
+      "not stated",
+      "not stated",
+      "not stated",
+      "not stated",
+      "not stated"
+     ],
+     "version": "deaf",
+     "attempt": 0,
+     "meaning": {
+      "pass": true,
+      "problems": []
+     }
+    }
+   }
+  },
+  {
+   "t": 29269,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 29175,
+     "agent": "Reviewer",
+     "status": "retry",
+     "message": "Deaf solution fails: 0/5 questions answered. Sending back to the Explainer"
+    }
+   }
+  },
+  {
+   "t": 29269,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 29175,
+     "agent": "Explainer",
+     "status": "start",
+     "message": "Rewriting the Deaf solution with the Reviewer's feedback"
+    }
+   }
+  },
+  {
+   "t": 29430,
+   "event": {
+    "type": "review",
+    "review": {
+     "agent": "Reviewer",
+     "check": "access-audio",
+     "pass": false,
+     "score": 5,
+     "total": 5,
+     "failed": [],
+     "reason": "5/5: every question answered from the audio description alone",
+     "answers": [
+      "x equals negative 2 and x equals 4",
+      "1, negative 9",
+      "minimum",
+      "0, negative 8",
+      "between x equals negative 2 and 4"
+     ],
+     "version": "audio",
+     "attempt": 0,
+     "meaning": {
+      "pass": false,
+      "problems": [
+       {
+        "sentence": "It crosses the y-axis at 0, negative 8.",
+        "reason": "y-intercept given as 0 but the proof gives -8"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 29430,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 29366,
+     "agent": "Reviewer",
+     "status": "retry",
+     "message": "audio description fails: 1 sentence disagree with the proof. Sending back to the Explainer"
+    }
+   }
+  },
+  {
+   "t": 29430,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 29366,
+     "agent": "Explainer",
+     "status": "start",
+     "message": "Rewriting the audio description with the Reviewer's feedback"
+    }
+   }
+  },
+  {
+   "t": 38558,
+   "event": {
+    "type": "patch",
+    "job": {
+     "description": {
+      "en": "Parabola opening upwards, U-shape. Equation: y equals x squared minus 2x minus 8. Drawn for x from negative 4 to 6. It crosses the x-axis at x equals negative 2 and x equals 4. Turning point is 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between negative 2 and 4, y is less than 0. For x less than negative 2 or x greater than 4, y is greater than 0.",
+      "zu": "Iparabola evula phezulu, emise u-U. I-equation: y ilingana no-x squared minus 2x minus 8. Kudwetshelwe i-x kusuka ku -4 kuya ku-6. Iwela i-x-axis lapho i-x ilingana no-2 futhi i-x ifinyelela ku-4. Iphuzu eliguqukayo liyi-1, -9, okuyiphuzu elincane. Iwela i-y-axis ngo-0, -8. Phakathi kuka-2 no-4, y ingaphansi kuka-0. Uma i-x ingaphansi kuka-2 noma i-x inkulu kuno-4, y inkulu kuno-0."
+     }
+    }
+   }
+  },
+  {
+   "t": 38558,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Explainer",
+     "field": "description.en",
+     "before": "An upward-opening parabola curves across a grid from x equals negative 4 to 6. It has a U-shape. It crosses the x-axis at x equals negative 2 and x equals 4. The turning point is at 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between x equals negative 2 and 4, the curve is below the x-axis. Outside these points, it is above.",
+     "after": "Parabola opening upwards, U-shape. Equation: y equals x squared minus 2x minus 8. Drawn for x from negative 4 to 6. It crosses the x-axis at x equals negative 2 and x equals 4. Turning point is 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between negative 2 and 4, y is less than 0. For x less than negative 2 or x greater than 4, y is greater than 0.",
+     "reason": "1 sentence disagree with the proof"
+    }
+   }
+  },
+  {
+   "t": 38558,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 38417,
+     "agent": "Explainer",
+     "status": "done",
+     "message": "audio description rewritten"
+    }
+   }
+  },
+  {
+   "t": 38559,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 38417,
+     "agent": "Reviewer",
+     "status": "start",
+     "message": "Answering the worksheet using only the audio description (try 2)"
+    }
+   }
+  },
+  {
+   "t": 40644,
+   "event": {
+    "type": "review",
+    "review": {
+     "agent": "Reviewer",
+     "check": "access-audio",
+     "pass": false,
+     "score": 5,
+     "total": 5,
+     "failed": [],
+     "reason": "5/5: every question answered from the audio description alone",
+     "answers": [
+      "x equals negative 2 and x equals 4",
+      "1, negative 9",
+      "minimum",
+      "0, negative 8",
+      "Between negative 2 and 4"
+     ],
+     "version": "audio",
+     "attempt": 1,
+     "before": "5/5 with a wrong number",
+     "after": "5/5 with a wrong number",
+     "meaning": {
+      "pass": false,
+      "problems": [
+       {
+        "sentence": "It crosses the y-axis at 0, negative 8.",
+        "reason": "y-intercept given as 0 but the proof gives -8"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 40644,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 40588,
+     "agent": "Reviewer",
+     "status": "retry",
+     "message": "audio description fails: 1 sentence disagree with the proof. Sending back to the Explainer"
+    }
+   }
+  },
+  {
+   "t": 40644,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 40588,
+     "agent": "Explainer",
+     "status": "start",
+     "message": "Rewriting the audio description with the Reviewer's feedback"
+    }
+   }
+  },
+  {
+   "t": 46561,
+   "event": {
+    "type": "patch",
+    "job": {
+     "description": {
+      "en": "A U-shaped parabola. It opens upwards. It is drawn for x from negative 4 to 6. It crosses the x-axis at x equals negative 2 and x equals 4. The turning point is 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between x equals negative 2 and x equals 4, the curve is below the x-axis where y is less than 0. For x less than negative 2 or x greater than 4, it is above the x-axis.",
+      "zu": "Iparabola emise okuka-U. Ivuleka iye phezulu. Idwetshelwa u-x kusuka ku-−4 kuya ku-6. Iwela i-x-axis lapho i-x ilingana no-2 futhi i-x ifinyelela ku-4. Iphuzu eliguqukayo liyi-1, -9, okuyiphuzu elincane. Iwela i-y-axis ngo-0, -8. Phakathi kokuthi u-x ulingana no-2 no-x ulingane no-4, ijika lingaphansi kwe-x-axis lapho u-y emncane khona kuno-0. Uma i-x ingaphansi kuka--2 noma i-x inkulu kuno-4, iphezu kwe-x-axis."
+     }
+    }
+   }
+  },
+  {
+   "t": 46561,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Explainer",
+     "field": "description.en",
+     "before": "Parabola opening upwards, U-shape. Equation: y equals x squared minus 2x minus 8. Drawn for x from negative 4 to 6. It crosses the x-axis at x equals negative 2 and x equals 4. Turning point is 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between negative 2 and 4, y is less than 0. For x less than negative 2 or x greater than 4, y is greater than 0.",
+     "after": "A U-shaped parabola. It opens upwards. It is drawn for x from negative 4 to 6. It crosses the x-axis at x equals negative 2 and x equals 4. The turning point is 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between x equals negative 2 and x equals 4, the curve is below the x-axis where y is less than 0. For x less than negative 2 or x greater than 4, it is above the x-axis.",
+     "reason": "1 sentence disagree with the proof"
+    }
+   }
+  },
+  {
+   "t": 46561,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 46368,
+     "agent": "Explainer",
+     "status": "done",
+     "message": "audio description rewritten"
+    }
+   }
+  },
+  {
+   "t": 46561,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 46368,
+     "agent": "Reviewer",
+     "status": "start",
+     "message": "Answering the worksheet using only the audio description (try 3)"
+    }
+   }
+  },
+  {
+   "t": 48166,
+   "event": {
+    "type": "review",
+    "review": {
+     "agent": "Reviewer",
+     "check": "access-audio",
+     "pass": false,
+     "score": 5,
+     "total": 5,
+     "failed": [],
+     "reason": "5/5: every question answered from the audio description alone",
+     "answers": [
+      "x equals negative 2 and x equals 4",
+      "1, negative 9",
+      "minimum",
+      "0, negative 8",
+      "between x equals negative 2 and x equals 4"
+     ],
+     "version": "audio",
+     "attempt": 2,
+     "before": "5/5 with a wrong number",
+     "after": "5/5 with a wrong number",
+     "meaning": {
+      "pass": false,
+      "problems": [
+       {
+        "sentence": "It crosses the y-axis at 0, negative 8.",
+        "reason": "y-intercept given as 0 but the proof gives -8"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 48167,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 48106,
+     "agent": "Reviewer",
+     "status": "fail",
+     "message": "audio description still fails after 2 rewrites (1 sentence disagree with the proof); escalated to the teacher"
+    }
+   }
+  },
+  {
+   "t": 69980,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 69793,
+     "agent": "Explainer",
+     "status": "fail",
+     "message": "isiZulu text may be missing the number(s) -2; check before use"
+    }
+   }
+  },
+  {
+   "t": 69980,
+   "event": {
+    "type": "patch",
+    "job": {
+     "deafSolution": {
+      "steps": [
+       {
+        "text": "The graph crosses the x-axis at x = -2 and x = 4.",
+        "visual": "mark -2 and 4 on the x-axis"
+       },
+       {
+        "text": "The turning point is (1, -9).",
+        "visual": "mark the point (1, -9)"
+       },
+       {
+        "text": "The turning point is a minimum.",
+        "visual": "highlight the bottom U-shape of the curve"
+       },
+       {
+        "text": "The graph crosses the y-axis at y = -8, at (0, -8).",
+        "visual": "mark -8 on the y-axis"
+       },
+       {
+        "text": "For -2 < x < 4, y is less than 0.",
+        "visual": "shade the curve below the x-axis between -2 and 4"
+       }
+      ],
+      "keyTerms": [
+       "ROOT",
+       "TURNING POINT",
+       "MINIMUM",
+       "Y-INTERCEPT"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "t": 69980,
+   "event": {
+    "type": "correction",
+    "correction": {
+     "agent": "Explainer",
+     "field": "deafSolution",
+     "before": "Step 1. Find where the graph crosses the x-axis.\nStep 2. Find the turning point of the graph.\nStep 3. Find where the graph crosses the y-axis.\nStep 4. Check where the graph is below the x-axis.",
+     "after": "Step 1. The graph crosses the x-axis at x = -2 and x = 4.\nStep 2. The turning point is (1, -9).\nStep 3. The turning point is a minimum.\nStep 4. The graph crosses the y-axis at y = -8, at (0, -8).\nStep 5. For -2 < x < 4, y is less than 0.",
+     "reason": "0/5 questions answered"
+    }
+   }
+  },
+  {
+   "t": 69980,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 69793,
+     "agent": "Explainer",
+     "status": "done",
+     "message": "Deaf solution rewritten"
+    }
+   }
+  },
+  {
+   "t": 69981,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 69793,
+     "agent": "Reviewer",
+     "status": "start",
+     "message": "Answering the worksheet using only the Deaf solution (try 2)"
+    }
+   }
+  },
+  {
+   "t": 76488,
+   "event": {
+    "type": "review",
+    "review": {
+     "agent": "Reviewer",
+     "check": "access-deaf",
+     "pass": true,
+     "score": 5,
+     "total": 5,
+     "failed": [],
+     "reason": "5/5: every question answered from the Deaf solution alone",
+     "answers": [
+      "x = -2 and x = 4",
+      "(1, -9)",
+      "minimum",
+      "y = -8, at (0, -8)",
+      "-2 < x < 4"
+     ],
+     "version": "deaf",
+     "attempt": 1,
+     "before": "0/5",
+     "after": "5/5",
+     "meaning": {
+      "pass": true,
+      "problems": []
+     }
+    }
+   }
+  },
+  {
+   "t": 76488,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 76455,
+     "agent": "Reviewer",
+     "status": "done",
+     "message": "Deaf solution: 5/5 (was 0/5), every number matches the proof"
+    }
+   }
+  },
+  {
+   "t": 76488,
+   "event": {
+    "type": "trace",
+    "entry": {
+     "t": 76456,
+     "agent": "Teacher",
+     "status": "start",
+     "message": "Ready for review: 1 check need the teacher's eye (access-audio)"
+    }
+   }
+  },
+  {
+   "t": 76489,
+   "event": {
+    "type": "done",
+    "job": {
+     "id": "job-mwf4pjr9",
+     "createdAt": "2026-11-13T15:25:47.973Z",
+     "mode": "live",
+     "input": {
+      "imageBase64": "",
+      "learners": [
+       "blind",
+       "deaf",
+       "sighted"
+      ],
+      "mimeType": "image/png",
+      "equationHint": "y = x^2 - 2x - 8",
+      "questions": [
+       "Where does the graph cross the x-axis?",
+       "What is the turning point of the graph?",
+       "Is the turning point a minimum or a maximum?",
+       "Where does the graph cross the y-axis?",
+       "For which values of x is y less than 0?"
+      ]
+     },
+     "plan": {
+      "steps": [
+       "Reader transcribes the photograph and Prover algebraically calculates the key features of y = x^2 - 2x - 8.",
+       "Designer generates tactile print files for the parabola, vertex, and axis intercepts.",
+       "Sonifier converts the graph's curve into an interactive sound and tactile-audio layout.",
+       "Explainer writes audio descriptions in English and isiZulu, plus a plain-language guide for Deaf learners.",
+       "Reviewer conducts a final quality check across all tactile, audio, and written outputs."
+      ],
+      "versions": [
+       "tactile",
+       "sound",
+       "audio-description",
+       "deaf-solution"
+      ]
+     },
+     "reading": {
+      "type": "function",
+      "confidence": 0.95,
+      "labels": [],
+      "questions": [],
+      "axes": {
+       "x": {
+        "min": -4,
+        "max": 6
+       },
+       "y": {
+        "min": -10,
+        "max": 10
+       }
+      },
+      "equation": "y = x^2 - 2x - 8",
+      "roots": [
+       -2,
+       4
+      ],
+      "turningPoint": {
+       "x": 1,
+       "y": -9
+      }
+     },
+     "proof": {
+      "equation": "y = x^2 - 2x - 8",
+      "coefficients": {
+       "a": 1,
+       "b": -2,
+       "c": -8
+      },
+      "roots": [
+       -2,
+       4
+      ],
+      "turningPoint": {
+       "x": 1,
+       "y": -9
+      },
+      "yIntercept": -8,
+      "domain": [
+       -4,
+       6
+      ],
+      "range": [
+       -9,
+       16
+      ],
+      "samples": [
+       {
+        "x": -4,
+        "y": 16
+       },
+       {
+        "x": -3.75,
+        "y": 13.5625
+       },
+       {
+        "x": -3.5,
+        "y": 11.25
+       },
+       {
+        "x": -3.25,
+        "y": 9.0625
+       },
+       {
+        "x": -3,
+        "y": 7
+       },
+       {
+        "x": -2.75,
+        "y": 5.0625
+       },
+       {
+        "x": -2.5,
+        "y": 3.25
+       },
+       {
+        "x": -2.25,
+        "y": 1.5625
+       },
+       {
+        "x": -2,
+        "y": 0
+       },
+       {
+        "x": -1.75,
+        "y": -1.4375
+       },
+       {
+        "x": -1.5,
+        "y": -2.75
+       },
+       {
+        "x": -1.25,
+        "y": -3.9375
+       },
+       {
+        "x": -1,
+        "y": -5
+       },
+       {
+        "x": -0.75,
+        "y": -5.9375
+       },
+       {
+        "x": -0.5,
+        "y": -6.75
+       },
+       {
+        "x": -0.25,
+        "y": -7.4375
+       },
+       {
+        "x": 0,
+        "y": -8
+       },
+       {
+        "x": 0.25,
+        "y": -8.4375
+       },
+       {
+        "x": 0.5,
+        "y": -8.75
+       },
+       {
+        "x": 0.75,
+        "y": -8.9375
+       },
+       {
+        "x": 1,
+        "y": -9
+       },
+       {
+        "x": 1.25,
+        "y": -8.9375
+       },
+       {
+        "x": 1.5,
+        "y": -8.75
+       },
+       {
+        "x": 1.75,
+        "y": -8.4375
+       },
+       {
+        "x": 2,
+        "y": -8
+       },
+       {
+        "x": 2.25,
+        "y": -7.4375
+       },
+       {
+        "x": 2.5,
+        "y": -6.75
+       },
+       {
+        "x": 2.75,
+        "y": -5.9375
+       },
+       {
+        "x": 3,
+        "y": -5
+       },
+       {
+        "x": 3.25,
+        "y": -3.9375
+       },
+       {
+        "x": 3.5,
+        "y": -2.75
+       },
+       {
+        "x": 3.75,
+        "y": -1.4375
+       },
+       {
+        "x": 4,
+        "y": 0
+       },
+       {
+        "x": 4.25,
+        "y": 1.5625
+       },
+       {
+        "x": 4.5,
+        "y": 3.25
+       },
+       {
+        "x": 4.75,
+        "y": 5.0625
+       },
+       {
+        "x": 5,
+        "y": 7
+       },
+       {
+        "x": 5.25,
+        "y": 9.0625
+       },
+       {
+        "x": 5.5,
+        "y": 11.25
+       },
+       {
+        "x": 5.75,
+        "y": 13.5625
+       },
+       {
+        "x": 6,
+        "y": 16
+       }
+      ],
+      "answers": [
+       {
+        "question": "Where does the graph cross the x-axis?",
+        "answer": "x = -2 and x = 4"
+       },
+       {
+        "question": "What is the turning point of the graph?",
+        "answer": "(1, -9)"
+       },
+       {
+        "question": "Is the turning point a minimum or a maximum?",
+        "answer": "minimum"
+       },
+       {
+        "question": "Where does the graph cross the y-axis?",
+        "answer": "y = -8, at (0, -8)"
+       },
+       {
+        "question": "For which values of x is y less than 0?",
+        "answer": "-2 < x < 4"
+       }
+      ]
+     },
+     "tactile": {
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"277mm\" height=\"190mm\" viewBox=\"0 0 277 190\" role=\"img\" aria-labelledby=\"thinta-title thinta-desc\" data-thinta=\"tactile-v1\" data-type=\"function\" data-units=\"mm\">\n<title id=\"thinta-title\">Graph of y = x² − 2x − 8</title>\n<desc id=\"thinta-desc\">Tactile graph of y = x² − 2x − 8 for x from -4 to 6. U-shaped (opens upward, so the turning point is a minimum). Key points: root (-2, 0); root (4, 0); turning point (1, -9); y-intercept (0, -8). Solid circles are roots, the square is the turning point, the triangle is the y-intercept. Maths braille: beta, check with a transcriber.</desc>\n<rect class=\"paper\" x=\"0\" y=\"0\" width=\"277\" height=\"190\" fill=\"#fff\"/>\n<g id=\"plot\" data-left=\"20\" data-right=\"172\" data-top=\"36\" data-bottom=\"166\" data-x-min=\"-4\" data-x-max=\"6\" data-y-min=\"-11\" data-y-max=\"18\" data-x-axis-y=\"116.69\" data-y-axis-x=\"80.8\">\n<g id=\"axes\"><line class=\"axis\" x1=\"20\" y1=\"116.69\" x2=\"172\" y2=\"116.69\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"axis\" x1=\"80.8\" y1=\"36\" x2=\"80.8\" y2=\"166\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"20\" y1=\"115.19\" x2=\"20\" y2=\"118.19\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"111.2\" y1=\"115.19\" x2=\"111.2\" y2=\"118.19\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"172\" y1=\"115.19\" x2=\"172\" y2=\"118.19\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/><line class=\"tick\" x1=\"79.3\" y1=\"71.86\" x2=\"82.3\" y2=\"71.86\" stroke=\"#000\" stroke-width=\"1\" stroke-linecap=\"round\"/></g>\n<g id=\"data\"><polyline id=\"curve\" class=\"curve\" data-kind=\"curve\" points=\"20,44.97 23.8,55.89 27.6,66.26 31.4,76.06 35.2,85.31 39,94 42.8,102.12 46.6,109.69 50.4,116.69 54.2,123.13 58,129.02 61.8,134.34 65.6,139.1 69.4,143.31 73.2,146.95 77,150.03 80.8,152.55 84.6,154.51 88.4,155.91 92.2,156.75 96,157.03 99.8,156.75 103.6,155.91 107.4,154.51 111.2,152.55 115,150.03 118.8,146.95 122.6,143.31 126.4,139.1 130.2,134.34 134,129.02 137.8,123.13 141.6,116.69 145.4,109.69 149.2,102.12 153,94 156.8,85.31 160.6,76.06 164.4,66.26 168.2,55.89 172,44.97\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g>\n<g id=\"key-points\"><g class=\"key-point\" data-kind=\"root\" data-x=\"-2\" data-y=\"0\" data-key=\"A\" data-name=\"root1\"><title>A: root (-2, 0)</title><circle cx=\"50.4\" cy=\"116.69\" r=\"1.75\" fill=\"#000\"/></g><g class=\"key-point\" data-kind=\"root\" data-x=\"4\" data-y=\"0\" data-key=\"B\" data-name=\"root2\"><title>B: root (4, 0)</title><circle cx=\"141.6\" cy=\"116.69\" r=\"1.75\" fill=\"#000\"/></g><g class=\"key-point\" data-kind=\"turning-point\" data-x=\"1\" data-y=\"-9\" data-key=\"C\" data-name=\"turningPoint\"><title>C: turning-point (1, -9)</title><rect x=\"94.2\" y=\"155.23\" width=\"3.6\" height=\"3.6\" fill=\"#000\"/></g><g class=\"key-point\" data-kind=\"y-intercept\" data-x=\"0\" data-y=\"-8\" data-key=\"D\" data-name=\"yIntercept\"><title>D: y-intercept (0, -8)</title><polygon points=\"80.8,150.15 83,154.15 78.6,154.15\" fill=\"#000\"/></g></g>\n</g>\n<g id=\"labels\"><g class=\"label\" data-name=\"title\" data-role=\"title\" data-braille=\"⠽⠀⠐⠶⠀⠭⠔⠼⠃⠀⠐⠤⠀⠼⠃⠭⠀⠐⠤⠀⠼⠓\" data-print=\"y = x² − 2x − 8\"><circle cx=\"10.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"10.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"13.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"13.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"13.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"25.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"28.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"28.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"31.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"31.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"40.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"40.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"43.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"43.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"46.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"49.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"52.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"55.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"55.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"55.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"58.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"58.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"73.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"76.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"79.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"88.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"91.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"91.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"91.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"94.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"94.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"100.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"100.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"115.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"118.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"121.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"130.75\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.25\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.25\" cy=\"12.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"136.75\" cy=\"7.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"136.75\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"139.25\" cy=\"10.25\" r=\"0.75\" fill=\"#000\"/><text x=\"10\" y=\"19.75\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"5\" fill=\"#000\">y = x² − 2x − 8</text></g><g class=\"label\" data-name=\"betaNote\" data-role=\"note\" data-braille=\"\" data-print=\"Maths braille: beta, check with a transcriber\"><text x=\"10\" y=\"183.04\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.2\" fill=\"#000\">Maths braille: beta, check with a transcriber</text></g><g class=\"label\" data-name=\"keyHeading\" data-role=\"key\" data-braille=\"⠅⠑⠽\" data-print=\"Key\"><circle cx=\"186.75\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"186.75\" cy=\"41.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"192.75\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"195.25\" cy=\"39.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"198.75\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"198.75\" cy=\"41.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"36.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"39.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"41.75\" r=\"0.75\" fill=\"#000\"/><text x=\"204\" y=\"40.48\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">Key</text></g><g class=\"label\" data-name=\"root1\" data-role=\"point\" data-braille=\"⠁\" data-print=\"A (-2, 0)\"><circle cx=\"54.71\" cy=\"101.68\" r=\"0.75\" fill=\"#000\"/><text x=\"53.96\" y=\"112.25\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">A (-2, 0)</text></g><g class=\"label\" data-name=\"key_root1\" data-role=\"key\" data-braille=\"⠁⠀⠐⠣⠐⠤⠼⠃⠂⠼⠚⠐⠜\" data-print=\"A = root (-2, 0)\"><circle cx=\"186.75\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"225.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"225.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"225.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"228.75\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"228.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"240.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"255.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"258.75\" cy=\"53.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"48.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"51.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"59.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">A = root (-2, 0)</text></g><g class=\"label\" data-name=\"root2\" data-role=\"point\" data-braille=\"⠃\" data-print=\"B (4, 0)\"><circle cx=\"122.55\" cy=\"101.68\" r=\"0.75\" fill=\"#000\"/><circle cx=\"122.55\" cy=\"104.18\" r=\"0.75\" fill=\"#000\"/><text x=\"121.8\" y=\"112.25\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">B (4, 0)</text></g><g class=\"label\" data-name=\"key_root2\" data-role=\"key\" data-braille=\"⠃⠀⠐⠣⠼⠙⠂⠼⠚⠐⠜\" data-print=\"B = root (4, 0)\"><circle cx=\"186.75\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"186.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"210.75\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"228.75\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"70.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"65.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"68.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"76.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">B = root (4, 0)</text></g><g class=\"label\" data-name=\"turningPoint\" data-role=\"point\" data-braille=\"⠼⠁⠂⠐⠤⠼⠊\" data-print=\"C: turning point (1, -9)\"><circle cx=\"101.4\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.9\" cy=\"162.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.9\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"103.9\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"107.4\" cy=\"162.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"113.4\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"121.9\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"125.4\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"127.9\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"131.4\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.9\" cy=\"162.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.9\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"133.9\" cy=\"167.43\" r=\"0.75\" fill=\"#000\"/><circle cx=\"137.4\" cy=\"164.93\" r=\"0.75\" fill=\"#000\"/><circle cx=\"139.9\" cy=\"162.43\" r=\"0.75\" fill=\"#000\"/><text x=\"100.65\" y=\"173.96\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"4.5\" fill=\"#000\">C: turning point (1, -9)</text></g><g class=\"label\" data-name=\"key_turningPoint\" data-role=\"key\" data-braille=\"⠉⠀⠐⠣⠼⠁⠂⠐⠤⠼⠊⠐⠜\" data-print=\"C = turning point (1, -9)\"><circle cx=\"186.75\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"189.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"210.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"240.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"255.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"258.75\" cy=\"87.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"82.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"85.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"93.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">C = turning point (1, -9)</text></g><g class=\"label\" data-name=\"yIntercept\" data-role=\"point\" data-braille=\"⠙\" data-print=\"D (0, -8)\"><circle cx=\"84.7\" cy=\"137.95\" r=\"0.75\" fill=\"#000\"/><circle cx=\"87.2\" cy=\"137.95\" r=\"0.75\" fill=\"#000\"/><circle cx=\"87.2\" cy=\"140.45\" r=\"0.75\" fill=\"#000\"/><text x=\"83.95\" y=\"148.53\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">D (0, -8)</text></g><g class=\"label\" data-name=\"key_yIntercept\" data-role=\"key\" data-braille=\"⠙⠀⠐⠣⠼⠚⠂⠐⠤⠼⠓⠐⠜\" data-print=\"D = y-intercept (0, -8)\"><circle cx=\"186.75\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"189.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"189.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"201.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"204.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"207.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"210.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"213.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"216.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"219.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"222.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"231.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"234.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"237.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"240.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"243.25\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"246.75\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"249.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"255.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"258.75\" cy=\"104.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"99.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"261.25\" cy=\"102.25\" r=\"0.75\" fill=\"#000\"/><text x=\"186\" y=\"110.33\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">D = y-intercept (0, -8)</text></g><g class=\"label\" data-name=\"axisX\" data-role=\"axis\" data-braille=\"⠭\" data-print=\"x\"><circle cx=\"174.75\" cy=\"114.19\" r=\"0.75\" fill=\"#000\"/><circle cx=\"174.75\" cy=\"119.19\" r=\"0.75\" fill=\"#000\"/><circle cx=\"177.25\" cy=\"114.19\" r=\"0.75\" fill=\"#000\"/><circle cx=\"177.25\" cy=\"119.19\" r=\"0.75\" fill=\"#000\"/><text x=\"180\" y=\"117.91\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">x</text></g><g class=\"label\" data-name=\"axisY\" data-role=\"axis\" data-braille=\"⠽\" data-print=\"y\"><circle cx=\"83.05\" cy=\"28.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"83.05\" cy=\"33.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"85.55\" cy=\"28.75\" r=\"0.75\" fill=\"#000\"/><circle cx=\"85.55\" cy=\"31.25\" r=\"0.75\" fill=\"#000\"/><circle cx=\"85.55\" cy=\"33.75\" r=\"0.75\" fill=\"#000\"/><text x=\"88.3\" y=\"32.48\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">y</text></g><g class=\"label\" data-name=\"tickX_-4\" data-role=\"tick\" data-braille=\"⠐⠤⠼⠙\" data-print=\"-4\"><circle cx=\"12.25\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"15.75\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"18.25\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"21.75\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"24.25\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"24.25\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"24.25\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"27.75\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"30.25\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"30.25\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><text x=\"9\" y=\"132.01\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">-4</text></g><g class=\"label\" data-name=\"tickX_2\" data-role=\"tick\" data-braille=\"⠼⠃\" data-print=\"2\"><circle cx=\"106.95\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"109.45\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"109.45\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"109.45\" cy=\"126.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"112.95\" cy=\"121.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"112.95\" cy=\"123.94\" r=\"0.75\" fill=\"#000\"/><text x=\"106.2\" y=\"132.01\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">2</text></g><g class=\"label\" data-name=\"tickX_6\" data-role=\"tick\" data-braille=\"⠼⠋\" data-print=\"6\"><circle cx=\"167.75\" cy=\"127.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"170.25\" cy=\"122.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"170.25\" cy=\"124.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"170.25\" cy=\"127.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"173.75\" cy=\"122.44\" r=\"0.75\" fill=\"#000\"/><circle cx=\"173.75\" cy=\"124.94\" r=\"0.75\" fill=\"#000\"/><circle cx=\"176.25\" cy=\"122.44\" r=\"0.75\" fill=\"#000\"/><text x=\"167\" y=\"133.01\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">6</text></g><g class=\"label\" data-name=\"tickY_10\" data-role=\"tick\" data-braille=\"⠼⠁⠚\" data-print=\"10\"><circle cx=\"61.55\" cy=\"71.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"64.05\" cy=\"66.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"64.05\" cy=\"69.01\" r=\"0.75\" fill=\"#000\"/><circle cx=\"64.05\" cy=\"71.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"67.55\" cy=\"66.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"73.55\" cy=\"69.01\" r=\"0.75\" fill=\"#000\"/><circle cx=\"76.05\" cy=\"66.51\" r=\"0.75\" fill=\"#000\"/><circle cx=\"76.05\" cy=\"69.01\" r=\"0.75\" fill=\"#000\"/><text x=\"60.8\" y=\"77.09\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"3.5\" fill=\"#000\">10</text></g></g>\n</svg>",
+      "warnings": [],
+      "ruleChecks": [
+       {
+        "rule": "label-gap",
+        "pass": true,
+        "labels": [],
+        "detail": "All 17 labels at least 3.2 mm from the curve (closest 3.2 mm) (after auto-fix)"
+       },
+       {
+        "rule": "stroke-hierarchy",
+        "pass": true,
+        "detail": "curve 2 mm vs axes 1 mm"
+       },
+       {
+        "rule": "label-overlap",
+        "pass": true,
+        "labels": [],
+        "detail": "No labels overlap (min space 1.5 mm) (after auto-fix)"
+       },
+       {
+        "rule": "label-in-page",
+        "pass": true,
+        "labels": [],
+        "detail": "All labels inside the printable area"
+       },
+       {
+        "rule": "label-near-own-point",
+        "pass": true,
+        "labels": [],
+        "detail": "Every point label within 15 mm of its own point and nearest to it (after auto-fix)"
+       },
+       {
+        "rule": "label-axis-gap",
+        "pass": true,
+        "labels": [],
+        "detail": "All labels at least 1.5 mm from the axes (after auto-fix)"
+       }
+      ]
+     },
+     "sound": {
+      "samples": [
+       {
+        "x": -4,
+        "y": 16
+       },
+       {
+        "x": -3.75,
+        "y": 13.5625
+       },
+       {
+        "x": -3.5,
+        "y": 11.25
+       },
+       {
+        "x": -3.25,
+        "y": 9.0625
+       },
+       {
+        "x": -3,
+        "y": 7
+       },
+       {
+        "x": -2.75,
+        "y": 5.0625
+       },
+       {
+        "x": -2.5,
+        "y": 3.25
+       },
+       {
+        "x": -2.25,
+        "y": 1.5625
+       },
+       {
+        "x": -2,
+        "y": 0
+       },
+       {
+        "x": -1.75,
+        "y": -1.4375
+       },
+       {
+        "x": -1.5,
+        "y": -2.75
+       },
+       {
+        "x": -1.25,
+        "y": -3.9375
+       },
+       {
+        "x": -1,
+        "y": -5
+       },
+       {
+        "x": -0.75,
+        "y": -5.9375
+       },
+       {
+        "x": -0.5,
+        "y": -6.75
+       },
+       {
+        "x": -0.25,
+        "y": -7.4375
+       },
+       {
+        "x": 0,
+        "y": -8
+       },
+       {
+        "x": 0.25,
+        "y": -8.4375
+       },
+       {
+        "x": 0.5,
+        "y": -8.75
+       },
+       {
+        "x": 0.75,
+        "y": -8.9375
+       },
+       {
+        "x": 1,
+        "y": -9
+       },
+       {
+        "x": 1.25,
+        "y": -8.9375
+       },
+       {
+        "x": 1.5,
+        "y": -8.75
+       },
+       {
+        "x": 1.75,
+        "y": -8.4375
+       },
+       {
+        "x": 2,
+        "y": -8
+       },
+       {
+        "x": 2.25,
+        "y": -7.4375
+       },
+       {
+        "x": 2.5,
+        "y": -6.75
+       },
+       {
+        "x": 2.75,
+        "y": -5.9375
+       },
+       {
+        "x": 3,
+        "y": -5
+       },
+       {
+        "x": 3.25,
+        "y": -3.9375
+       },
+       {
+        "x": 3.5,
+        "y": -2.75
+       },
+       {
+        "x": 3.75,
+        "y": -1.4375
+       },
+       {
+        "x": 4,
+        "y": 0
+       },
+       {
+        "x": 4.25,
+        "y": 1.5625
+       },
+       {
+        "x": 4.5,
+        "y": 3.25
+       },
+       {
+        "x": 4.75,
+        "y": 5.0625
+       },
+       {
+        "x": 5,
+        "y": 7
+       },
+       {
+        "x": 5.25,
+        "y": 9.0625
+       },
+       {
+        "x": 5.5,
+        "y": 11.25
+       },
+       {
+        "x": 5.75,
+        "y": 13.5625
+       },
+       {
+        "x": 6,
+        "y": 16
+       }
+      ],
+      "keyPoints": [
+       {
+        "x": -2,
+        "y": 0,
+        "kind": "root"
+       },
+       {
+        "x": 0,
+        "y": -8,
+        "kind": "y-intercept"
+       },
+       {
+        "x": 1,
+        "y": -9,
+        "kind": "turning-point"
+       },
+       {
+        "x": 4,
+        "y": 0,
+        "kind": "root"
+       }
+      ]
+     },
+     "description": {
+      "en": "A U-shaped parabola. It opens upwards. It is drawn for x from negative 4 to 6. It crosses the x-axis at x equals negative 2 and x equals 4. The turning point is 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between x equals negative 2 and x equals 4, the curve is below the x-axis where y is less than 0. For x less than negative 2 or x greater than 4, it is above the x-axis.",
+      "zu": "Iparabola emise okuka-U. Ivuleka iye phezulu. Idwetshelwa u-x kusuka ku-−4 kuya ku-6. Iwela i-x-axis lapho i-x ilingana no-2 futhi i-x ifinyelela ku-4. Iphuzu eliguqukayo liyi-1, -9, okuyiphuzu elincane. Iwela i-y-axis ngo-0, -8. Phakathi kokuthi u-x ulingana no-2 no-x ulingane no-4, ijika lingaphansi kwe-x-axis lapho u-y emncane khona kuno-0. Uma i-x ingaphansi kuka--2 noma i-x inkulu kuno-4, iphezu kwe-x-axis."
+     },
+     "deafSolution": {
+      "steps": [
+       {
+        "text": "The graph crosses the x-axis at x = -2 and x = 4.",
+        "visual": "mark -2 and 4 on the x-axis"
+       },
+       {
+        "text": "The turning point is (1, -9).",
+        "visual": "mark the point (1, -9)"
+       },
+       {
+        "text": "The turning point is a minimum.",
+        "visual": "highlight the bottom U-shape of the curve"
+       },
+       {
+        "text": "The graph crosses the y-axis at y = -8, at (0, -8).",
+        "visual": "mark -8 on the y-axis"
+       },
+       {
+        "text": "For -2 < x < 4, y is less than 0.",
+        "visual": "shade the curve below the x-axis between -2 and 4"
+       }
+      ],
+      "keyTerms": [
+       "ROOT",
+       "TURNING POINT",
+       "MINIMUM",
+       "Y-INTERCEPT"
+      ]
+     },
+     "reviews": [
+      {
+       "agent": "Reviewer",
+       "check": "reader-vs-prover",
+       "pass": true,
+       "reason": "The Reader agreed with the algebra"
+      },
+      {
+       "agent": "Reviewer",
+       "check": "fresh-eyes",
+       "pass": false,
+       "before": {
+        "roots": [
+         -2,
+         4
+        ],
+        "turningPoint": null
+       },
+       "after": {
+        "roots": [
+         -2,
+         4
+        ],
+        "turningPoint": {
+         "x": 1,
+         "y": -9
+        }
+       },
+       "reason": "Gemini read the rendered PNG. fresh read: turning point missing (proof (1, -9))",
+       "attempt": 0
+      },
+      {
+       "agent": "Reviewer",
+       "check": "fresh-eyes",
+       "pass": true,
+       "before": {
+        "roots": [
+         -2,
+         4
+        ],
+        "turningPoint": {
+         "x": 1,
+         "y": -9
+        }
+       },
+       "after": {
+        "roots": [
+         -2,
+         4
+        ],
+        "turningPoint": {
+         "x": 1,
+         "y": -9
+        }
+       },
+       "reason": "Gemini read the rendered PNG; roots and turning point match the proof within 0.25",
+       "attempt": 1
+      },
+      {
+       "agent": "Reviewer",
+       "check": "access-deaf",
+       "pass": false,
+       "score": 0,
+       "total": 5,
+       "failed": [
+        {
+         "question": "Where does the graph cross the x-axis?",
+         "expected": "x = -2 and x = 4",
+         "got": "not stated"
+        },
+        {
+         "question": "What is the turning point of the graph?",
+         "expected": "(1, -9)",
+         "got": "not stated"
+        },
+        {
+         "question": "Is the turning point a minimum or a maximum?",
+         "expected": "minimum",
+         "got": "not stated"
+        },
+        {
+         "question": "Where does the graph cross the y-axis?",
+         "expected": "y = -8, at (0, -8)",
+         "got": "not stated"
+        },
+        {
+         "question": "For which values of x is y less than 0?",
+         "expected": "-2 < x < 4",
+         "got": "not stated"
+        }
+       ],
+       "reason": "0/5: a reader of the Deaf solution could not answer \"Where does the graph cross the x-axis?\", \"What is the turning point of the graph?\", \"Is the turning point a minimum or a maximum?\", \"Where does the graph cross the y-axis?\", \"For which values of x is y less than 0?\"",
+       "answers": [
+        "not stated",
+        "not stated",
+        "not stated",
+        "not stated",
+        "not stated"
+       ],
+       "version": "deaf",
+       "attempt": 0,
+       "meaning": {
+        "pass": true,
+        "problems": []
+       }
+      },
+      {
+       "agent": "Reviewer",
+       "check": "access-audio",
+       "pass": false,
+       "score": 5,
+       "total": 5,
+       "failed": [],
+       "reason": "5/5: every question answered from the audio description alone",
+       "answers": [
+        "x equals negative 2 and x equals 4",
+        "1, negative 9",
+        "minimum",
+        "0, negative 8",
+        "between x equals negative 2 and 4"
+       ],
+       "version": "audio",
+       "attempt": 0,
+       "meaning": {
+        "pass": false,
+        "problems": [
+         {
+          "sentence": "It crosses the y-axis at 0, negative 8.",
+          "reason": "y-intercept given as 0 but the proof gives -8"
+         }
+        ]
+       }
+      },
+      {
+       "agent": "Reviewer",
+       "check": "access-audio",
+       "pass": false,
+       "score": 5,
+       "total": 5,
+       "failed": [],
+       "reason": "5/5: every question answered from the audio description alone",
+       "answers": [
+        "x equals negative 2 and x equals 4",
+        "1, negative 9",
+        "minimum",
+        "0, negative 8",
+        "Between negative 2 and 4"
+       ],
+       "version": "audio",
+       "attempt": 1,
+       "before": "5/5 with a wrong number",
+       "after": "5/5 with a wrong number",
+       "meaning": {
+        "pass": false,
+        "problems": [
+         {
+          "sentence": "It crosses the y-axis at 0, negative 8.",
+          "reason": "y-intercept given as 0 but the proof gives -8"
+         }
+        ]
+       }
+      },
+      {
+       "agent": "Reviewer",
+       "check": "access-audio",
+       "pass": false,
+       "score": 5,
+       "total": 5,
+       "failed": [],
+       "reason": "5/5: every question answered from the audio description alone",
+       "answers": [
+        "x equals negative 2 and x equals 4",
+        "1, negative 9",
+        "minimum",
+        "0, negative 8",
+        "between x equals negative 2 and x equals 4"
+       ],
+       "version": "audio",
+       "attempt": 2,
+       "before": "5/5 with a wrong number",
+       "after": "5/5 with a wrong number",
+       "meaning": {
+        "pass": false,
+        "problems": [
+         {
+          "sentence": "It crosses the y-axis at 0, negative 8.",
+          "reason": "y-intercept given as 0 but the proof gives -8"
+         }
+        ]
+       }
+      },
+      {
+       "agent": "Reviewer",
+       "check": "access-deaf",
+       "pass": true,
+       "score": 5,
+       "total": 5,
+       "failed": [],
+       "reason": "5/5: every question answered from the Deaf solution alone",
+       "answers": [
+        "x = -2 and x = 4",
+        "(1, -9)",
+        "minimum",
+        "y = -8, at (0, -8)",
+        "-2 < x < 4"
+       ],
+       "version": "deaf",
+       "attempt": 1,
+       "before": "0/5",
+       "after": "5/5",
+       "meaning": {
+        "pass": true,
+        "problems": []
+       }
+      }
+     ],
+     "corrections": [
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.root1",
+       "before": {
+        "x": 63.3,
+        "y": 116.7
+       },
+       "after": {
+        "x": 63.1,
+        "y": 107
+       },
+       "reason": "Label 0 mm from the curve (needs 3.2 mm); 0 mm from an axis line; moved upper-right, now 3.8 mm from the curve"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.root2",
+       "before": {
+        "x": 153.5,
+        "y": 116.7
+       },
+       "after": {
+        "x": 129.9,
+        "y": 107
+       },
+       "reason": "Label 0 mm from the curve (needs 3.2 mm); 0 mm from an axis line; moved upper-left, now 3.8 mm from the curve"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.turningPoint",
+       "before": {
+        "x": 109.3,
+        "y": 157
+       },
+       "after": {
+        "x": 96,
+        "y": 167.3
+       },
+       "reason": "Label 0 mm from the curve (needs 3.2 mm); overlapped yIntercept; moved below, now 3.2 mm from the curve"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.yIntercept",
+       "before": {
+        "x": 94.1,
+        "y": 152.6
+       },
+       "after": {
+        "x": 93.1,
+        "y": 143.3
+       },
+       "reason": "Label 0 mm from the curve (needs 3.2 mm); overlapped marker turningPoint; 4.2 mm from its own point or nearer another one; moved upper-right, now 3.2 mm from the curve"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.tickX_6",
+       "before": {
+        "x": 172,
+        "y": 126.8
+       },
+       "after": {
+        "x": 172,
+        "y": 127.8
+       },
+       "reason": "Label overlapped axisX; moved below, now 23.7 mm from the curve"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.turningPoint",
+       "before": {
+        "braille": "⠉",
+        "print": "C (1, -9)",
+        "printSize": 3.5
+       },
+       "after": {
+        "braille": "⠼⠁⠂⠐⠤⠼⠊",
+        "print": "C: turning point (1, -9)",
+        "printSize": 4.5
+       },
+       "reason": "Fresh eyes reported turningPoint missing; label made larger with full coordinates"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.root1",
+       "before": {
+        "x": 63.3,
+        "y": 116.7
+       },
+       "after": {
+        "x": 63.1,
+        "y": 107
+       },
+       "reason": "Label 0 mm from the curve (needs 3.2 mm); 0 mm from an axis line; moved upper-right, now 3.8 mm from the curve"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.root2",
+       "before": {
+        "x": 153.5,
+        "y": 116.7
+       },
+       "after": {
+        "x": 129.9,
+        "y": 107
+       },
+       "reason": "Label 0 mm from the curve (needs 3.2 mm); 0 mm from an axis line; moved upper-left, now 3.8 mm from the curve"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.turningPoint",
+       "before": {
+        "x": 131.5,
+        "y": 157
+       },
+       "after": {
+        "x": 132,
+        "y": 168.4
+       },
+       "reason": "Label 0 mm from the curve (needs 3.2 mm); overlapped yIntercept; moved lower-right, now 4 mm from the curve"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.yIntercept",
+       "before": {
+        "x": 94.1,
+        "y": 152.6
+       },
+       "after": {
+        "x": 93.1,
+        "y": 143.3
+       },
+       "reason": "Label 0 mm from the curve (needs 3.2 mm); overlapped marker turningPoint; 4.2 mm from its own point or nearer another one; moved upper-right, now 3.2 mm from the curve"
+      },
+      {
+       "agent": "Designer",
+       "field": "tactile.labels.tickX_6",
+       "before": {
+        "x": 172,
+        "y": 126.8
+       },
+       "after": {
+        "x": 172,
+        "y": 127.8
+       },
+       "reason": "Label overlapped axisX; moved below, now 23.7 mm from the curve"
+      },
+      {
+       "agent": "Explainer",
+       "field": "description.en",
+       "before": "An upward-opening parabola curves across a grid from x equals negative 4 to 6. It has a U-shape. It crosses the x-axis at x equals negative 2 and x equals 4. The turning point is at 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between x equals negative 2 and 4, the curve is below the x-axis. Outside these points, it is above.",
+       "after": "Parabola opening upwards, U-shape. Equation: y equals x squared minus 2x minus 8. Drawn for x from negative 4 to 6. It crosses the x-axis at x equals negative 2 and x equals 4. Turning point is 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between negative 2 and 4, y is less than 0. For x less than negative 2 or x greater than 4, y is greater than 0.",
+       "reason": "1 sentence disagree with the proof"
+      },
+      {
+       "agent": "Explainer",
+       "field": "description.en",
+       "before": "Parabola opening upwards, U-shape. Equation: y equals x squared minus 2x minus 8. Drawn for x from negative 4 to 6. It crosses the x-axis at x equals negative 2 and x equals 4. Turning point is 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between negative 2 and 4, y is less than 0. For x less than negative 2 or x greater than 4, y is greater than 0.",
+       "after": "A U-shaped parabola. It opens upwards. It is drawn for x from negative 4 to 6. It crosses the x-axis at x equals negative 2 and x equals 4. The turning point is 1, negative 9, which is a minimum. It crosses the y-axis at 0, negative 8. Between x equals negative 2 and x equals 4, the curve is below the x-axis where y is less than 0. For x less than negative 2 or x greater than 4, it is above the x-axis.",
+       "reason": "1 sentence disagree with the proof"
+      },
+      {
+       "agent": "Explainer",
+       "field": "deafSolution",
+       "before": "Step 1. Find where the graph crosses the x-axis.\nStep 2. Find the turning point of the graph.\nStep 3. Find where the graph crosses the y-axis.\nStep 4. Check where the graph is below the x-axis.",
+       "after": "Step 1. The graph crosses the x-axis at x = -2 and x = 4.\nStep 2. The turning point is (1, -9).\nStep 3. The turning point is a minimum.\nStep 4. The graph crosses the y-axis at y = -8, at (0, -8).\nStep 5. For -2 < x < 4, y is less than 0.",
+       "reason": "0/5 questions answered"
+      }
+     ],
+     "approval": {
+      "approved": false
+     },
+     "trace": [
+      {
+       "t": 23,
+       "agent": "Planner",
+       "status": "start",
+       "message": "Planning a pack for blind, deaf, sighted learners"
+      },
+      {
+       "t": 28,
+       "agent": "Reader",
+       "status": "start",
+       "message": "Reading the photo"
+      },
+      {
+       "t": 9676,
+       "agent": "Reader",
+       "status": "done",
+       "message": "Graph y = x^2 - 2x - 8; turning point read as (1, -9) confidence 95%"
+      },
+      {
+       "t": 14730,
+       "agent": "Planner",
+       "status": "done",
+       "message": "4 versions: tactile, sound, audio-description, deaf-solution. Please share the tactile printouts and audio files with blind learners and the written step-by-step guide with Deaf learners."
+      },
+      {
+       "t": 14731,
+       "agent": "Prover",
+       "status": "start",
+       "message": "Checking the maths with algebra"
+      },
+      {
+       "t": 14733,
+       "agent": "Prover",
+       "status": "done",
+       "message": "roots -2 and 4, turning point (1, -9)"
+      },
+      {
+       "t": 14733,
+       "agent": "Designer",
+       "status": "start",
+       "message": "Drawing the tactile print"
+      },
+      {
+       "t": 14750,
+       "agent": "Designer",
+       "status": "done",
+       "message": "6/6 print rules pass, 5 labels moved"
+      },
+      {
+       "t": 14750,
+       "agent": "Sonifier",
+       "status": "start",
+       "message": "Mapping the curve to sound"
+      },
+      {
+       "t": 14750,
+       "agent": "Sonifier",
+       "status": "done",
+       "message": "4 key points will click and vibrate"
+      },
+      {
+       "t": 14750,
+       "agent": "Reviewer",
+       "status": "start",
+       "message": "Fresh eyes: reading the tactile print without the photo"
+      },
+      {
+       "t": 14752,
+       "agent": "Explainer",
+       "status": "start",
+       "message": "Writing the audio description and the Deaf solution"
+      },
+      {
+       "t": 16875,
+       "agent": "Reviewer",
+       "status": "retry",
+       "message": "Fresh eyes disagree: Gemini read the rendered PNG. fresh read: turning point missing (proof (1, -9)). Sending back to the Designer"
+      },
+      {
+       "t": 16885,
+       "agent": "Designer",
+       "status": "done",
+       "message": "Tactile print regenerated with clearer labels"
+      },
+      {
+       "t": 16885,
+       "agent": "Reviewer",
+       "status": "start",
+       "message": "Fresh eyes again after the fix (try 2)"
+      },
+      {
+       "t": 21064,
+       "agent": "Reviewer",
+       "status": "done",
+       "message": "Fresh eyes agree with the proof: Gemini read the rendered PNG; roots and turning point match the proof within 0.25"
+      },
+      {
+       "t": 26829,
+       "agent": "Explainer",
+       "status": "fail",
+       "message": "isiZulu text may be missing the number(s) 6, -2; check before use"
+      },
+      {
+       "t": 26829,
+       "agent": "Explainer",
+       "status": "done",
+       "message": "Description written in English and isiZulu; 4 Deaf solution steps"
+      },
+      {
+       "t": 26830,
+       "agent": "Reviewer",
+       "status": "start",
+       "message": "Answering the worksheet using only the audio description"
+      },
+      {
+       "t": 26832,
+       "agent": "Reviewer",
+       "status": "start",
+       "message": "Answering the worksheet using only the Deaf solution"
+      },
+      {
+       "t": 29175,
+       "agent": "Reviewer",
+       "status": "retry",
+       "message": "Deaf solution fails: 0/5 questions answered. Sending back to the Explainer"
+      },
+      {
+       "t": 29175,
+       "agent": "Explainer",
+       "status": "start",
+       "message": "Rewriting the Deaf solution with the Reviewer's feedback"
+      },
+      {
+       "t": 29366,
+       "agent": "Reviewer",
+       "status": "retry",
+       "message": "audio description fails: 1 sentence disagree with the proof. Sending back to the Explainer"
+      },
+      {
+       "t": 29366,
+       "agent": "Explainer",
+       "status": "start",
+       "message": "Rewriting the audio description with the Reviewer's feedback"
+      },
+      {
+       "t": 38417,
+       "agent": "Explainer",
+       "status": "done",
+       "message": "audio description rewritten"
+      },
+      {
+       "t": 38417,
+       "agent": "Reviewer",
+       "status": "start",
+       "message": "Answering the worksheet using only the audio description (try 2)"
+      },
+      {
+       "t": 40588,
+       "agent": "Reviewer",
+       "status": "retry",
+       "message": "audio description fails: 1 sentence disagree with the proof. Sending back to the Explainer"
+      },
+      {
+       "t": 40588,
+       "agent": "Explainer",
+       "status": "start",
+       "message": "Rewriting the audio description with the Reviewer's feedback"
+      },
+      {
+       "t": 46368,
+       "agent": "Explainer",
+       "status": "done",
+       "message": "audio description rewritten"
+      },
+      {
+       "t": 46368,
+       "agent": "Reviewer",
+       "status": "start",
+       "message": "Answering the worksheet using only the audio description (try 3)"
+      },
+      {
+       "t": 48106,
+       "agent": "Reviewer",
+       "status": "fail",
+       "message": "audio description still fails after 2 rewrites (1 sentence disagree with the proof); escalated to the teacher"
+      },
+      {
+       "t": 69793,
+       "agent": "Explainer",
+       "status": "fail",
+       "message": "isiZulu text may be missing the number(s) -2; check before use"
+      },
+      {
+       "t": 69793,
+       "agent": "Explainer",
+       "status": "done",
+       "message": "Deaf solution rewritten"
+      },
+      {
+       "t": 69793,
+       "agent": "Reviewer",
+       "status": "start",
+       "message": "Answering the worksheet using only the Deaf solution (try 2)"
+      },
+      {
+       "t": 76455,
+       "agent": "Reviewer",
+       "status": "done",
+       "message": "Deaf solution: 5/5 (was 0/5), every number matches the proof"
+      },
+      {
+       "t": 76456,
+       "agent": "Teacher",
+       "status": "start",
+       "message": "Ready for review: 1 check need the teacher's eye (access-audio)"
+      }
+     ],
+     "calls": 13,
+     "ms": 76456
+    }
+   }
+  }
+ ]
+}

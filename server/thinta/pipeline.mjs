@@ -69,65 +69,66 @@ export async function* runPipeline(input, { apiKey, fetchImpl = fetch, translate
   const overBudget = () => elapsed() > LIMITS.runBudgetMs;
   const flush = function* () { while (events.length) yield events.shift(); };
 
+  // Yields events while a promise runs, so agents working at the same time stream their trace as they go.
+  const pump = async function* (promise) {
+    let settled = false;
+    promise.then(() => { settled = true; }, () => { settled = true; });
+    while (!settled) { yield* flush(); await Promise.race([promise.catch(() => {}), new Promise(resolve => setTimeout(resolve, 150))]); }
+    yield* flush();
+    return promise;
+  };
+
   try {
     deps = deps || await defaultDeps();
     deafText = deps.deafText || joinSteps;
     const ctx = { apiKey, fetchImpl };
 
-    // Planner
-    trace('Planner', 'start', `Planning a pack for ${job.input.learners.join(', ')} learners`);
-    yield* flush();
-    try {
-      const plan = await ai(() => deps.plan({ input: job.input, ...ctx }));
-      const wanted = versionsFor(job.input.learners);
-      const versions = [...new Set([...(plan.versions || []).filter(v => wanted.includes(v)), ...wanted])];
-      patch({ plan: { steps: plan.steps?.length ? plan.steps : ['Read', 'Prove', 'Design', 'Review'], versions } });
-      trace('Planner', 'done', `${versions.length} versions: ${versions.join(', ')}${plan.note ? `. ${plan.note}` : ''}`);
-    } catch (error) {
-      if (error instanceof StepCapError) throw error;
-      patch({ plan: { steps: ['Read the photo', 'Prove the maths', 'Design every version', 'Review every version'], versions: versionsFor(job.input.learners) } });
-      trace('Planner', 'fail', `Planner unavailable (${error.message.slice(0, 80)}); using the standard plan`);
-    }
-    yield* flush();
-
-    // Reader
-    trace('Reader', 'start', 'Reading the photo');
-    yield* flush();
-    let reading;
-    try {
-      if (!job.input.imageBase64) throw new Error('no photo sent');
-      reading = await ai(() => deps.readGraph({ imageBase64: job.input.imageBase64, mimeType: job.input.mimeType, equationHint: job.input.equationHint, ...ctx }));
-      const tp = reading.turningPoint ? ` turning point read as (${reading.turningPoint.x}, ${reading.turningPoint.y})` : '';
-      trace('Reader', 'done', `${reading.type === 'bar' ? 'Bar chart' : `Graph ${reading.equation || '(no equation seen)'}`};${tp} confidence ${Math.round((reading.confidence ?? 0) * 100)}%`);
-    } catch (error) {
-      if (error instanceof StepCapError) throw error;
-      if (!job.input.equationHint) { trace('Reader', 'fail', `Could not read the photo: ${error.message.slice(0, 120)}`); throw new Error('The photo could not be read and no equation was typed.'); }
-      reading = { type: 'function', equation: job.input.equationHint, confidence: 0 };
-      trace('Reader', 'fail', `Could not read the photo (${error.message.slice(0, 80)}); continuing from the typed equation`);
-    }
-    patch({ reading });
-    yield* flush();
+    // Planner ∥ Reader: the Reader does not need the plan, so neither waits for the other.
+    const planning = (async () => {
+      trace('Planner', 'start', `Planning a pack for ${job.input.learners.join(', ')} learners`);
+      try {
+        const plan = await ai(() => deps.plan({ input: job.input, ...ctx }));
+        const wanted = versionsFor(job.input.learners);
+        const versions = [...new Set([...(plan.versions || []).filter(v => wanted.includes(v)), ...wanted])];
+        patch({ plan: { steps: plan.steps?.length ? plan.steps : ['Read', 'Prove', 'Design', 'Review'], versions } });
+        trace('Planner', 'done', `${versions.length} versions: ${versions.join(', ')}${plan.note ? `. ${plan.note}` : ''}`);
+      } catch (error) {
+        if (error instanceof StepCapError) throw error;
+        patch({ plan: { steps: ['Read the photo', 'Prove the maths', 'Design every version', 'Review every version'], versions: versionsFor(job.input.learners) } });
+        trace('Planner', 'fail', `Planner unavailable (${error.message.slice(0, 80)}); using the standard plan`);
+      }
+    })();
+    const reading = (async () => {
+      trace('Reader', 'start', 'Reading the photo');
+      try {
+        if (!job.input.imageBase64) throw new Error('no photo sent');
+        const read = await ai(() => deps.readGraph({ imageBase64: job.input.imageBase64, mimeType: job.input.mimeType, equationHint: job.input.equationHint, ...ctx }));
+        const tp = read.turningPoint ? ` turning point read as (${read.turningPoint.x}, ${read.turningPoint.y})` : '';
+        trace('Reader', 'done', `${read.type === 'bar' ? 'Bar chart' : `Graph ${read.equation || '(no equation seen)'}`};${tp} confidence ${Math.round((read.confidence ?? 0) * 100)}%`);
+        return read;
+      } catch (error) {
+        if (error instanceof StepCapError) throw error;
+        if (!job.input.equationHint) { trace('Reader', 'fail', `Could not read the photo: ${error.message.slice(0, 120)}`); throw new Error('The photo could not be read and no equation was typed.'); }
+        trace('Reader', 'fail', `Could not read the photo (${error.message.slice(0, 80)}); continuing from the typed equation`);
+        return { type: 'function', equation: job.input.equationHint, confidence: 0 };
+      }
+    })();
+    const [, read] = yield* pump(Promise.all([planning, reading]));
+    patch({ reading: read });
 
     // Prover (pure algebra, overrules the Reader)
     trace('Prover', 'start', 'Checking the maths with algebra');
-    yield* flush();
-    const { proof, corrections } = deps.prove(reading, { equationHint: job.input.equationHint, questions: job.input.questions });
+    const { proof, corrections } = deps.prove(read, { equationHint: job.input.equationHint, questions: job.input.questions });
     patch({ proof });
     corrections.forEach(correct);
-    const readerChecked = reading.type !== 'bar' && (reading.turningPoint || reading.roots);
-    if (readerChecked) review({ agent: 'Reviewer', check: 'reader-vs-prover', pass: !corrections.length, before: corrections[0]?.before, after: corrections[0]?.after, reason: corrections.length ? `${corrections.length} value${corrections.length > 1 ? 's' : ''} read from the drawing disagreed with the algebra; the Prover's values win` : 'The Reader agreed with the algebra' });
+    if (read.type !== 'bar' && (read.turningPoint || read.roots)) review({ agent: 'Reviewer', check: 'reader-vs-prover', pass: !corrections.length, before: corrections[0]?.before, after: corrections[0]?.after, reason: corrections.length ? `${corrections.length} value${corrections.length > 1 ? 's' : ''} read from the drawing disagreed with the algebra; the Prover's values win` : 'The Reader agreed with the algebra' });
     const facts = proof.bars?.length ? `${proof.bars.length} bars checked` : `roots ${proof.roots.length ? proof.roots.join(' and ') : 'none'}${proof.turningPoint ? `, turning point (${proof.turningPoint.x}, ${proof.turningPoint.y})` : ''}`;
     trace('Prover', 'done', `${facts}${corrections.length ? `. Overruled the Reader on ${corrections.map(c => c.field.replace('reading.', '')).join(', ')}` : ''}`);
     yield* flush();
 
-    // Designer ∥ Explainer, Sonifier
+    // Designer and Sonifier are instant; the Explainer and the fresh-eyes check of the print run side by side.
     trace('Designer', 'start', 'Drawing the tactile print');
-    trace('Explainer', 'start', 'Writing the audio description and the Deaf solution');
-    yield* flush();
-    const type = reading.type === 'bar' ? 'bar' : 'function';
-    const explaining = ai(() => deps.explain({ proof, reading, translate, ...ctx }));
-    explaining.catch(() => {});
-    let tactile = deps.designTactile(proof, { type });
+    let tactile = deps.designTactile(proof, { type: read.type === 'bar' ? 'bar' : 'function' });
     (tactile.corrections || []).forEach(correct);
     patch({ tactile: { svg: tactile.svg, warnings: tactile.warnings || [], ruleChecks: tactile.ruleChecks || [] } });
     const failedRules = (tactile.ruleChecks || []).filter(r => !r.pass);
@@ -136,82 +137,82 @@ export async function* runPipeline(input, { apiKey, fetchImpl = fetch, translate
     const sound = deps.sonify(proof);
     patch({ sound });
     trace('Sonifier', 'done', `${sound.keyPoints.length} key points will click and vibrate`);
-    yield* flush();
-    const { description, deafSolution, warnings = [] } = await explaining;
-    patch({ description, deafSolution });
-    for (const warning of warnings) trace('Explainer', 'fail', warning);
-    trace('Explainer', 'done', `Description written${description.zu ? ' in English and isiZulu' : ' in English (isiZulu failed)'}; ${deafSolution.steps.length} Deaf solution steps`);
-    yield* flush();
 
-    // Reviewer 1: fresh eyes on the tactile print
-    for (let attempt = 0; attempt <= LIMITS.maxRetries; attempt++) {
-      if (overBudget()) { trace('Reviewer', 'fail', 'Out of time for the fresh-eyes check; escalated to the teacher'); break; }
-      trace('Reviewer', 'start', attempt ? `Fresh eyes again after the fix (try ${attempt + 1})` : 'Fresh eyes: reading the tactile print without the photo');
-      yield* flush();
-      try {
-        const result = await ai(() => deps.freshEyes({ svg: job.tactile.svg, proof, ...ctx }));
-        review({ ...result.review, attempt });
-        if (result.review.pass) { trace('Reviewer', 'done', `Fresh eyes agree with the proof: ${result.review.reason}`); break; }
-        if (attempt === LIMITS.maxRetries) { trace('Reviewer', 'fail', `Fresh eyes still disagree after ${attempt} fixes; escalated to the teacher`); break; }
-        trace('Reviewer', 'retry', `Fresh eyes disagree: ${result.review.reason}. Sending back to the Designer`);
-        yield* flush();
-        const fixed = deps.fixTactile(proof, tactile, result.feedback || { missing: [], unclear: ['roots', 'turningPoint', 'yIntercept'] });
-        (fixed.corrections || []).forEach(correct);
-        tactile = fixed;
-        patch({ tactile: { svg: fixed.svg, warnings: fixed.warnings || [], ruleChecks: fixed.ruleChecks || [] } });
-        trace('Designer', 'done', 'Tactile print regenerated with clearer labels');
-      } catch (error) {
-        if (error instanceof StepCapError) throw error;
-        trace('Reviewer', 'fail', `Fresh-eyes check failed to run: ${error.message.slice(0, 100)}`);
-        break;
+    // Reviewer 1: fresh eyes on the tactile print, sending it back to the Designer when they disagree.
+    const freshEyes = (async () => {
+      for (let attempt = 0; attempt <= LIMITS.maxRetries; attempt++) {
+        if (overBudget()) { trace('Reviewer', 'fail', 'Out of time for the fresh-eyes check; escalated to the teacher'); return; }
+        trace('Reviewer', 'start', attempt ? `Fresh eyes again after the fix (try ${attempt + 1})` : 'Fresh eyes: reading the tactile print without the photo');
+        try {
+          const result = await ai(() => deps.freshEyes({ svg: job.tactile.svg, proof, ...ctx }));
+          review({ ...result.review, attempt });
+          if (result.review.pass) { trace('Reviewer', 'done', `Fresh eyes agree with the proof: ${result.review.reason}`); return; }
+          if (attempt === LIMITS.maxRetries) { trace('Reviewer', 'fail', `Fresh eyes still disagree after ${attempt} fixes; escalated to the teacher`); return; }
+          trace('Reviewer', 'retry', `Fresh eyes disagree: ${result.review.reason}. Sending back to the Designer`);
+          const fixed = deps.fixTactile(proof, tactile, result.feedback || { missing: [], unclear: ['roots', 'turningPoint', 'yIntercept'] });
+          (fixed.corrections || []).forEach(correct);
+          tactile = fixed;
+          patch({ tactile: { svg: fixed.svg, warnings: fixed.warnings || [], ruleChecks: fixed.ruleChecks || [] } });
+          trace('Designer', 'done', 'Tactile print regenerated with clearer labels');
+        } catch (error) {
+          if (error instanceof StepCapError) throw error;
+          trace('Reviewer', 'fail', `Fresh-eyes check failed to run: ${error.message.slice(0, 100)}`);
+          return;
+        }
       }
-      yield* flush();
-    }
-    yield* flush();
+    })();
+    freshEyes.catch(() => {});
 
-    // Reviewer 2 and 3: access tests (audio description, Deaf solution) with meaning checks
-    for (const version of ['audio', 'deaf']) {
-      if (version === 'audio' && !job.plan.versions.includes('audio-description')) continue;
-      if (version === 'deaf' && !job.plan.versions.includes('deaf-solution')) continue;
+    trace('Explainer', 'start', 'Writing the audio description and the Deaf solution');
+    const explained = yield* pump(ai(() => deps.explain({ proof, reading: read, translate, ...ctx })));
+    patch({ description: explained.description, deafSolution: explained.deafSolution });
+    (explained.warnings || []).forEach(warning => trace('Explainer', 'fail', warning));
+    trace('Explainer', 'done', `Description written${explained.description.zu ? ' in English and isiZulu' : ' in English (isiZulu failed)'}; ${explained.deafSolution.steps.length} Deaf solution steps`);
+
+    // Reviewer 2 and 3: answer the worksheet from each version alone, plus a meaning check; both versions in parallel.
+    const accessLoop = async version => {
       const label = version === 'audio' ? 'audio description' : 'Deaf solution';
       let first = null;
       for (let attempt = 0; attempt <= LIMITS.maxRetries; attempt++) {
-        if (overBudget()) { trace('Reviewer', 'fail', `Out of time testing the ${label}; escalated to the teacher`); break; }
+        if (overBudget()) { trace('Reviewer', 'fail', `Out of time testing the ${label}; escalated to the teacher`); return; }
         const text = version === 'audio' ? job.description.en : deafText(job.deafSolution);
         trace('Reviewer', 'start', `Answering the worksheet using only the ${label}${attempt ? ` (try ${attempt + 1})` : ''}`);
-        yield* flush();
         let result;
         try { result = await ai(() => deps.accessTest({ version, text, proof, questions: job.input.questions, ...ctx })); }
-        catch (error) { if (error instanceof StepCapError) throw error; trace('Reviewer', 'fail', `Access test failed to run: ${error.message.slice(0, 100)}`); break; }
+        catch (error) { if (error instanceof StepCapError) throw error; trace('Reviewer', 'fail', `Access test failed to run: ${error.message.slice(0, 100)}`); return; }
         const meaning = deps.meaningCheck(text, proof);
-        first = first || result;
+        first = first || { ...result, meaningPass: meaning.pass };
         const pass = result.pass && meaning.pass;
-        review({ ...result, pass, attempt, before: attempt ? scoreText(first) : undefined, after: attempt ? scoreText(result) : undefined, meaning });
-        if (pass) { trace('Reviewer', 'done', `${label}: ${scoreText(result)}${attempt ? ` (was ${scoreText(first)})` : ''}, every number matches the proof`); break; }
+        const status = r => `${scoreText(r)}${r.meaningPass === false ? ' with a wrong number' : ''}`;
+        review({ ...result, version, pass, attempt, before: attempt ? status(first) : undefined, after: attempt ? status({ ...result, meaningPass: meaning.pass }) : undefined, meaning });
+        if (pass) { trace('Reviewer', 'done', `${label}: ${scoreText(result)}${attempt ? ` (was ${status(first)})` : ''}, every number matches the proof`); return; }
         const why = [!result.pass && `${scoreText(result)} questions answered`, !meaning.pass && `${meaning.problems.length} sentence${meaning.problems.length > 1 ? 's' : ''} disagree with the proof`].filter(Boolean).join('; ');
-        if (attempt === LIMITS.maxRetries) { trace('Reviewer', 'fail', `${label} still fails after ${attempt} rewrites (${why}); escalated to the teacher`); break; }
+        if (attempt === LIMITS.maxRetries) { trace('Reviewer', 'fail', `${label} still fails after ${attempt} rewrites (${why}); escalated to the teacher`); return; }
         trace('Reviewer', 'retry', `${label} fails: ${why}. Sending back to the Explainer`);
         trace('Explainer', 'start', `Rewriting the ${label} with the Reviewer's feedback`);
-        yield* flush();
         const feedback = [...deps.feedbackFrom(result), ...meaning.problems.map(p => `This sentence disagrees with the proof (${p.reason}): ${p.sentence}`)];
         try {
-          const rewritten = await ai(() => deps.explain({ proof, reading, feedback, translate, ...ctx }));
-          const before = version === 'audio' ? job.description.en : deafText(job.deafSolution);
+          const rewritten = await ai(() => deps.explain({ proof, reading: read, feedback, translate, ...ctx }));
           (rewritten.warnings || []).forEach(warning => trace('Explainer', 'fail', warning));
+          const before = text;
           if (version === 'audio') patch({ description: rewritten.description });
           else patch({ deafSolution: rewritten.deafSolution });
           correct({ agent: 'Explainer', field: version === 'audio' ? 'description.en' : 'deafSolution', before, after: version === 'audio' ? rewritten.description.en : deafText(rewritten.deafSolution), reason: why });
           trace('Explainer', 'done', `${label} rewritten`);
-        } catch (error) { if (error instanceof StepCapError) throw error; trace('Explainer', 'fail', `Rewrite failed: ${error.message.slice(0, 100)}`); break; }
-        yield* flush();
+        } catch (error) { if (error instanceof StepCapError) throw error; trace('Explainer', 'fail', `Rewrite failed: ${error.message.slice(0, 100)}`); return; }
       }
-      yield* flush();
-    }
+    };
+    const checks = [freshEyes];
+    if (job.plan.versions.includes('audio-description')) checks.push(accessLoop('audio'));
+    if (job.plan.versions.includes('deaf-solution')) checks.push(accessLoop('deaf'));
+    yield* pump(Promise.all(checks));
 
-    const open = job.reviews.filter(r => !r.pass && r.check !== 'reader-vs-prover');
-    const lastByCheck = Object.values(Object.fromEntries(job.reviews.map(r => [r.check, r])));
-    const unresolved = lastByCheck.filter(r => !r.pass && r.check !== 'reader-vs-prover');
-    trace('Teacher', 'start', unresolved.length ? `Ready for review: ${unresolved.length} check${unresolved.length > 1 ? 's' : ''} need the teacher's eye` : `Ready for approval: every check passes (${open.length} fixed along the way)`);
+    // Every check the plan needs must have passed on its last try; a missing check counts as open.
+    const needed = ['fresh-eyes', ...(job.plan.versions.includes('audio-description') ? ['access-audio'] : []), ...(job.plan.versions.includes('deaf-solution') ? ['access-deaf'] : [])];
+    const last = Object.fromEntries(job.reviews.map(r => [r.check === 'access' ? `access-${r.version}` : r.check, r]));
+    const open = needed.filter(check => !last[check]?.pass);
+    const fixed = job.corrections.length;
+    trace('Teacher', 'start', open.length ? `Ready for review: ${open.length} check${open.length > 1 ? 's need' : ' needs'} the teacher's eye (${open.join(', ')})` : `Ready for approval: every check passes (${fixed} correction${fixed === 1 ? '' : 's'} made along the way)`);
     yield* flush();
     yield { type: 'done', job: { ...job, input: { ...job.input, imageBase64: '' }, calls, ms: elapsed() } };
   } catch (error) {

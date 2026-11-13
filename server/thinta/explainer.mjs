@@ -60,11 +60,12 @@ Return JSON only.`;
 async function toZulu(text, translate) {
   if (!translate || !text) return { zu: '', warning: 'isiZulu translation not available' };
   try {
-    const out = await translate(text, 'en', 'zu');
+    // Spoken negatives go in as "−2": in a live run the translation dropped "negative" and flipped a root's sign.
+    const out = await translate(text.replace(/\bnegative\s+(\d+(?:\.\d+)?)/gi, '−$1'), 'en', 'zu');
     const zu = (typeof out === 'string' ? out : out?.text || '').trim();
     if (!zu) return { zu: '', warning: 'isiZulu translation came back empty' };
-    // Numbers must survive translation; NLLB sometimes drops or changes them.
-    const missing = [...new Set(parseNumbers(text).map(Math.abs))].filter(n => !parseNumbers(zu).map(Math.abs).includes(n));
+    // Numbers, signs included, must survive translation; NLLB sometimes drops or changes them.
+    const missing = [...new Set(parseNumbers(text))].filter(n => !parseNumbers(zu).includes(n));
     return { zu, warning: missing.length ? `isiZulu text may be missing the number(s) ${missing.join(', ')}; check before use` : '' };
   } catch (error) { return { zu: '', warning: `isiZulu translation failed: ${error.message}` }; }
 }
