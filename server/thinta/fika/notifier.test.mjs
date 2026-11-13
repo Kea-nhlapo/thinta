@@ -2,7 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { notify, numberCheck, deliveryFacts, templateSummary, notifyPrompt } from './notifier.mjs';
 import { EXAMPLE_DISPATCH } from '../../../src/thinta/contract.js';
-import { DEMO_SCHOOL } from '../../../src/thinta/fika-demo-school.js';
+import { DEMO_SCHOOL, DEMO_DEADLINE } from '../../../src/thinta/fika-demo-school.js';
+import { planJobs, schedule, replan } from '../../../src/thinta/fika/scheduler.js';
+import { formatEta } from '../../../src/thinta/fika/time.js';
+import { finish } from './tracker.mjs';
 
 const G = 'example-parabola', DUE = '2026-11-20T07:30:00+02:00', NOW = '2026-11-19T13:00:00+02:00';
 const phone = (id, learnerId, item = 'phone-blind') => ({ id, graphJobId: G, learnerId, item, pages: 0, deadline: DUE, eta: NOW, status: 'delivered' });
@@ -136,4 +139,21 @@ test('a print that finishes after the deadline is ready but still reported late'
   const text = templateSummary(f);
   assert.match(text, /Late for Learner F \(ready at Fri 07:34\): The embosser queue runs past Fri 07:30\./);
   assert.equal(numberCheck(text, f).pass, true);
+});
+
+test("H's real scheduler output: on time, tracked to the end, then every tactile machine offline", async () => {
+  const jobs = schedule(planJobs(DEMO_SCHOOL, G, DEMO_DEADLINE), DEMO_SCHOOL, {}).jobs;
+  let d = { schoolId: DEMO_SCHOOL.id, graphJobId: G, clock: DEMO_SCHOOL.clockStart, machines: DEMO_SCHOOL.machines.map(m => ({ id: m.id, online: true })), jobs, checks: [], events: [], summary: { en: '', zu: '', ready: 0, late: 0 } };
+  const latest = formatEta(jobs.filter(j => j.eta).map(j => j.eta).sort().pop());
+  const start = await notify({ dispatch: d, school: DEMO_SCHOOL });
+  assert.equal(start.summary.en, `Phone packs and plain-language solutions are with 5 learners now. Tactile prints ready: 0 of 4; all 4 by ${latest}, before the Fri 08:00 lesson.`);
+  assert.equal(start.numberCheck.pass, true);
+  const done = finish(d, DEMO_SCHOOL);
+  assert.equal(done.events.length, 4);
+  assert.equal((await notify({ dispatch: done.dispatch, school: DEMO_SCHOOL })).summary.en, 'Phone packs and plain-language solutions are with 5 learners now. Tactile prints ready: 4 of 4.');
+  for (const machineId of ['embosser-1', 'swell-1']) { const r = replan(d, DEMO_SCHOOL, { kind: 'machine-offline', machineId }); d = { ...d, jobs: r.jobs, machines: r.machines }; }
+  const out = await notify({ dispatch: d, school: DEMO_SCHOOL });
+  assert.match(out.summary.en, /Can't meet Friday's lesson\. Flagged for the teacher\. Late for Learner A, Learner B, Learner C and Learner F: .+\. The phone pack was delivered as the fallback for Learner A, Learner B and Learner F\./);
+  assert.equal(out.numberCheck.pass, true);
+  assert.deepEqual([out.summary.ready, out.summary.late], [5, 4]);
 });

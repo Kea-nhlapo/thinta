@@ -1,33 +1,21 @@
 // Tracker: moves Fika's jobs through queued → printing → ready on a simulated clock. Deterministic and pure:
 // it never reads the wall clock and never touches eta or machineId (that is the Dispatcher's job).
+import { formatEta, toIso, toMs } from '../../../src/thinta/fika/time.js';
 
 // Short machine nouns for teacher-facing events ("ready on the embosser").
 const MACHINE_NOUN = { swell: 'swell-paper heater', embosser: 'embosser', printer: 'printer' };
 const ITEM_NOUN = { tactile: 'tactile print', 'phone-blind': 'phone pack', 'deaf-solution': 'plain-language solution' };
 const FINAL = new Set(['ready', 'delivered']);
 
-const ms = iso => Date.parse(iso);
-// Keep the clock in the same UTC offset as the dispatch ("+02:00"), so times stay readable in the school's zone.
-const offsetOf = iso => (String(iso).match(/([+-]\d\d:\d\d|Z)$/) || [, 'Z'])[1];
-export function isoAt(time, like) {
-  const off = offsetOf(like);
-  const mins = off === 'Z' ? 0 : (off[0] === '-' ? -1 : 1) * (+off.slice(1, 3) * 60 + +off.slice(4, 6));
-  return new Date(time + mins * 60000).toISOString().slice(0, 19) + (off === 'Z' ? 'Z' : off);
-}
-
-// Fallback until H's time.js lands: "Thu 15:10" in the school's time zone.
-export function formatEta(iso, timeZone = 'Africa/Johannesburg') {
-  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(iso)).map(p => [p.type, p.value]));
-  return `${parts.weekday} ${parts.hour}:${parts.minute}`;
-}
+const ms = toMs;
 
 const learnerName = (school, id) => school?.learners?.find(l => l.id === id)?.name || id;
 const machineNoun = (school, id) => MACHINE_NOUN[school?.machines?.find(m => m.id === id)?.kind] || id;
 const offline = (dispatch, id) => dispatch.machines?.some(m => m.id === id && m.online === false);
 
 function doneDetail(job, school) {
-  const base = `${learnerName(school, job.learnerId)}'s ${ITEM_NOUN[job.item] || job.item} is ready on the ${machineNoun(school, job.machineId)}`;
-  return ms(job.eta) > ms(job.deadline) ? `${base}, after the deadline (${formatEta(job.deadline, school?.timezone)})` : base;
+  const base = `${learnerName(school, job.learnerId)}'s ${job.urgent ? 'urgent ' : ''}${ITEM_NOUN[job.item] || job.item} is ready on the ${machineNoun(school, job.machineId)}`;
+  return ms(job.eta) > ms(job.deadline) ? `${base}, after the deadline (${formatEta(job.deadline)})` : base;
 }
 
 // Moves the clock forward to toClock (never back) and returns the new dispatch plus the job-done events, in time order.
@@ -48,7 +36,7 @@ export function advance(dispatch, school, { toClock } = {}) {
     } else if (now >= ms(job.start) && job.status === 'queued') job.status = 'printing';
   }
   events.sort((a, b) => ms(a.t) - ms(b.t));
-  next.clock = isoAt(now, dispatch.clock);
+  next.clock = toIso(now);
   next.events = [...(next.events || []), ...events];
   return { dispatch: next, events };
 }
@@ -67,7 +55,7 @@ export function boundaries(dispatch) {
 //   {} or {to:'boundary'}  jump to the next start or finish (null when nothing is left to happen);
 //   {to:'end'}             jump to the last finish (cut order: skip the animation, show the final statuses).
 export function nextClock(dispatch, { minutes, speed, realSeconds = 1, to } = {}) {
-  if (minutes !== undefined || speed !== undefined) return isoAt(ms(dispatch.clock) + (minutes ?? speed * realSeconds) * 60000, dispatch.clock);
+  if (minutes !== undefined || speed !== undefined) return toIso(ms(dispatch.clock) + (minutes ?? speed * realSeconds) * 60000);
   const ahead = boundaries(dispatch);
   if (!ahead.length) return null;
   return to === 'end' ? ahead[ahead.length - 1] : ahead[0];

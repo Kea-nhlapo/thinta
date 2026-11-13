@@ -3,19 +3,19 @@
 // is unavailable or keeps getting a number wrong. isiZulu comes from the injected translate (the gateway's).
 import { geminiJSON } from '../gemini.mjs';
 import { parseNumbers } from '../reviewer.mjs';
-import { formatEta } from './tracker.mjs';
+import { formatEta } from '../../../src/thinta/fika/time.js';
 
 const SCHEMA = { type: 'object', properties: { summary: { type: 'string' } }, required: ['summary'] };
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const ms = iso => Date.parse(iso);
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 const list = names => (names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`);
-const dayName = (iso, timeZone) => new Intl.DateTimeFormat('en-GB', { timeZone, weekday: 'long' }).format(new Date(iso));
+// "Friday" from time.js's "Fri 08:00", so every day name uses the same school-time maths.
+const dayName = iso => DAYS.find(d => d.startsWith(formatEta(iso).slice(0, 3)));
 const missed = job => job.status === 'late' || Boolean(job.lateReason) || (job.eta && ms(job.eta) > ms(job.deadline));
 
 // The facts, worked out here so Gemini never counts or adds anything.
 export function deliveryFacts(dispatch, school) {
-  const tz = school?.timezone || 'Africa/Johannesburg';
   const name = id => school?.learners?.find(l => l.id === id)?.name || id;
   const jobs = dispatch.jobs || [];
   const phone = jobs.filter(j => j.item !== 'tactile');
@@ -23,21 +23,21 @@ export function deliveryFacts(dispatch, school) {
   const lessonAt = school?.lesson?.at || jobs[0]?.deadline;
   // Honest failure: no slot at all, or the slot ends after the lesson has started.
   const lost = j => j.status !== 'ready' && (!j.eta || (lessonAt && ms(j.eta) >= ms(lessonAt)));
-  const late = jobs.filter(missed).map(j => ({ learner: name(j.learnerId), item: j.item, reason: j.lateReason || 'Its slot ends after the deadline', eta: j.eta ? formatEta(j.eta, tz) : null, ready: j.status === 'ready', lost: lost(j) }));
+  const late = jobs.filter(missed).map(j => ({ learner: name(j.learnerId), item: j.item, reason: j.lateReason || 'Its slot ends after the deadline', eta: j.eta ? formatEta(j.eta) : null, ready: j.status === 'ready', lost: lost(j) }));
   const lostIds = new Set(jobs.filter(j => missed(j) && lost(j)).map(j => j.learnerId));
   const onTime = prints.filter(j => !missed(j) && j.eta);
   const latest = onTime.filter(j => j.status !== 'ready').map(j => j.eta).sort((a, b) => ms(a) - ms(b)).pop();
   return {
-    now: formatEta(dispatch.clock, tz),
+    now: formatEta(dispatch.clock),
     phoneLearners: new Set(phone.filter(j => j.status === 'delivered').map(j => j.learnerId)).size,
     phonePacks: phone.filter(j => j.item === 'phone-blind' && j.status === 'delivered').length,
     deafSolutions: phone.filter(j => j.item === 'deaf-solution' && j.status === 'delivered').length,
     prints: prints.length,
     printsReady: prints.filter(j => j.status === 'ready').length,
     printsComing: onTime.filter(j => j.status !== 'ready').length,
-    latestEta: latest ? formatEta(latest, tz) : null,
-    lesson: lessonAt ? { title: school?.lesson?.title || 'the lesson', at: formatEta(lessonAt, tz), day: dayName(lessonAt, tz) } : null,
-    deadline: jobs[0]?.deadline ? formatEta(jobs[0].deadline, tz) : null,
+    latestEta: latest ? formatEta(latest) : null,
+    lesson: lessonAt ? { title: school?.lesson?.title || 'the lesson', at: formatEta(lessonAt), day: dayName(lessonAt) } : null,
+    deadline: jobs[0]?.deadline ? formatEta(jobs[0].deadline) : null,
     late,
     cannotMeet: late.some(l => l.lost),
     // Learners whose print can't make the lesson but who already have their phone pack: the fallback.
@@ -108,7 +108,7 @@ export function templateSummary(f) {
   const out = [];
   if (f.phoneLearners) out.push(`Phone packs and plain-language solutions are with ${plural(f.phoneLearners, 'learner')} now.`);
   if (f.prints) {
-    const coming = f.printsComing && f.latestEta ? `; ${f.printsComing} more by ${f.latestEta}${f.lesson ? `, before the ${f.lesson.at} lesson` : ''}` : '';
+    const coming = f.printsComing && f.latestEta ? `; ${f.printsComing === f.prints ? 'all ' : ''}${f.printsComing}${f.printsReady ? ' more' : ''} by ${f.latestEta}${f.lesson ? `, before the ${f.lesson.at} lesson` : ''}` : '';
     out.push(`Tactile prints ready: ${f.printsReady} of ${f.prints}${coming}.`);
   }
   if (f.cannotMeet) out.push(`Can't meet ${f.lesson?.day || 'the'}'s lesson. Flagged for the teacher.`);

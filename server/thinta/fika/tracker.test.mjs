@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { advance, nextClock, boundaries, finish, formatEta, isoAt } from './tracker.mjs';
+import { advance, nextClock, boundaries, finish } from './tracker.mjs';
 import { EXAMPLE_DISPATCH, DISPATCH_STATUSES, validateDispatch } from '../../../src/thinta/contract.js';
 import { DEMO_SCHOOL } from '../../../src/thinta/fika-demo-school.js';
 
@@ -17,12 +17,6 @@ const dispatch = () => ({
 });
 const rank = { queued: 0, late: 0, printing: 1, ready: 2, delivered: 2 };
 const byId = d => Object.fromEntries(d.jobs.map(j => [j.id, j]));
-
-test('formatEta and isoAt keep the school time zone', () => {
-  assert.equal(formatEta('2026-11-19T15:10:00+02:00'), 'Thu 15:10');
-  assert.equal(formatEta('2026-11-19T13:10:00Z', 'Africa/Johannesburg'), 'Thu 15:10');
-  assert.equal(isoAt(Date.parse('2026-11-19T13:10:00Z'), '2026-11-19T13:00:00+02:00'), '2026-11-19T15:10:00+02:00');
-});
 
 test('a clock sweep moves queued → printing → ready, never backwards, and never touches eta or machine', () => {
   let d = dispatch();
