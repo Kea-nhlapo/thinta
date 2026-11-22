@@ -90,5 +90,15 @@ export function signOut() {
   try { fetch('/api/auth/signout', { method: 'POST', credentials: 'same-origin', keepalive: true }).catch(() => {}); } catch {}
 }
 
-// Where each kind of account lands after signing in: learners start with sign-to-speech.
-export const homeFor = account => account?.role === 'learner' ? '/sign-introduction' : '/app?screen=dashboard-loading';
+// Where each kind of account lands after signing in: teachers on their dashboard (with the agents), learners on
+// the material assigned to them. Learners never land on the agents.
+export const homeFor = account => account?.role === 'learner' ? '/learn' : '/app?screen=dashboard-loading';
+export const LOGIN_PAGE = '/app?screen=login';
+
+// For a page only some roles may see: where to send this visitor instead, or null if they may stay.
+// Signed-out visitors go to the login page; a signed-in person with the wrong role goes to their own home.
+// The server checks again for anything it stores or returns.
+export function redirectFor(roles, account = currentAccount()) {
+  if (!account) return LOGIN_PAGE;
+  return roles.includes(account.role) ? null : homeFor(account);
+}

@@ -1,4 +1,4 @@
-// Where SA Educate keeps accounts, learner profiles and sign-in sessions.
+// Where SA Educate keeps accounts, learner profiles, sign-in sessions and the material teachers assign.
 // With DATABASE_URL it is Postgres, so accounts work from any device and survive redeploys. Without it, memory
 // only, for development and tests. Both have the same async interface. Like server/thinta/store.mjs.
 
@@ -17,9 +17,23 @@ create table if not exists sae_sessions (
   expires_at timestamptz not null,
   created_at timestamptz not null default now()
 );
-create index if not exists sae_sessions_email on sae_sessions(email);`;
+create index if not exists sae_sessions_email on sae_sessions(email);
+create table if not exists sae_assignments (
+  learner_email text not null references sae_users(email) on delete cascade,
+  item_id text not null,
+  kind text not null check (kind in ('pack', 'lesson')),
+  title text not null,
+  content jsonb not null,
+  teacher_email text not null references sae_users(email) on delete cascade,
+  assigned_at timestamptz not null default now(),
+  primary key (learner_email, item_id)
+);`;
 
 const UNIQUE_VIOLATION = '23505';
+const assignmentOf = row => row && {
+  itemId: row.item_id, kind: row.kind, title: row.title, learnerEmail: row.learner_email, teacherEmail: row.teacher_email,
+  assignedAt: new Date(row.assigned_at).toISOString(), ...(row.content !== undefined ? { content: row.content } : {}),
+};
 const userOf = row => row && { email: row.email, name: row.name, role: row.role, passwordHash: row.password_hash, profile: row.profile || null };
 
 function postgresStore(databaseUrl, Pool) {
@@ -52,6 +66,20 @@ function postgresStore(databaseUrl, Pool) {
       return userOf((await db('select u.* from sae_sessions s join sae_users u on u.email = s.email where s.token_hash = $1 and s.expires_at > now()', [tokenHash])).rows[0]);
     },
     async deleteSession(tokenHash) { await db('delete from sae_sessions where token_hash = $1', [tokenHash]); },
+    // Assigning the same item to a learner again replaces it with the latest version.
+    async assign({ itemId, kind, title, content, teacherEmail }, learnerEmails) {
+      for (const email of learnerEmails) {
+        await db(`insert into sae_assignments (learner_email, item_id, kind, title, content, teacher_email) values ($1, $2, $3, $4, $5, $6)
+          on conflict (learner_email, item_id) do update set kind = excluded.kind, title = excluded.title, content = excluded.content,
+            teacher_email = excluded.teacher_email, assigned_at = now()`, [email, itemId, kind, title, content, teacherEmail]);
+      }
+    },
+    async learnerAssignments(email) {
+      return (await db('select * from sae_assignments where learner_email = $1 order by assigned_at desc', [email])).rows.map(assignmentOf);
+    },
+    async teacherAssignments(email) {
+      return (await db('select learner_email, item_id, kind, title, teacher_email, assigned_at from sae_assignments where teacher_email = $1 order by assigned_at desc', [email])).rows.map(assignmentOf);
+    },
     close: () => pool.end(),
   };
 }
@@ -59,6 +87,7 @@ function postgresStore(databaseUrl, Pool) {
 function memoryStore() {
   const users = new Map();
   const sessions = new Map();
+  const assignments = new Map(); // `${learner}|${item}` -> assignment
   return {
     kind: 'memory',
     async getUser(email) { return users.has(email) ? { ...users.get(email) } : null; },
@@ -71,6 +100,17 @@ function memoryStore() {
       return session && session.expiresAt > new Date() ? this.getUser(session.email) : null;
     },
     async deleteSession(tokenHash) { sessions.delete(tokenHash); },
+    async assign({ itemId, kind, title, content, teacherEmail }, learnerEmails) {
+      for (const learnerEmail of learnerEmails) {
+        assignments.set(`${learnerEmail}|${itemId}`, { itemId, kind, title, content, teacherEmail, learnerEmail, assignedAt: new Date().toISOString() });
+      }
+    },
+    async learnerAssignments(email) {
+      return [...assignments.values()].filter(a => a.learnerEmail === email).sort((a, b) => b.assignedAt.localeCompare(a.assignedAt)).map(a => ({ ...a }));
+    },
+    async teacherAssignments(email) {
+      return [...assignments.values()].filter(a => a.teacherEmail === email).sort((a, b) => b.assignedAt.localeCompare(a.assignedAt)).map(({ content, ...a }) => a);
+    },
     close: async () => {},
   };
 }

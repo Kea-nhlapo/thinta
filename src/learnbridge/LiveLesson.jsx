@@ -12,10 +12,12 @@ import { currentAccount } from './accounts.js';
 import { activeProfile } from './learner-profile.js';
 import { recordResult } from './results.js';
 import { capsLabel } from './caps.js';
+import { assignedLesson } from './assigned-lesson.js';
 import './live-lesson.css';
 
 const api = createLessonApi();
-let live = { fileName: '', job: null, lesson: null, error: '', results: [], figures: [], figuresStatus: '' };
+// A lesson a learner opened from their page starts here; otherwise a teacher's upload fills it in.
+let live = { fileName: '', job: null, lesson: assignedLesson(), error: '', results: [], figures: [], figuresStatus: '' };
 const listeners = new Set();
 let describing = 0; // which upload's pictures are being described
 const update = fields => { live = { ...live, ...fields }; listeners.forEach(l => l()); };

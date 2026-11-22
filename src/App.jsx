@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import VisionDemo from './DemoJourney.jsx';
 import Brand from './Brand.jsx';
 import { applyProfile } from './learnbridge/learner-profile.js';
+import { redirectFor } from './learnbridge/accounts.js';
 const NiaLab = React.lazy(() => import('./NiaLab.jsx'));
 const NiaSign = React.lazy(() => import('./learnbridge/NiaSign.jsx'));
 const SignIntroduction = React.lazy(() => import('./SignConversation.jsx'));
@@ -9,9 +10,18 @@ const SignCalibration = React.lazy(() => import('./SignCalibration.jsx'));
 const ProfilePage = React.lazy(() => import('./learnbridge/ProfilePage.jsx'));
 const ResultsPage = React.lazy(() => import('./learnbridge/ResultsPage.jsx'));
 const ThintaApp = React.lazy(() => import('./thinta/ThintaApp.jsx'));
+const LearnerHome = React.lazy(() => import('./learnbridge/LearnerHome.jsx'));
 
 // The signed-in learner's large text and contrast settings, before anything is drawn.
 applyProfile();
+
+// A page for some roles only: anyone else is sent to the login page or to their own home. The server checks the
+// same rule for every route that reads or writes teacher data.
+function OnlyFor({ roles, children }) {
+  const away = redirectFor(roles);
+  React.useEffect(() => { if (away) window.location.replace(away); }, [away]);
+  return away ? null : children;
+}
 
 const assets = '/assets/';
 
@@ -38,11 +48,12 @@ function App() {
   if (window.location.pathname === '/nia-lab') return <React.Suspense fallback={<p>Loading Nia lab…</p>}><NiaLab /></React.Suspense>;
   if (window.location.pathname === '/sign-introduction') return <React.Suspense fallback={<p>Loading sign introduction…</p>}><SignIntroduction /></React.Suspense>;
   if (window.location.pathname === '/profile') return <React.Suspense fallback={<p>Loading settings…</p>}><ProfilePage /></React.Suspense>;
-  if (window.location.pathname === '/results') return <React.Suspense fallback={<p>Loading results…</p>}><ResultsPage /></React.Suspense>;
-  if (window.location.pathname === '/thinta') return <React.Suspense fallback={<p>Loading Thinta…</p>}><ThintaApp /></React.Suspense>;
+  if (window.location.pathname === '/results') return <OnlyFor roles={['teacher']}><React.Suspense fallback={<p>Loading results…</p>}><ResultsPage /></React.Suspense></OnlyFor>;
+  // The agents are teacher tools; learners only ever get what a teacher assigns, on /learn.
+  if (window.location.pathname === '/thinta') return <OnlyFor roles={['teacher']}><React.Suspense fallback={<p>Loading Thinta…</p>}><ThintaApp /></React.Suspense></OnlyFor>;
+  if (window.location.pathname === '/learn') return <React.Suspense fallback={<p>Loading your lessons…</p>}><LearnerHome /></React.Suspense>;
   if (window.location.pathname === '/sign-calibration') return <React.Suspense fallback={<p>Loading calibration…</p>}><SignCalibration /></React.Suspense>;
   const [language, setLanguage] = useState('English');
-  const [signInOpen, setSignInOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
   const start = () => { window.location.href = '/app?screen=login'; };
@@ -117,7 +128,6 @@ function App() {
     </main>
     <footer className="footer"><Brand light/><nav aria-label="Footer"><a href="#top">About</a><a href="#access-title">Accessibility</a><button onClick={() => setContactOpen(true)}>Contact</button></nav></footer>
 
-    {signInOpen && <div className="dialog-backdrop" onMouseDown={() => setSignInOpen(false)}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" onMouseDown={event => event.stopPropagation()}><button className="dialog-close" onClick={() => setSignInOpen(false)} aria-label="Close">×</button><Brand/><h2 id="dialog-title">Welcome back</h2><p>Sign in to your educator account</p><form onSubmit={event => {event.preventDefault(); setSignInOpen(false);}}><label>Email address<input type="email" required autoFocus/></label><label>Password<input type="password" required/></label><button className="button button-primary" type="submit">Sign in</button></form></div></div>}
     {contactOpen && <div className="dialog-backdrop" onMouseDown={() => setContactOpen(false)}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="contact-title" onMouseDown={event => event.stopPropagation()}><button className="dialog-close" onClick={() => setContactOpen(false)} aria-label="Close">×</button><Brand/><h2 id="contact-title">Contact SA Educate</h2><p>Contact details will be added when the platform launches.</p></div></div>}
   </>;
 }

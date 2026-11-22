@@ -5,6 +5,8 @@ import { checkOutcomes, outcomeSummary } from './highlights.js';
 import StepPicture from './StepPicture.jsx';
 import { formatPoint, formatValue, prettyMaths } from './format.js';
 import { readAloud, unlockAudio } from './speech.js';
+import { currentAccount } from '../../learnbridge/accounts.js';
+import AssignToLearners from '../../learnbridge/AssignToLearners.jsx';
 
 // Sub-agent C's touch graph and sub-agent B's PDF export load only if their files exist.
 const touchModules = import.meta.glob('../sound/TouchGraph.jsx');
@@ -61,7 +63,8 @@ const BLIND_WORDS = {
 };
 const savedLang = () => { try { return BLIND_LANGS[localStorage.getItem('thinta-blind-lang')] ? localStorage.getItem('thinta-blind-lang') : 'en'; } catch { return 'en'; } };
 
-function BlindTab({ job, replay }) {
+// Also shown on a learner's page (src/learnbridge/LearnerHome.jsx) for packs assigned to them.
+export function BlindTab({ job, replay }) {
   const [lang, setLang] = useState(savedLang);
   const choose = value => { setLang(value); try { localStorage.setItem('thinta-blind-lang', value); } catch { /* private mode */ } };
   const words = BLIND_WORDS[lang];
@@ -177,10 +180,10 @@ function TactilePreview({ job, showDownloads = false }) {
   </>;
 }
 
-function DeafTab({ job }) {
+export function DeafTab({ job, saslNote = true }) {
   const solution = job.deafSolution;
   return <>
-    <p className="th-notice th-sasl"><span aria-hidden="true">ⓘ </span>Signs need a human SASL reviewer. Thinta does not make sign language.</p>
+    {saslNote && <p className="th-notice th-sasl"><span aria-hidden="true">ⓘ </span>Signs need a human SASL reviewer. Thinta does not make sign language.</p>}
     <h3>Step by step</h3>
     {solution?.steps?.length ? <ol className="th-steps">
       {solution.steps.map((step, i) => <li key={i}>
@@ -223,7 +226,7 @@ function outcomeText(o) {
 }
 
 function TeacherTab({ job, log, replay, onApprove, approving, approveError }) {
-  const [name, setName] = useState('Teacher');
+  const [name, setName] = useState(() => currentAccount()?.name || 'Teacher');
   const reviews = job.reviews || [], corrections = job.corrections || [];
   const outcomes = checkOutcomes(job);
   const totals = outcomeSummary(outcomes);
@@ -248,7 +251,8 @@ function TeacherTab({ job, log, replay, onApprove, approving, approveError }) {
 
     <h3>Approve the pack</h3>
     {approval.approved
-      ? <p className="th-approved" role="status"><span aria-hidden="true">✓ </span>Approved by {approval.by || 'Teacher'} at {new Date(approval.at || Date.now()).toLocaleString('en-ZA')}{replay ? ' (replay: saved on this phone only)' : ''}. The Delivery tab is open.</p>
+      ? <><p className="th-approved" role="status"><span aria-hidden="true">✓ </span>Approved by {approval.by || 'Teacher'} at {new Date(approval.at || Date.now()).toLocaleString('en-ZA')}{replay ? ' (replay: saved on this phone only)' : ''}. The Delivery tab is open.</p>
+        {replay ? <p className="th-muted">Replays are not saved, so they cannot be assigned. Run a live pack to assign it to learners.</p> : <AssignToLearners item={{ packId: job.id }} />}</>
       : <form className="th-approve" onSubmit={event => { event.preventDefault(); onApprove(name.trim() || 'Teacher'); }}>
           <p>{totals.open ? `Look at the ${totals.open === 1 ? 'check that needs' : 'checks that need'} you first. ` : ''}Nothing reaches learners until you approve.</p>
           <label>Your name<input value={name} onChange={e => setName(e.target.value)} maxLength={80} autoComplete="name" /></label>
