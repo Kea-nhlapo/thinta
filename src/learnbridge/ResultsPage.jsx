@@ -1,8 +1,8 @@
 // Teacher results: how each learner is doing, which questions were hardest, and which supports were used.
 // Results are kept on this device for now; example results can be added for demonstrations.
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Brand from '../Brand.jsx';
-import { currentAccount, allLearners, NEEDS } from './accounts.js';
+import { currentAccount, allLearners, fetchLearners, NEEDS } from './accounts.js';
 import { allResults, summarise, addDemoResults, clearDemoResults, hasDemoResults } from './results.js';
 import { capsLabel } from './caps.js';
 import './results-page.css';
@@ -29,6 +29,8 @@ export default function ResultsPage() {
   const [lessonFilter, setLessonFilter] = useState('');
   const results = useMemo(() => allResults(), [version]);
   const learners = useMemo(() => allLearners(), [version]);
+  // Learner accounts live on the server; show the last list at once, then the fresh one.
+  useEffect(() => { if (account?.role === 'teacher') fetchLearners().then(() => setVersion(v => v + 1), () => {}); }, []);
   const shown = lessonFilter ? results.filter(r => r.lessonId === lessonFilter) : results;
   const summary = useMemo(() => summarise(shown, learners), [shown, learners]);
   const lessonsAll = useMemo(() => summarise(results, []).lessons, [results]);

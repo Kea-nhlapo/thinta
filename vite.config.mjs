@@ -4,6 +4,7 @@ import { learnBridgeMiddleware } from './server/learnbridge-middleware.mjs';
 import { createLessonJobs } from './server/lesson-jobs.mjs';
 import { ngtSignsMiddleware } from './server/ngt-signs.mjs';
 import { thintaMiddleware } from './server/thinta.mjs';
+import { accountsMiddleware } from './server/accounts.mjs';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'GEMINI_');
@@ -25,5 +26,8 @@ export default defineConfig(({ mode }) => {
   // Thinta's agent team (/api/thinta/*), streamed.
   const thinta = thintaMiddleware(() => ({ GEMINI_API_KEY: env.GEMINI_API_KEY || process.env.GEMINI_API_KEY, HF_TOKEN: loadEnv(mode, process.cwd(), 'HF_').HF_TOKEN || process.env.HF_TOKEN }));
   const thintaApi = { name: 'thinta-api', configureServer(server) { server.middlewares.use(thinta); }, configurePreviewServer(server) { server.middlewares.use(thinta); } };
-  return { plugins: [signApi, learnBridgeApi, lessonApi, ngtApi, thintaApi], server: { hmr: false } };
+  // SA Educate accounts (/api/auth/*): Postgres when DATABASE_URL is set, memory otherwise.
+  const accounts = accountsMiddleware();
+  const accountsApi = { name: 'accounts-api', configureServer(server) { server.middlewares.use(accounts); }, configurePreviewServer(server) { server.middlewares.use(accounts); } };
+  return { plugins: [accountsApi, signApi, learnBridgeApi, lessonApi, ngtApi, thintaApi], server: { hmr: false } };
 });
