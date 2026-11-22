@@ -13,6 +13,7 @@ import { createHash, randomBytes, scrypt as scryptCallback, timingSafeEqual } fr
 import { promisify } from 'node:util';
 import { ALREADY_EXISTS, WRONG_DETAILS, accountProblem, cleanEmail, cleanProfile, profileFromNeeds } from '../src/learnbridge/account-rules.js';
 import { createAccountStore } from './accounts/store.mjs';
+import { TEACHER_HEADER, createAssignments, guardThinta } from './assignments.mjs';
 
 const scrypt = promisify(scryptCallback);
 const COOKIE = 'sae_session';
@@ -118,7 +119,7 @@ export function createAccounts({ store: given, now = () => Date.now() } = {}) {
   // A hash to compare against when the email has no account, so a wrong email takes as long as a wrong password.
   let decoy = null;
 
-  return async function handleAccounts(request) {
+  async function handleAccounts(request) {
     const { pathname } = new URL(request.url);
     const route = `${request.method} ${pathname}`;
     try {
@@ -177,13 +178,39 @@ export function createAccounts({ store: given, now = () => Date.now() } = {}) {
       console.error('Account request failed:', error);
       return problem('Accounts are not available right now. Please try again shortly.', 503);
     }
-  };
+  }
+  // For other server routes: the signed-in person for a request (or null), and the shared store.
+  handleAccounts.userFor = async request => currentUser(request, await store());
+  handleAccounts.store = store;
+  return handleAccounts;
 }
 
-// For the Vite dev and preview servers (and so Railway): adapts Node's req/res to the web handler above.
-export function accountsMiddleware(handle = createAccounts()) {
+async function send(res, response) {
+  res.statusCode = response.status;
+  response.headers.forEach((value, name) => res.setHeader(name, value));
+  res.end(Buffer.from(await response.arrayBuffer()));
+}
+
+// For the Vite dev and preview servers (and so Railway): accounts, assignments, and the teachers-only rule for
+// Thinta, adapting Node's req/res to the web handlers.
+export function accountsMiddleware(handle = createAccounts(), assignments = createAssignments({ accounts: handle })) {
+  const guard = guardThinta(handle);
   return async (req, res, next) => {
-    if (!req.url?.startsWith('/api/auth/')) return next();
+    const path = req.url?.split('?')[0] || '';
+    if (path.startsWith('/api/thinta/')) {
+      // Checked before Thinta's own middleware reads the request; only the cookie is needed.
+      delete req.headers[TEACHER_HEADER];
+      try {
+        const check = await guard(new Request(`http://localhost${req.url}`, { headers: { cookie: req.headers.cookie || '' } }));
+        if (check.response) return send(res, check.response);
+        req.headers[TEACHER_HEADER] = encodeURIComponent(check.teacher.name);
+      } catch (error) {
+        console.error('Thinta sign-in check failed:', error);
+        return send(res, Response.json({ error: 'Accounts are not available right now. Please try again shortly.' }, { status: 503 }));
+      }
+      return next();
+    }
+    if (!path.startsWith('/api/auth/') && path !== '/api/assignments' && path !== '/api/my-assignments') return next();
     const chunks = []; let size = 0;
     for await (const chunk of req) {
       size += chunk.length;
@@ -193,9 +220,6 @@ export function accountsMiddleware(handle = createAccounts()) {
     const body = Buffer.concat(chunks);
     const proto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https' ? 'https' : 'http';
     const request = new Request(`${proto}://${req.headers.host}${req.url}`, { method: req.method, headers: req.headers, ...(body.length ? { body } : {}) });
-    const response = await handle(request);
-    res.statusCode = response.status;
-    response.headers.forEach((value, name) => res.setHeader(name, value));
-    res.end(Buffer.from(await response.arrayBuffer()));
+    await send(res, path.startsWith('/api/auth/') ? await handle(request) : await assignments(request));
   };
 }

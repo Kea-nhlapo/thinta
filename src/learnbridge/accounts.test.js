@@ -19,13 +19,14 @@ globalThis.fetch = async (path, options = {}) => {
 const settle = () => new Promise(resolve => setTimeout(resolve, 20));
 const newDevice = () => { storage.clear(); cookie = ''; };
 
-const { signIn, createAccount, currentAccount, signOut, homeFor, refreshSession, getProfile, saveProfile, profileFromNeeds, fetchLearners, allLearners } = await import('./accounts.js');
+const { signIn, createAccount, currentAccount, signOut, homeFor, redirectFor, refreshSession, getProfile, saveProfile, profileFromNeeds, fetchLearners, allLearners } = await import('./accounts.js');
+const { formatFor } = await import('./learner-format.js');
 
-test('demo accounts sign in through the server; learners land on sign-to-speech, teachers on the dashboard', async () => {
+test('demo accounts sign in through the server; learners land on their lessons, teachers on the dashboard', async () => {
   newDevice();
   const learner = await signIn('Learner1@SAEducate.test ', 'Learn2026!');
   assert.deepEqual(learner, { email: 'learner1@saeducate.test', name: 'Thabo', role: 'learner' });
-  assert.equal(homeFor(learner), '/sign-introduction');
+  assert.equal(homeFor(learner), '/learn');
   assert.equal(currentAccount().name, 'Thabo');
   assert.equal(getProfile('learner1@saeducate.test').voiceAnswers, true);
   const teacher = await signIn('teacher@saeducate.test', 'Teach2026!');
@@ -104,4 +105,22 @@ test('old browser-only account data is cleared on sign-in', async () => {
   await signIn('learner5@saeducate.test', 'Learn2026!');
   assert.equal(storage.has('sae-accounts'), false);
   assert.equal(storage.has('sae-session'), false);
+});
+
+test('pages for one role send everyone else to the login page or their own home', () => {
+  const learner = { email: 'l@x.org', name: 'L', role: 'learner' }, teacher = { email: 't@x.org', name: 'T', role: 'teacher' };
+  assert.equal(redirectFor(['teacher'], null), '/app?screen=login');
+  assert.equal(redirectFor(['teacher'], learner), '/learn');
+  assert.equal(redirectFor(['teacher'], teacher), null);
+  assert.equal(redirectFor(['learner'], teacher), '/app?screen=dashboard-loading');
+  assert.equal(redirectFor(['learner', 'teacher'], teacher), null);
+});
+
+test('each learner gets the version their needs call for', () => {
+  assert.equal(formatFor(profileFromNeeds(['blind'])), 'listen');
+  assert.equal(formatFor(profileFromNeeds(['low-vision'])), 'listen');
+  assert.equal(formatFor(profileFromNeeds(['deaf'])), 'see');
+  assert.equal(formatFor(profileFromNeeds(['hard-of-hearing'])), 'see');
+  assert.equal(formatFor(profileFromNeeds([])), 'standard');
+  assert.equal(formatFor(null), 'standard');
 });

@@ -8,12 +8,15 @@ import { createLessonJobs } from '../server/lesson-jobs.mjs';
 import { signReconstructionMiddleware } from '../server/sign-reconstruct.mjs';
 import { handleThinta } from '../server/thinta.mjs';
 import { createAccounts } from '../server/accounts.mjs';
+import { TEACHER_HEADER, createAssignments, guardThinta } from '../server/assignments.mjs';
 
 const GATEWAY_ROUTES = new Set(['/api/translate', '/api/speak', '/api/transcribe', '/api/youtube', '/api/asl', '/api/describe-images']);
 // Serverless instances do not share memory, so lessons are generated within the request.
 const lessons = createLessonJobs({ apiKey: process.env.GEMINI_API_KEY, inline: true });
 const signReconstruct = signReconstructionMiddleware(process.env.GEMINI_API_KEY, process.env.GEMINI_MODEL);
 const accounts = createAccounts();
+const assignments = createAssignments({ accounts });
+const teachersOnly = guardThinta(accounts);
 
 // Runs a Node-style (req, res, next) middleware on a web Request and returns its web Response.
 function runMiddleware(middleware, request) {
@@ -53,8 +56,16 @@ async function handle(incoming) {
   if (path.startsWith('/api/lesson-jobs') || path.startsWith('/api/lessons/')) return runMiddleware(lessons.handle, request);
   if (path === '/api/sign-reconstruct') return runMiddleware(signReconstruct, request);
   if (path.startsWith('/api/auth/')) return accounts(request);
+  if (path === '/api/assignments' || path === '/api/my-assignments') return assignments(request);
   // Thinta streams its trace, so it answers with a web Response directly instead of going through runMiddleware.
-  if (path.startsWith('/api/thinta/')) return handleThinta(request, { HF_TOKEN: process.env.HF_TOKEN, GEMINI_API_KEY: process.env.GEMINI_API_KEY });
+  if (path.startsWith('/api/thinta/')) {
+    // Teachers only. The checked teacher's name is passed on so approvals record who approved.
+    const check = await teachersOnly(request);
+    if (check.response) return check.response;
+    const headers = new Headers(request.headers);
+    headers.set(TEACHER_HEADER, encodeURIComponent(check.teacher.name));
+    return handleThinta(new Request(request, { headers }), { HF_TOKEN: process.env.HF_TOKEN, GEMINI_API_KEY: process.env.GEMINI_API_KEY });
+  }
   return Response.json({ message: 'Not found.' }, { status: 404 });
 }
 

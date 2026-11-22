@@ -90,7 +90,9 @@ export async function handleThinta(request, env = {}) {
   if (url.pathname === '/api/thinta/approve') {
     const data = await readJSON(request, 5000);
     if (!JOB_ID.test(data?.jobId || '')) return jsonError('Say which job to approve.', 400);
-    const approval = { approved: true, by: String(data.by || 'Teacher').slice(0, 80), at: new Date().toISOString() };
+    // The signed-in teacher's name, set by the teachers-only check in server/assignments.mjs, wins over a typed one.
+    const teacher = decodeURIComponent(request.headers.get('x-sae-teacher') || '');
+    const approval = { approved: true, by: (teacher || String(data.by || 'Teacher')).slice(0, 80), at: new Date().toISOString() };
     // saved: false means the pack was never stored (e.g. a replay), so the approval lives on this phone only.
     const saved = await orElse(store.approvePack(data.jobId, approval), false);
     return Response.json({ jobId: data.jobId, approval, saved }, { headers });
