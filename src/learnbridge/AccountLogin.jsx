@@ -1,5 +1,5 @@
-// The sign-in screen with working test accounts: sign in or create an account, then learners go to
-// sign-to-speech and teachers to the dashboard.
+// The sign-in screen: sign in or create an account (checked by the account server, so it works on any device),
+// then learners go to sign-to-speech and teachers to the dashboard.
 import React, { useState } from 'react';
 import { signIn, createAccount, homeFor, getProfile, NEEDS } from './accounts.js';
 import { applyProfile, resetQuizChoices } from './learner-profile.js';
@@ -43,7 +43,7 @@ export function AccountLogin({ Btn, Brand, onTeacher }) {
         </div>
         <label className="dj-field"><PersonIcon /><input aria-label="Your name" placeholder="Your name" autoComplete="name" {...field('name')} /></label>
         {form.role === 'learner' && <fieldset className="lb-account-needs"><legend>How do you learn best? (optional)</legend>
-          {NEEDS.map(([id, label]) => <label key={id}><input type="checkbox" checked={form.needs.includes(id)} onChange={() => setForm(f => ({ ...f, needs: f.needs.includes(id) ? f.needs.filter(n => n !== id) : [...f.needs, id] }))} />{label}</label>)}
+          {NEEDS.map(([id, label]) => <label key={id}><input type="checkbox" aria-label={label} checked={form.needs.includes(id)} onChange={() => setForm(f => ({ ...f, needs: f.needs.includes(id) ? f.needs.filter(n => n !== id) : [...f.needs, id] }))} />{label}</label>)}
           <label className="lb-account-language">Language<select value={form.language} onChange={event => setForm(f => ({ ...f, language: event.target.value }))}>{Object.entries(LANGUAGES).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select></label>
         </fieldset>}
       </>}

@@ -19,15 +19,20 @@ export default function ProfilePage() {
   const account = currentAccount();
   const [profile, setProfile] = useState(() => account?.role === 'learner' ? getProfile(account.email) : null);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
   if (!account) {
     return <main className="lb-profile"><Brand href="/" /><h1>My settings</h1><p>Sign in to see your settings.</p><a className="lb-profile-primary" href="/app?screen=login">Sign in</a></main>;
   }
-  const change = next => { setProfile(next); setSaved(false); applyProfile(next); };
+  const change = next => { setProfile(next); setSaved(false); setSaveError(''); applyProfile(next); };
   const toggleNeed = id => {
     const needs = profile.needs.includes(id) ? profile.needs.filter(n => n !== id) : [...profile.needs, id];
     change(profileFromNeeds(needs, profile.language));
   };
-  const save = () => { saveProfile(account.email, profile); setQuestionLanguage(profile.language); resetQuizChoices(); setSaved(true); };
+  const save = async () => {
+    setSaveError('');
+    try { await saveProfile(account.email, profile); setQuestionLanguage(profile.language); resetQuizChoices(); setSaved(true); }
+    catch (problem) { setSaveError(problem.message); }
+  };
   const leave = () => { signOut(); window.location.href = '/app?screen=login'; };
 
   return <main className="lb-profile">
@@ -46,7 +51,7 @@ export default function ProfilePage() {
           <select value={profile.language} onChange={event => change({ ...profile, language: event.target.value })}>{Object.entries(LANGUAGES).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select>
         </label>
       </fieldset>
-      <div className="lb-profile-actions"><button type="button" className="lb-profile-primary" onClick={save}>Save settings</button>{saved && <span role="status">Saved. Your lessons will use these settings.</span>}</div>
+      <div className="lb-profile-actions"><button type="button" className="lb-profile-primary" onClick={save}>Save settings</button>{saved && <span role="status">Saved. Your lessons will use these settings.</span>}{saveError && <span role="alert" className="lb-account-error">{saveError}</span>}</div>
     </>}
   </main>;
 }

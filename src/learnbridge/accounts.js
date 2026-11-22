@@ -1,91 +1,94 @@
-// Test accounts for SA Educate. There is no account server yet: the seed accounts below are built in, and
-// accounts made with "Create an account" are kept in this browser only. Not real security, just enough to
-// tell learners and teachers apart during testing.
+// SA Educate accounts in the browser. The account server (/api/auth/*, server/accounts.mjs) is the source of
+// truth: it checks passwords and keeps the session in an httpOnly cookie, so an account works on any device.
+// This file keeps a copy of the signed-in person and their profile in localStorage so screens can read them at
+// once; refreshSession() checks that copy against the server when the app starts.
+import { NEEDS, accountProblem, cleanEmail, profileFromNeeds } from './account-rules.js';
 
-export const SEED_ACCOUNTS = [
-  { email: 'teacher@saeducate.test', password: 'Teach2026!', name: 'Demo Teacher', role: 'teacher' },
-  { email: 'learner1@saeducate.test', password: 'Learn2026!', name: 'Thabo', role: 'learner', needs: ['blind'] },
-  { email: 'learner2@saeducate.test', password: 'Learn2026!', name: 'Lerato', role: 'learner', needs: ['deaf'] },
-  { email: 'learner3@saeducate.test', password: 'Learn2026!', name: 'Sipho', role: 'learner', needs: ['low-vision'] },
-  { email: 'learner4@saeducate.test', password: 'Learn2026!', name: 'Naledi', role: 'learner', needs: ['hard-of-hearing'], language: 'zu' },
-  { email: 'learner5@saeducate.test', password: 'Learn2026!', name: 'Ayanda', role: 'learner', needs: [], language: 'nso' },
-];
+export { NEEDS, profileFromNeeds };
 
-const ACCOUNTS_KEY = 'sae-accounts';
-const SESSION_KEY = 'sae-session';
-const PROFILES_KEY = 'sae-profiles';
+const SIGNED_IN_KEY = 'sae-signed-in';
+const LEARNERS_KEY = 'sae-learners';
+// Left over from the browser-only accounts; removed so old copies of password hashes and sessions do not linger.
+const OLD_KEYS = ['sae-accounts', 'sae-session', 'sae-profiles'];
 const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
-const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
-const clean = email => String(email || '').trim().toLowerCase();
-const publicPart = ({ email, name, role }) => ({ email, name, role });
+const write = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} };
+const forget = key => { try { localStorage.removeItem(key); } catch {} };
 
-// Passwords for accounts made here are stored hashed, in case a tester reuses a real password.
-async function hash(password) {
-  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`sae:${password}`));
-  return [...new Uint8Array(bytes)].map(b => b.toString(16).padStart(2, '0')).join('');
+async function call(path, { method = 'GET', body } = {}) {
+  let response;
+  try {
+    response = await fetch(path, { method, credentials: 'same-origin', headers: body ? { 'content-type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
+  } catch {
+    throw Object.assign(Error('Could not reach SA Educate. Check your connection and try again.'), { status: 0 });
+  }
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw Object.assign(Error(data.error || 'Something went wrong. Please try again.'), { status: response.status });
+  return data;
 }
 
-function findAccount(email) {
-  const key = clean(email);
-  return SEED_ACCOUNTS.find(a => a.email === key) || read(ACCOUNTS_KEY, []).find(a => a.email === key) || null;
+function remember({ account, profile }) {
+  OLD_KEYS.forEach(forget);
+  write(SIGNED_IN_KEY, { account, profile });
+  return account;
 }
 
 export async function signIn(email, password) {
-  const account = findAccount(email);
-  const ok = account && (account.passwordHash ? account.passwordHash === await hash(password) : account.password === password);
-  if (!ok) throw Error('That email and password do not match an account.');
-  write(SESSION_KEY, clean(email));
-  return publicPart(account);
+  return remember(await call('/api/auth/signin', { method: 'POST', body: { email: cleanEmail(email), password } }));
 }
 
 export async function createAccount({ name, email, password, role, needs = [], language = 'en' }) {
-  const key = clean(email);
-  if (!String(name || '').trim()) throw Error('Enter your name.');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(key)) throw Error('Enter a valid email address.');
-  if (String(password || '').length < 6) throw Error('Use a password of at least 6 characters.');
-  if (!['learner', 'teacher'].includes(role)) throw Error('Choose learner or teacher.');
-  if (findAccount(key)) throw Error('An account with that email already exists. Sign in instead.');
-  const account = { email: key, name: name.trim(), role, passwordHash: await hash(password) };
-  write(ACCOUNTS_KEY, [...read(ACCOUNTS_KEY, []), account]);
-  write(SESSION_KEY, key);
-  if (role === 'learner') saveProfile(key, profileFromNeeds(needs, language));
-  return publicPart(account);
+  // Checked here too, so a mistake shows at once without a round trip. The server checks again.
+  const message = accountProblem({ name, email, password, role });
+  if (message) throw Error(message);
+  return remember(await call('/api/auth/signup', { method: 'POST', body: { name, email: cleanEmail(email), password, role, needs, language } }));
 }
 
-// Accessibility profile: what a learner needs, and the settings that follow from it.
-export const NEEDS = [
-  ['blind', 'I am blind'], ['low-vision', 'I have low vision'], ['deaf', 'I am Deaf'], ['hard-of-hearing', 'I am hard of hearing'],
-];
-export function profileFromNeeds(needs = [], language = 'en') {
-  const has = need => needs.includes(need);
-  return {
-    needs: NEEDS.map(([id]) => id).filter(has), language: ['en', 'zu', 'nso'].includes(language) ? language : 'en',
-    voiceAnswers: has('blind'), readAloud: has('blind') || has('low-vision'),
-    largeText: has('low-vision'), highContrast: has('low-vision'),
-    signedHelp: has('deaf') || has('hard-of-hearing'),
-  };
-}
-export function getProfile(email) {
-  const key = clean(email);
-  const saved = read(PROFILES_KEY, {})[key];
-  if (saved) return saved;
-  const seed = SEED_ACCOUNTS.find(a => a.email === key);
-  return profileFromNeeds(seed?.needs, seed?.language);
-}
-export function saveProfile(email, profile) {
-  write(PROFILES_KEY, { ...read(PROFILES_KEY, {}), [clean(email)]: profile });
-}
-export function allLearners() {
-  const learners = [...SEED_ACCOUNTS, ...read(ACCOUNTS_KEY, []).filter(a => !SEED_ACCOUNTS.some(s => s.email === a.email))].filter(a => a.role === 'learner');
-  return learners.map(a => ({ ...publicPart(a), profile: getProfile(a.email) }));
+// Checks the saved copy against the server. A session that has ended or been signed out elsewhere is forgotten;
+// if the server cannot be reached, the copy is kept so the app still works offline.
+export async function refreshSession() {
+  try {
+    remember(await call('/api/auth/me'));
+  } catch (error) {
+    if (error.status === 401) forget(SIGNED_IN_KEY);
+  }
+  return currentAccount();
 }
 
 export function currentAccount() {
-  const account = findAccount(read(SESSION_KEY, ''));
-  return account ? publicPart(account) : null;
+  return read(SIGNED_IN_KEY, null)?.account || null;
 }
 
-export function signOut() { try { localStorage.removeItem(SESSION_KEY); } catch {} }
+export function getProfile(email) {
+  const key = cleanEmail(email);
+  const signedIn = read(SIGNED_IN_KEY, null);
+  if (signedIn?.account?.email === key && signedIn.profile) return signedIn.profile;
+  return read(LEARNERS_KEY, []).find(learner => learner.email === key)?.profile || profileFromNeeds();
+}
+
+// Saves a learner's settings on the server, and in the saved copy straight away.
+export async function saveProfile(email, profile) {
+  const signedIn = read(SIGNED_IN_KEY, null);
+  if (signedIn?.account?.email === cleanEmail(email)) write(SIGNED_IN_KEY, { ...signedIn, profile });
+  const saved = await call('/api/auth/profile', { method: 'PUT', body: { profile } });
+  const latest = read(SIGNED_IN_KEY, null);
+  if (latest?.account?.email === cleanEmail(email)) write(SIGNED_IN_KEY, { ...latest, profile: saved.profile });
+  return saved.profile;
+}
+
+// Teachers: every learner account and its profile, from the server. allLearners() returns the last list fetched.
+export async function fetchLearners() {
+  const { learners } = await call('/api/auth/learners');
+  write(LEARNERS_KEY, learners);
+  return learners;
+}
+export function allLearners() { return read(LEARNERS_KEY, []); }
+
+// Forgets the session here at once and tells the server; keepalive lets the request finish as the page changes.
+export function signOut() {
+  forget(SIGNED_IN_KEY);
+  forget(LEARNERS_KEY);
+  try { fetch('/api/auth/signout', { method: 'POST', credentials: 'same-origin', keepalive: true }).catch(() => {}); } catch {}
+}
 
 // Where each kind of account lands after signing in: learners start with sign-to-speech.
 export const homeFor = account => account?.role === 'learner' ? '/sign-introduction' : '/app?screen=dashboard-loading';

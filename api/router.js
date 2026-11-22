@@ -7,11 +7,13 @@ import gateway from '../server/learnbridge-gateway.mjs';
 import { createLessonJobs } from '../server/lesson-jobs.mjs';
 import { signReconstructionMiddleware } from '../server/sign-reconstruct.mjs';
 import { handleThinta } from '../server/thinta.mjs';
+import { createAccounts } from '../server/accounts.mjs';
 
 const GATEWAY_ROUTES = new Set(['/api/translate', '/api/speak', '/api/transcribe', '/api/youtube', '/api/asl', '/api/describe-images']);
 // Serverless instances do not share memory, so lessons are generated within the request.
 const lessons = createLessonJobs({ apiKey: process.env.GEMINI_API_KEY, inline: true });
 const signReconstruct = signReconstructionMiddleware(process.env.GEMINI_API_KEY, process.env.GEMINI_MODEL);
+const accounts = createAccounts();
 
 // Runs a Node-style (req, res, next) middleware on a web Request and returns its web Response.
 function runMiddleware(middleware, request) {
@@ -50,6 +52,7 @@ async function handle(incoming) {
   if (GATEWAY_ROUTES.has(path)) return gateway.fetch(request, { HF_TOKEN: process.env.HF_TOKEN, GEMINI_API_KEY: process.env.GEMINI_API_KEY });
   if (path.startsWith('/api/lesson-jobs') || path.startsWith('/api/lessons/')) return runMiddleware(lessons.handle, request);
   if (path === '/api/sign-reconstruct') return runMiddleware(signReconstruct, request);
+  if (path.startsWith('/api/auth/')) return accounts(request);
   // Thinta streams its trace, so it answers with a web Response directly instead of going through runMiddleware.
   if (path.startsWith('/api/thinta/')) return handleThinta(request, { HF_TOKEN: process.env.HF_TOKEN, GEMINI_API_KEY: process.env.GEMINI_API_KEY });
   return Response.json({ message: 'Not found.' }, { status: 404 });
@@ -57,3 +60,4 @@ async function handle(incoming) {
 
 export const GET = handle;
 export const POST = handle;
+export const PUT = handle;
