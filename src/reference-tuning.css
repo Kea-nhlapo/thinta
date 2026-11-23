@@ -176,6 +176,8 @@
 .dj-login>.brand span{white-space:nowrap}
 .dj-login .dj-back{
   font-weight:900;
+  min-width:44px;
+  min-height:44px;
 }
 @media(max-width:900px){
   .dj-login>.brand{left:calc(50% + 27px);width:min(210px,58vw)}

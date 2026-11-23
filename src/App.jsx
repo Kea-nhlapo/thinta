@@ -3,6 +3,10 @@ import VisionDemo from './DemoJourney.jsx';
 import Brand from './Brand.jsx';
 import { applyProfile } from './learnbridge/learner-profile.js';
 import { redirectFor } from './learnbridge/accounts.js';
+import { LANGUAGES, setQuestionLanguage, useQuestionLanguageCode } from './learnbridge/QuestionLanguage.jsx';
+import en from './i18n/landing.en.js';
+import zu from './i18n/landing.zu.js';
+import nso from './i18n/landing.nso.js';
 const NiaLab = React.lazy(() => import('./NiaLab.jsx'));
 const NiaSign = React.lazy(() => import('./learnbridge/NiaSign.jsx'));
 const SignIntroduction = React.lazy(() => import('./SignConversation.jsx'));
@@ -33,12 +37,15 @@ const logos = [
   { src: 'logo-nsfas.png', alt: 'NSFAS' },
 ];
 
-const faqs = [
-  ['Can I edit generated lessons?', 'Yes. You can review and edit a lesson before assigning it to a class.'],
-  ['What can I upload?', 'The lesson workflow starts with a PDF. Documents, videos, and images are planned options.'],
-  ['How does the help feature work?', 'Learners can open an explanation with text, audio, and a sign-language video.'],
-  ['Will more languages be available?', 'The design supports switching lesson languages as more translations become available.'],
-];
+const stepImages = ['step-upload.png', 'step-review.png', 'step-assign.png'];
+
+// One file of landing text per language; the choice is shared with the question screens and sign-in.
+const landingText = { en, zu, nso };
+
+// Text with "\n" where the desktop layout breaks a line.
+function Lines({ text, breakClass }) {
+  return text.split('\n').map((part, index) => <React.Fragment key={index}>{index > 0 && <br className={breakClass}/>}{part}</React.Fragment>);
+}
 
 function App() {
   // `/app` is the product experience reached from the public homepage.
@@ -53,21 +60,26 @@ function App() {
   if (window.location.pathname === '/thinta') return <OnlyFor roles={['teacher']}><React.Suspense fallback={<p>Loading Thinta…</p>}><ThintaApp /></React.Suspense></OnlyFor>;
   if (window.location.pathname === '/learn') return <React.Suspense fallback={<p>Loading your lessons…</p>}><LearnerHome /></React.Suspense>;
   if (window.location.pathname === '/sign-calibration') return <React.Suspense fallback={<p>Loading calibration…</p>}><SignCalibration /></React.Suspense>;
-  const [language, setLanguage] = useState('English');
+  return <Landing />;
+}
+
+function Landing() {
+  const language = useQuestionLanguageCode();
+  const t = landingText[language] || en;
   const [contactOpen, setContactOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
   const start = () => { window.location.href = '/app?screen=login'; };
   const signIn = () => { window.location.href = '/app?screen=login'; };
 
   return <>
-    <a className="skip-link" href="#main">Skip to content</a>
+    <a className="skip-link" href="#main">{t.skip}</a>
     <header className="site-header" id="top">
       <div className="header-inner">
-        <Brand />
+        <Brand label={t.home}/>
         <div className="header-actions">
-          <label className="language-control"><svg className="globe" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true"><circle cx="16" cy="16" r="12"/><path d="M4 16h24M16 4c-4 4-6 8-6 12s2 8 6 12M16 4c4 4 6 8 6 12s-2 8-6 12"/></svg><span>Language: </span><select aria-label="Language" value={language} onChange={event => setLanguage(event.target.value)}><option>English</option><option>isiZulu</option><option>Sesotho</option><option>Afrikaans</option></select></label>
+          <label className="language-control"><svg className="globe" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true"><circle cx="16" cy="16" r="12"/><path d="M4 16h24M16 4c-4 4-6 8-6 12s2 8 6 12M16 4c4 4 6 8 6 12s-2 8-6 12"/></svg><span>{t.language}: </span><select aria-label={t.language} value={language} onChange={event => setQuestionLanguage(event.target.value)}>{Object.entries(LANGUAGES).map(([code, name]) => <option key={code} value={code} lang={code}>{name}</option>)}</select></label>
           <span className="header-rule" aria-hidden="true" />
-          <button className="sign-in" onClick={signIn}>Sign in</button>
+          <button className="sign-in" onClick={signIn}>{t.signIn}</button>
         </div>
       </div>
     </header>
@@ -76,63 +88,58 @@ function App() {
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-inner">
           <div className="hero-copy">
-            <h1 id="hero-title">Quality education <br/>for a brighter <br/>South Africa.</h1>
-            <p>Create, share and deliver engaging <br className="desktop-break"/> lesson plans for every classroom.</p>
-            <div className="hero-buttons"><button className="button button-primary" onClick={start}>Get started</button><button className="button button-outline" onClick={signIn}>I already have an account</button></div>
+            <h1 id="hero-title"><Lines text={t.heroTitle}/></h1>
+            <p><Lines text={t.heroText} breakClass="desktop-break"/></p>
+            <div className="hero-buttons"><button className="button button-primary" onClick={start}>{t.getStarted}</button><button className="button button-outline" onClick={signIn}>{t.haveAccount}</button></div>
           </div>
-          <img className="hero-illustration" src={`${assets}hero-educator.png`} alt="Educator holding a lesson plan and tablet" />
+          <img className="hero-illustration" src={`${assets}hero-educator.png`} alt={t.heroAlt} />
         </div>
       </section>
 
-      <section className="collaborators" aria-label="Public-sector organisation logos"><LogoCarousel /></section>
+      <section className="collaborators" aria-label={t.logos}><LogoCarousel previous={t.previousLogos} next={t.nextLogos}/></section>
 
       <section className="how-section" aria-labelledby="how-title">
-        <div className="section-heading"><span className="spark-left" aria-hidden="true">⌁</span><h2 id="how-title">From a PDF to a lesson learners love.</h2><span className="spark-right" aria-hidden="true">⌁</span><p>Turn your existing materials into engaging, accessible lessons in just a few steps.</p></div>
+        <div className="section-heading"><span className="spark-left" aria-hidden="true">⌁</span><h2 id="how-title">{t.howTitle}</h2><span className="spark-right" aria-hidden="true">⌁</span><p>{t.howText}</p></div>
         <div className="steps">
-          <article className="step-card"><span className="step-number">1</span><img src={`${assets}step-upload.png`} alt="PDF being uploaded"/><h3>Upload material</h3><p>Add a PDF, document, video <br/>or image from your device.</p></article>
-          <span className="step-arrow" aria-hidden="true">⇢</span>
-          <article className="step-card"><span className="step-number">2</span><img src={`${assets}step-review.png`} alt="Generated lesson preview"/><h3>Review the lesson</h3><p>We turn your content into <br/>a structured, interactive lesson.</p></article>
-          <span className="step-arrow" aria-hidden="true">⇢</span>
-          <article className="step-card"><span className="step-number">3</span><img src={`${assets}step-assign.png`} alt="Three learners"/><h3>Assign to your class</h3><p>Share with your learners <br/>and track their progress.</p></article>
+          {t.steps.map((step, index) => <React.Fragment key={index}>
+            {index > 0 && <span className="step-arrow" aria-hidden="true">⇢</span>}
+            <article className="step-card"><span className="step-number">{index + 1}</span><img src={`${assets}${stepImages[index]}`} alt={step.alt}/><h3>{step.title}</h3><p><Lines text={step.text}/></p></article>
+          </React.Fragment>)}
         </div>
       </section>
 
       <section className="dashboard-section" aria-labelledby="dashboard-title">
-        <div className="dashboard-copy"><h2 id="dashboard-title">Everything you need <br/>to keep lessons moving.</h2><p>Organise your materials, create engaging lessons, assign to classes, and see real progress, all in one simple workspace.</p>
-          <Feature icon="book" title="All your materials in one place">Upload PDFs, videos, images and more.</Feature>
-          <Feature icon="lesson" title="Interactive, accessible lessons">Turn content into activities, quizzes and summaries.</Feature>
-          <Feature icon="chart" title="Track learner progress">See completion, understanding and class insights.</Feature>
+        <div className="dashboard-copy"><h2 id="dashboard-title"><Lines text={t.dashboardTitle}/></h2><p>{t.dashboardText}</p>
+          {t.dashboardFeatures.map((feature, index) => <Feature key={index} icon={['book', 'lesson', 'chart'][index]} title={feature.title}>{feature.text}</Feature>)}
         </div>
-        <img className="dashboard-preview" src={`${assets}dashboard-preview.png`} alt="Educator dashboard preview showing classes, lesson plans, and a lesson path"/>
+        <img className="dashboard-preview" src={`${assets}dashboard-preview.png`} alt={t.dashboardAlt}/>
       </section>
 
       <section className="accessibility-section" aria-labelledby="access-title">
-        <img className="access-preview" src={`${assets}accessibility-preview.png`} alt="Lesson question with text, audio and sign-language explanation options" />
-        <div className="access-copy"><h2 id="access-title">One lesson. <br/>More ways to <br/>understand.</h2><p>Read it, hear it, or watch the explanation in sign language.</p>
-          <Feature icon="document" title="Read">Clear, simple explanations.</Feature>
-          <Feature icon="volume" title="Listen">Hear the question and explanation.</Feature>
-          <Feature icon="hand" title="Watch">See the explanation in sign language.</Feature>
+        <img className="access-preview" src={`${assets}accessibility-preview.png`} alt={t.accessAlt} />
+        <div className="access-copy"><h2 id="access-title"><Lines text={t.accessTitle}/></h2><p>{t.accessText}</p>
+          {t.accessFeatures.map((feature, index) => <Feature key={index} icon={['document', 'volume', 'hand'][index]} title={feature.title}>{feature.text}</Feature>)}
         </div>
       </section>
 
       <section className="progress-section" aria-labelledby="progress-title">
-        <div className="progress-copy"><h2 id="progress-title">Every step feels <br/>like progress.</h2><p>Short, focused lessons help you <br/>build your skills with confidence.</p></div>
-        <img src={`${assets}progress-preview.png`} alt="Water Cycle lesson path alongside correct and incorrect feedback"/>
+        <div className="progress-copy"><h2 id="progress-title"><Lines text={t.progressTitle}/></h2><p><Lines text={t.progressText}/></p></div>
+        <img src={`${assets}progress-preview.png`} alt={t.progressAlt}/>
       </section>
 
-      <section className="benefits-section" aria-labelledby="benefits-title"><h2 id="benefits-title">Built for the whole learning journey.</h2><div className="benefit-grid"><Benefit icon="book" title="Plan with confidence">Turn your existing materials <br/>into clear, structured lessons.</Benefit><Benefit icon="play" title="Learn at your own pace">Short, focused lessons that <br/>fit your time and goals.</Benefit><Benefit icon="bulb" title="Understand every answer">Clear explanations help <br/>you learn and remember.</Benefit></div></section>
+      <section className="benefits-section" aria-labelledby="benefits-title"><h2 id="benefits-title">{t.benefitsTitle}</h2><div className="benefit-grid">{t.benefits.map((benefit, index) => <Benefit key={index} icon={['book', 'play', 'bulb'][index]} title={benefit.title}><Lines text={benefit.text}/></Benefit>)}</div></section>
 
-      <section className="faq-section" aria-labelledby="faq-title"><h2 id="faq-title">Frequently asked questions</h2><div className="faq-list">{faqs.map(([question, answer], index) => <div className="faq-row" key={question}><button aria-expanded={openFaq === index} onClick={() => setOpenFaq(openFaq === index ? null : index)}><span>{question}</span><span className={`chevron ${openFaq === index ? 'open' : ''}`} aria-hidden="true">⌄</span></button>{openFaq === index && <p>{answer}</p>}</div>)}</div></section>
+      <section className="faq-section" aria-labelledby="faq-title"><h2 id="faq-title">{t.faqTitle}</h2><div className="faq-list">{t.faqs.map(([question, answer], index) => <div className="faq-row" key={index}><button aria-expanded={openFaq === index} onClick={() => setOpenFaq(openFaq === index ? null : index)}><span>{question}</span><span className={`chevron ${openFaq === index ? 'open' : ''}`} aria-hidden="true">⌄</span></button>{openFaq === index && <p>{answer}</p>}</div>)}</div></section>
 
-      <section className="final-cta" aria-labelledby="cta-title"><h2 id="cta-title">Make every lesson count.</h2><button className="button button-white" onClick={start}>Get started</button></section>
+      <section className="final-cta" aria-labelledby="cta-title"><h2 id="cta-title">{t.ctaTitle}</h2><button className="button button-white" onClick={start}>{t.getStarted}</button></section>
     </main>
-    <footer className="footer"><Brand light/><nav aria-label="Footer"><a href="#top">About</a><a href="#access-title">Accessibility</a><button onClick={() => setContactOpen(true)}>Contact</button></nav></footer>
+    <footer className="footer"><Brand light label={t.home}/><nav aria-label={t.footer}><a href="#top">{t.about}</a><a href="#access-title">{t.accessibility}</a><button onClick={() => setContactOpen(true)}>{t.contact}</button></nav></footer>
 
-    {contactOpen && <div className="dialog-backdrop" onMouseDown={() => setContactOpen(false)}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="contact-title" onMouseDown={event => event.stopPropagation()}><button className="dialog-close" onClick={() => setContactOpen(false)} aria-label="Close">×</button><Brand/><h2 id="contact-title">Contact SA Educate</h2><p>Contact details will be added when the platform launches.</p></div></div>}
+    {contactOpen && <div className="dialog-backdrop" onMouseDown={() => setContactOpen(false)}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="contact-title" onMouseDown={event => event.stopPropagation()}><button className="dialog-close" onClick={() => setContactOpen(false)} aria-label={t.close}>×</button><Brand label={t.home}/><h2 id="contact-title">{t.contactTitle}</h2><p>{t.contactText}</p></div></div>}
   </>;
 }
 
-function LogoCarousel() {
+function LogoCarousel({ previous, next }) {
   const viewportRef = useRef(null);
   const pauseUntilRef = useRef(0);
   const hoveringRef = useRef(false);
@@ -172,11 +179,11 @@ function LogoCarousel() {
     viewport.scrollBy({ left: direction * step, behavior: reducedMotion ? 'auto' : 'smooth' });
   };
   return <div className="logo-carousel" onMouseEnter={() => { hoveringRef.current = true; }} onMouseLeave={() => { hoveringRef.current = false; }} onFocus={() => { hoveringRef.current = true; }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) hoveringRef.current = false; }}>
-    <button className="carousel-arrow" onClick={() => move(-1)} aria-label="Previous logos">‹</button>
+    <button className="carousel-arrow" onClick={() => move(-1)} aria-label={previous}>‹</button>
     <div className="logo-viewport" ref={viewportRef} role="img" aria-label={logos.map(item => item.alt).join(', ')}>
       <div className="logo-track">{[0, 1, 2].map(copy => <div className="logo-set" aria-hidden="true" key={copy}>{logos.map(item => <div className="logo-item" key={`${copy}-${item.src}`}><img src={`${assets}${item.src}`} alt="" /></div>)}</div>)}</div>
     </div>
-    <button className="carousel-arrow" onClick={() => move(1)} aria-label="Next logos">›</button>
+    <button className="carousel-arrow" onClick={() => move(1)} aria-label={next}>›</button>
   </div>;
 }
 

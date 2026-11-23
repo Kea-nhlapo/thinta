@@ -10,12 +10,16 @@ const STORAGE_KEY = 'sae-question-language';
 // One chosen language for every question screen, kept across screens and reloads.
 let current = (() => { try { return LANGUAGES[localStorage.getItem(STORAGE_KEY)] ? localStorage.getItem(STORAGE_KEY) : 'en'; } catch { return 'en'; } })();
 const listeners = new Set();
+// <html lang> follows the choice, so screen readers pronounce the page in the right language.
+const markPage = () => { if (typeof document !== 'undefined') document.documentElement.lang = current; };
+markPage();
 export function setQuestionLanguage(language) {
   current = language;
   try { localStorage.setItem(STORAGE_KEY, language); } catch {}
+  markPage();
   listeners.forEach(listener => listener());
 }
-const useQuestionLanguageCode = () => useSyncExternalStore(listener => { listeners.add(listener); return () => listeners.delete(listener); }, () => current);
+export const useQuestionLanguageCode = () => useSyncExternalStore(listener => { listeners.add(listener); return () => listeners.delete(listener); }, () => current);
 
 const translations = new Map();
 // Labels such as "X", "Q3.1" or "2/4" stay as they are; translating them only garbles them.

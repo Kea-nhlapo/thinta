@@ -13,3 +13,6 @@
 .sae-learn-versions button[aria-pressed="true"] { color: #fff; background: #0076e9; }
 .sae-learn-start { display: inline-block; border: 0; border-radius: 10px; padding: 12px 20px; font: inherit; font-weight: 800; color: #fff; background: linear-gradient(90deg, #0076e9, #1aa3f0); cursor: pointer; text-decoration: none; }
 .sae-learn-start.outline { color: #0076e9; background: #fff; border: 2px solid #0076e9; }
+/* Phone-sized tap targets: the header links and lesson buttons are at least 44px tall. */
+.sae-learn > header a, .sae-learn > header button { display: inline-flex; align-items: center; min-height: 44px; }
+.sae-learn-versions button, .sae-learn-start { min-height: 44px; }
