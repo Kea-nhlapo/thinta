@@ -244,3 +244,43 @@
   .final-cta h2{font-size:clamp(32px,10vw,42px);margin-bottom:20px}
   .button-white{min-width:0;width:min(100%,300px)}
 }
+
+/* Phones, all three languages: isiZulu and Sepedi words run much longer than English, so the desktop-style
+   headings (40-47px, tight lines, squeezed letters) packed them together. Headings scale with the screen,
+   lines get room to breathe, and the letter squeeze is mostly undone. */
+@media (max-width:760px){
+  .hero h1{font-size:clamp(31px,9.2vw,40px);line-height:1.12;letter-spacing:-.02em;margin-bottom:16px}
+  .section-heading h2,.dashboard-copy h2,.access-copy h2,.progress-copy h2,.benefits-section h2,.faq-section h2,.final-cta h2{font-size:clamp(26px,7.6vw,33px);line-height:1.16;letter-spacing:-.015em;margin-bottom:14px}
+  .collaborators h2{font-size:19px;line-height:1.25}
+  .hero p{font-size:17px;line-height:1.5;letter-spacing:0}
+  .section-heading p,.dashboard-copy>p,.access-copy>p,.progress-copy p{font-size:17px;line-height:1.5}
+  .access-copy>p{font-weight:600}
+  .step-card{height:auto}
+  .step-card h3{font-size:21px;line-height:1.22;letter-spacing:-.01em;margin-bottom:8px}
+  .step-card p{font-size:16px;line-height:1.5}
+  .feature,.access-copy .feature{margin:20px 0}
+  .feature h3,.access-copy .feature h3{font-size:18px;line-height:1.25;letter-spacing:-.01em}
+  .feature p,.access-copy .feature p{font-size:15.5px;line-height:1.5}
+  .benefit{min-height:0}
+  .benefit h3{font-size:18px;line-height:1.25;letter-spacing:-.01em}
+  .benefit p{font-size:15.5px;line-height:1.5}
+  .faq-row button{font-size:16px;text-align:left}
+  .button{white-space:normal;text-align:center;padding-block:12px}
+  .hero-buttons{gap:12px}
+  .language-control select{max-width:none;min-width:84px}
+  .header-actions{gap:8px}
+  .footer nav{flex-wrap:wrap;row-gap:12px}
+}
+@media (max-width:380px){
+  .brand{font-size:20px}
+  .brand svg{width:36px;height:36px}
+  .language-control select{min-width:76px;font-size:13px}
+  .sign-in{padding-inline:10px;font-size:13px}
+}
+@media (max-width:340px){
+  .header-inner{max-width:calc(100% - 24px)}
+  .brand{font-size:18px;gap:3px}
+  .brand svg{width:32px;height:32px}
+  .header-actions{gap:4px}
+  .language-control select{min-width:70px}
+}
