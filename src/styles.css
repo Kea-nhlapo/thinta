@@ -202,3 +202,45 @@
   .collaborators,.logo-carousel{height:76px}
   .logo-item{height:67px}
 }
+
+/* Tablet: the language list is a full-size tap target too. */
+@media (max-width:1100px){.language-control select{min-height:44px}}
+
+/* Phone pass (375-414px, checked in English, isiZulu and Sepedi, which run longer): no blank band under the
+   hero, 44px tap targets, room between sections, and long words that wrap instead of overflowing. */
+@media (max-width:760px){
+  .hero h1,.section-heading h2,.dashboard-copy h2,.access-copy h2,.progress-copy h2,.benefits-section h2,.faq-section h2,.final-cta h2{overflow-wrap:break-word;hyphens:auto;line-height:1.05}
+  .site-header{height:auto;min-height:72px;padding-block:8px}
+  .header-actions{gap:6px}
+  .language-control{min-height:44px;display:flex;align-items:center}
+  .language-control select{width:auto;max-width:96px;min-height:44px;padding:0 4px;font-size:14px}
+  .sign-in{height:44px;padding-inline:12px;font-size:14px}
+  .hero{min-height:0}
+  .hero-inner{padding-bottom:20px}
+  .hero p{line-height:1.35}
+  .button{min-height:52px;padding-inline:16px;line-height:1.2}
+  .logo-carousel{grid-template-columns:44px minmax(0,1fr) 44px}
+  .carousel-arrow{width:44px;height:44px}
+  .how-section{padding:44px 20px 48px}
+  .section-heading p{line-height:1.4}
+  .step-card{min-height:0;padding:26px 18px 22px}
+  .step-card p{line-height:1.35}
+  .dashboard-section,.progress-section{padding-bottom:40px}
+  .dashboard-section,.accessibility-section,.progress-section,.benefits-section,.faq-section{padding-left:20px;padding-right:20px}
+  .dashboard-copy>p,.access-copy>p,.progress-copy p{line-height:1.4}
+  .feature{gap:14px;margin:14px 0;align-items:flex-start}
+  .feature h3{line-height:1.2;margin-bottom:4px}
+  .feature p{line-height:1.35}
+  .progress-section img{max-width:100%;height:auto}
+  .benefit{gap:14px;padding:18px 16px;align-items:flex-start}
+  .benefit-icon{width:56px;height:56px}
+  .benefit-icon svg{width:32px;height:32px}
+  .benefit h3{line-height:1.2;margin-bottom:6px}
+  .benefit p{line-height:1.4}
+  .faq-row button{min-height:64px;padding:14px 0;gap:12px;line-height:1.3}
+  .chevron{flex:none;width:44px;height:44px;display:grid;place-items:center;font-size:30px;line-height:0;padding-bottom:14px}
+  .faq-row p{line-height:1.5;margin:0 0 18px}
+  .final-cta{padding:48px 20px 52px}
+  .final-cta h2{font-size:clamp(32px,10vw,42px);margin-bottom:20px}
+  .button-white{min-width:0;width:min(100%,300px)}
+}

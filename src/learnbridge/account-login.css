@@ -4,7 +4,7 @@
 .lb-role button { flex: 1; font: inherit; font-weight: 800; border: 0; border-radius: 9px; padding: 12px; background: transparent; color: #40536d; cursor: pointer; }
 .lb-role button.on { background: #fff; color: #0c5bd0; box-shadow: 0 2px 8px #07192c1a; }
 .lb-account-error { color: #b42318 !important; font-weight: 700; margin: 4px 0 14px; }
-.lb-account-switch { font: inherit; font-weight: 800; color: #0781da; background: none; border: 0; padding: 0; cursor: pointer; }
+.lb-account-switch { font: inherit; font-weight: 800; color: #0781da; background: none; border: 0; padding: 0 6px; min-height: 44px; cursor: pointer; }
 .lb-account .brand, .lb-account .lb-account-switch { color: #0566b0; }
 
 .lb-account-needs { text-align: left; border: 1.5px solid #cbd9e5; border-radius: 10px; padding: 10px 14px 12px; margin: 14px 0; }
@@ -12,4 +12,4 @@
 .lb-account-needs label { display: flex !important; align-items: center; gap: 10px; margin: 8px 0 !important; font-size: 15px !important; color: #10243f !important; cursor: pointer; }
 .lb-account-needs input[type=checkbox] { width: 20px; height: 20px !important; accent-color: #0c5bd0; }
 .lb-account-needs .lb-account-language { justify-content: space-between; }
-.lb-account-needs select { font: inherit; padding: 6px 10px; border: 1.5px solid #cbd9e5; border-radius: 8px; }
+.lb-account-needs select { font: inherit; padding: 6px 10px; min-height: 44px; border: 1.5px solid #cbd9e5; border-radius: 8px; }

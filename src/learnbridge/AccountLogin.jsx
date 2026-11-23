@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { signIn, createAccount, homeFor, getProfile, NEEDS } from './accounts.js';
 import { applyProfile, resetQuizChoices } from './learner-profile.js';
-import { LANGUAGES, setQuestionLanguage } from './QuestionLanguage.jsx';
+import { LANGUAGES, setQuestionLanguage, useQuestionLanguageCode } from './QuestionLanguage.jsx';
 import './account-login.css';
 
 const MailIcon = () => <span aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m4 7 8 6 8-6"/></svg></span>;
@@ -12,7 +12,9 @@ const PersonIcon = () => <span aria-hidden="true"><svg viewBox="0 0 24 24"><circ
 
 export function AccountLogin({ Btn, Brand, onTeacher }) {
   const [mode, setMode] = useState('signin');
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'learner', needs: [], language: 'en' });
+  // A new account starts in the language picked on the landing page.
+  const chosenLanguage = useQuestionLanguageCode();
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'learner', needs: [], language: chosenLanguage });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const field = key => ({ value: form[key], onChange: event => setForm(f => ({ ...f, [key]: event.target.value })) });
